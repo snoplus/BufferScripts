@@ -1,0 +1,3 @@
+#! /bin/bash
+
+tail -f -c +1 jobqueue | parallel -j8 --retries 4 --progress

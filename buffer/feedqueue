@@ -1,0 +1,46 @@
+#! /bin/bash
+
+while true
+do
+  if [ $(ls closed -l | wc -l) -gt 1 ]
+    then
+# This elaborate command finds the alphabetically first file
+# among those with the oldest time-stamp
+      FILE=$( ls closed -l | grep `ls closed -lt | tail -n1 | awk 'BEGIN {FS=" "}{print $8}'` | head -n1 | awk 'BEGIN {FS=" "}{print $9}' )
+      NUM=`echo $FILE | awk 'BEGIN {FS="_"}{print $2}'`
+      CHUNK=`echo $FILE | awk 'BEGIN {FS="_"}{print $3}'`
+      cat > /tmp/fitter.sh.$NUM.mac << EOF
+    
+/rat/db/set DETECTOR geo_file "geo/snoplus.geo"
+
+/run/initialize
+/rat/proc calibratePMT
+/rat/proc count
+/rat/procset update 10
+/rat/proc burst
+/rat/procset fBurstTrigName "Burst"
+/rat/proc fitter
+/rat/procset method "quad"
+/rat/proc filter
+/rat/procset chunk $CHUNK
+/rat/procset index $NUM
+/rat/proc monitor
+/rat/procset chunk $CHUNK
+/rat/procset index $NUM
+/rat/proc outroot
+/rat/procset filter "true"
+/rat/procset file "$FILE.root"
+
+/rat/inzdab/read processed/$FILE
+EOF
+
+    echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log >> jobqueue
+    echo added job $NUM to queue
+
+    mv ./closed/$FILE ./processed/$FILE
+  
+  else
+    sleep 1
+  fi
+
+done

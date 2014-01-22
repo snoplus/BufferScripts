@@ -1,0 +1,32 @@
+#! /bin/bash
+
+DIR=data_temp
+LOG=server.log
+FL=served.txt
+
+while true
+do
+# Get list of files needing serving
+    echo $(ls -tr $DIR/*.zdab) > ls.txt
+
+    if [ $(comm -23 ls.txt $FL | wc -l) -gt 0 ]
+        then
+            FILE=$(comm -23 ls.txt $FL | head -n 1)
+    else
+        sleep 1
+        echo Waiting for data > server.log
+    fi
+
+# If we have a new file, serve it and the filename to the buffer
+    cat > tmp/filename.txt << EOF
+
+$FILE
+EOF
+
+    echo Pushing $FILE to pipe
+    tail -c +1 tmp/filename.txt > pipe
+    tail -f -c +1 $DIR/$FILE > pipe
+    echo $FILE > server.log
+    echo $FILE > $FL 
+
+done

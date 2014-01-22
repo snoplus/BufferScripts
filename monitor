@@ -1,0 +1,6 @@
+#! /bin/bash
+
+./builder/server &
+./buffer/client &
+./buffer/feedrat
+
