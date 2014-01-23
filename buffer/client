@@ -12,6 +12,9 @@ HOST=snotpenn01
 USER=snoplus
 PSWD=scintillate
 
+# Save the last job in the last file
+OLDJOB=0
+
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
 {
@@ -23,8 +26,22 @@ trap exit 2
 
 while true
 do
+# For each file coming from the builder, first receive the filename
+# then, receive the file; finally, write list of jobs associated to run
+
     FILE=$(ssh $BUILDER cat $PIPE)
 
     ssh $BUILDER cat $PIPE | ourtee -a $FILE \
                            | ./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD 
+
+    RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
+    JOB=$( ls -tr closed/chopped* | tail -n1 | awk 'BEGIN {FS="_"}{print $2}' )
+
+    for ((j=$OLDJOB+1; j<=$JOB; j++))
+    do
+        cat $j >> $RUN.chopper.log
+    done
+
+    OLDRUN=$RUN
+
 done
