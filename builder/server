@@ -7,7 +7,7 @@ FL=served.txt
 while true
 do
 # Get list of files needing serving
-    echo $(ls -tr $DIR/*.zdab) > ls.txt
+    ls -tr $DIR/*.zdab > ls.txt
 
     if [ $(comm -23 ls.txt $FL | wc -l) -gt 0 ]
         then
@@ -25,8 +25,8 @@ EOF
 
     echo Pushing $FILE to pipe
     tail -c +1 tmp/filename.txt > pipe
-    tail -f -c +1 $DIR/$FILE > pipe
-    echo $FILE > server.log
-    echo $FILE > $FL 
+    tail -f -c +1 $FILE > pipe
+    echo $FILE >> server.log
+    echo $FILE >> $FL 
 
 done
