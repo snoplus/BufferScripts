@@ -1,6 +1,6 @@
 #! /bin/bash
 
-DIR=data_temp
+DIR=~/data_temp
 LOG=server.log
 FL=served.txt
 
