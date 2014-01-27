@@ -30,18 +30,21 @@ do
 # then, receive the file; finally, write list of jobs associated to run
 
     FILE=$(ssh $BUILDER cat $PIPE)
+    RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
 
-    ssh $BUILDER cat $PIPE | ourtee -a $FILE \
-                           | ./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD 
+    ssh $BUILDER cat $PIPE | ourtee -a $RUN \
+                           | (./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD; echo true > /mnt/builder/filereceived) 
 
-    RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
-    JOB=$( ls -tr closed/chopped* | tail -n1 | awk 'BEGIN {FS="_"}{print $2}' )
+    echo Finished chopping
 
-    for ((j=$OLDJOB+1; j<=$JOB; j++))
-    do
-        cat $j >> $RUN.chopper.log
-    done
-
-    OLDRUN=$RUN
+    JOB=$( ls -tr closed/chopped* | tail -n 1 | awk 'BEGIN {FS="_"}{print $2}' )
+#
+#    for ((j=$OLDJOB+1; j<=$JOB; j++))
+#    touch $RUN.chopper.log
+#    do
+#        cat $j >> $RUN.chopper.log
+#    done
+#
+#    OLDRUN=$RUN
 
 done

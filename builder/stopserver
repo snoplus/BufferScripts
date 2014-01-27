@@ -1,0 +1,17 @@
+#! /bin/bash
+FILE=/Users/snotdaq/data_temp/filereceived
+
+while true
+do
+
+    if [ -f $FILE ]
+        then
+            echo File received
+            kill $(pgrep tail)
+            rm $FILE
+        else
+            echo waiting
+            sleep 1
+    fi
+
+done
