@@ -1,6 +1,128 @@
 #! /bin/bash
 
-./builder/server &
-./buffer/client &
-./buffer/feedrat
+# Variables in which to store PIDs of the various monitoring scripts
+stopserverpid=0
+serverpid=0
+clientpid=0
+feedqueuepid=0
+batchpid=0
 
+while true
+do
+
+    echo Welcome to the UChicago SNO+ Monitoring Tools user interface
+    echo For simple usage, select "Start" to start all scripts and "Stop" to stop all scripts
+    echo If you know what you are doing, select "Details" to start or stop specific scripts
+
+    options=("Start" "Stop" "Details" "Status" "Quit")
+    select opt in "${options[@]}"
+	do
+	    case $opt in
+        	"Start")
+	            echo Starting monitoring scripts
+        	    ssh $BUILDER ~/Users/server/stopserver &
+	            stopserverpid=$(jobs -l | awk {print $2})
+        	    ssh $BUILDER ~/Users/server/server &
+	            serverpid=$(jobs -l | awk {print $2})
+        	    buffer/client &
+	            clientpid=$(jobs -l | awk {print $2})
+        	    buffer/feedqueue &
+	            feedqueuepid=$(jobs -l | awk {print $2})
+        	    buffer/batch &
+	            batchpid=$(jobs -l | awk {print $2})
+        	    ;;
+	        "Stop")
+        	    echo Killing monitoring processes
+                    if [ $serverpid -ne 0 ]
+                    then
+	                kill $serverpid
+                    fi
+                    if [ $clientpid -ne 0 ]
+                    then
+        	        kill $clientpid
+                    fi
+                    if [ $stopserverpid -ne 0 ]
+                    then
+	                kill $stopserverpid
+                    fi
+                    if [ $feedqueuepid -ne 0 ]
+                    then
+        	        kill $feedqueuepid
+                    fi
+                    if [ $batchpid -ne 0 ]
+                    then
+	                kill $batchpid
+                    fi
+        	    ;;
+	        "Details")
+        	    echo Here are the processes running at this time:
+                    if [ $stopserverpid -ne 0 ]
+                    then
+                        echo -e stopserver \t $stopserverpid
+                    else
+                        NO="stopserver\n" 
+                    fi
+                    if [ $serverpid -ne 0 ]
+                    then
+                        echo -e server \t $serverpid
+                    else
+                        NO+="server\n"
+                    fi
+                    if [ $clientpid -ne 0 ]
+                    then
+                        echo -e client \t $clientpid
+                    else
+                        NO+="client\n"
+                    fi
+                    if [ $feedqueuepid -ne 0 ]
+                    then
+                        echo -e feedqueue \t $feedqueuepid
+                    else
+                        NO+="feedqueue\n"
+                    fi
+                    if [ $batchpid -ne 0 ]
+                    then
+                        echo -e batch \t $batchpid
+                    else
+                        NO+="batch\n"
+                    fi
+                    echo Here are the processes not running at this time:
+                    echo -e $NO
+                    echo Select below to start or stop particular processes
+                    echo If you have arrived here by mistake, select cancel
+                    detailoptions=("Start" "Stop" "Cancel")
+                    select opt2 in "${detailoptions[@]}"
+                        do
+                            case $opt2 in
+                                "Start")
+                                    ;;
+                                "Stop")
+                                    ;;
+                                "Cancel")
+                                    ;;
+                            esac
+                        done
+	            ;;
+                "Status")
+                    echo Process statuses will appear here
+                    ;;
+                "Quit")
+                    if [[ $stopserverpid -eq 0 && \
+                          $serverpid -eq 0 && \
+                          $clientpid -eq 0 && \
+                          $feedqueuepid -eq 0 && \
+                          $batchpid -eq 0 ]];
+                    then
+                        echo Goodbye
+                        exit
+                    else
+                        echo You have unstopped processes.  Please stop all processes before
+                        echo exiting the user interface, or it will be a pain to recover.
+                    fi
+                    ;;
+        	*)
+	            echo Invalid option
+        	    ;;
+	    esac
+	done
+done
