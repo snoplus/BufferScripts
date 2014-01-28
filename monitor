@@ -95,10 +95,16 @@ do
                         do
                             case $opt2 in
                                 "Start")
+                                    echo This will let you start scripts
                                     ;;
                                 "Stop")
+                                    echo This will let you stop scripts
                                     ;;
                                 "Cancel")
+                                    echo Returning to main menu
+                                    ;;
+                                *)
+                                    echo Invalid selection.  Try again.
                                     ;;
                             esac
                         done
