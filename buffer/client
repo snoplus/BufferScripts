@@ -31,20 +31,21 @@ do
 
     FILE=$(ssh $BUILDER cat $PIPE)
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
+    BIGFILE=$( $FILE | awk 'BEGIN {FS="/"}{print $4}' )
 
-    ssh $BUILDER cat $PIPE | ourtee -a $RUN \
-                           | (./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD; echo true > /mnt/builder/filereceived) 
+    ssh $BUILDER cat $PIPE | ourtee -a $BIGFILE \
+                           | (./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD; ssh $BUILDER echo true > /Users/snotdaq/server/filereceived) 
 
     echo Finished chopping
 
     JOB=$( ls -tr closed/chopped* | tail -n 1 | awk 'BEGIN {FS="_"}{print $2}' )
-#
-#    for ((j=$OLDJOB+1; j<=$JOB; j++))
-#    touch $RUN.chopper.log
-#    do
-#        cat $j >> $RUN.chopper.log
-#    done
-#
-#    OLDRUN=$RUN
+    LOG=$RUN.chopper.log
+
+    for ((j=$OLDJOB+1; j<=$JOB; j++))
+    do
+        echo $j >> $LOG
+    done
+
+    OLDJOB=$JOB
 
 done
