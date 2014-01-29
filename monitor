@@ -1,5 +1,7 @@
 #! /bin/bash
 
+BUILDER=snotdaq@snoplusbuilder1.snolab.ca
+
 # Variables in which to store PIDs of the various monitoring scripts
 stopserverpid=0
 serverpid=0
@@ -7,12 +9,165 @@ clientpid=0
 feedqueuepid=0
 batchpid=0
 
+#This function prints the main menu options
+function printmenu {
+    echo "1) Start"
+    echo "2) Stop"
+    echo "3) Details"
+    echo "4) Status"
+    echo "5) Quit"
+}
+function printdetailmenu {
+    echo "1) Start"
+    echo "2) Stop"
+    echo "3) Cancel"
+}
+
+# This function prints lists of running and not-running processes
+function processes {
+    echo Here are the processes running at this time:
+    if [ $stopserverpid -ne 0 ]
+    then
+        echo -e \t stopserver \t $stopserverpid
+    else
+        NO="\tstopserver\n"
+    fi
+    if [ $serverpid -ne 0 ]
+    then
+        echo -e \t server \t $serverpid
+    else
+        NO+="\tserver\n"
+    fi
+    if [ $clientpid -ne 0 ]
+    then
+        echo -e \t client \t $clientpid
+    else
+        NO+="\tclient\n"
+    fi
+    if [ $feedqueuepid -ne 0 ]
+    then
+        echo -e \t feedqueue \t $feedqueuepid
+    else
+        NO+="\tfeedqueue\n"
+    fi
+    if [ $batchpid -ne 0 ]
+    then
+        echo -e \t batch \t $batchpid
+    else
+        NO+="\tbatch\n"
+    fi
+    echo Here are the processes not running at this time:
+    echo -e $NO
+}
+
+#These functions allow you to select particular processes for action
+function startselect {
+    echo Select the number of the script you wish to start.
+    echo If you do not wish to start any processes at this time, select cancel to return to the previous menu.
+    startoptions=("server" "client" "stopserver" "feedqueue" "batch" "cancel")
+    select opt3 in "${startoptions[@]}"
+        do
+            case $opt3 in
+                "server")
+                    if [ $serverpid -eq 0 ]
+                    then
+                        ssh $BUILDER ~/Users/snotdaq/server/server &
+                        serverpid=$(jobs -l | awk {print $2})
+                    else
+                        echo server already running.  You must stop server before starting it again.
+                    fi
+                    ;;
+                "client")
+                    if [ $clientpid -eq 0 ]
+                    then
+                        buffer/client &
+                        clientpid=$(jobs -l | awk {print $2})
+                    else
+                        echo client already running.  You must stop client before starting it again.
+                    fi
+                    ;;
+                "stopserver")
+                    if [ $stopserverpid -eq 0 ]
+                    then
+                        ssh $BUILDER ~/Users/snotdaq/server/stopserver &
+                        stopserverpid=$(jobs -l | awk {print $2})
+                    else
+                        echo stopserver already running.  You must stop stopserver before starting it again.
+                    fi
+                    ;;
+                "feedqueue")
+                    if [ $feedqueuepid -eq 0 ]
+                    then
+                        buffer/feedqueue &
+                        feedqueuepid=$(jobs -l | awk {print $2})
+                    else
+                        echo feedqueue already running.  You must stop feedqueue before starting it again.
+                    fi
+                    ;;
+                "batch")
+                    if [ $batchpid -eq 0 ]
+                    then
+                        buffer/batch &
+                        batchpid=$(jobs -l | awk {print $2})
+                    else
+                        echo batch already running.  You must stop batch before starting it again.
+                    fi
+                    ;;
+                "cancel")
+                    echo Returning to previous menu
+                    printdetailmenu
+                    break
+                    ;;
+                *)
+                    echo Invalid option.  Try again.
+                    ;;
+            esac
+        done
+}
+
+function stopselect {
+    echo Enter the number of the process you wish to stop.
+}
+
+# This function is the submenu for the details option
+function details {
+    detailoptions=("Start" "Stop" "Cancel")
+    select opt2 in "${detailoptions[@]}"
+        do
+            case $opt2 in
+                "Start")
+                    startselect
+                    ;;
+                "Stop")
+                    stopselect
+                    ;;
+                "Cancel")
+                    echo Returning to main menu
+                    break
+                    ;;
+                *)
+                    echo Invalid selection.  Try again.
+                    ;;
+            esac
+        done
+}
+
+#
+# MAIN LOOP BEGINS HERE
+#
 while true
 do
 
-    echo Welcome to the UChicago SNO+ Monitoring Tools user interface
-    echo For simple usage, select "Start" to start all scripts and "Stop" to stop all scripts
-    echo If you know what you are doing, select "Details" to start or stop specific scripts
+    echo "*********************************************************************************"
+    echo "**       Welcome to the UChicago SNO+ Monitoring Tools user interface          **"
+    echo "**                                                                             **"
+    echo "**  For simple usage, select "Start" to start all scripts and "Stop" to stop       **"
+    echo "**  all scripts.  If you know what you are doing, select "Details" to start or   **"
+    echo "**  stop specific scripts.  "Status" will report on the progress of the data     **"
+    echo "**  through the script chain.  To exit the user interface, select "Quit" after   **"
+    echo "**  stopping all processes.                                                    **"
+    echo "**                                                                             **"
+    echo "*********************************************************************************"
 
     options=("Start" "Stop" "Details" "Status" "Quit")
     select opt in "${options[@]}"
@@ -30,6 +185,7 @@ do
 	            feedqueuepid=$(jobs -l | awk {print $2})
         	    buffer/batch &
 	            batchpid=$(jobs -l | awk {print $2})
+                    printmenu
         	    ;;
 	        "Stop")
         	    echo Killing monitoring processes
@@ -53,64 +209,18 @@ do
                     then
 	                kill $batchpid
                     fi
+                    printmenu
         	    ;;
 	        "Details")
-        	    echo Here are the processes running at this time:
-                    if [ $stopserverpid -ne 0 ]
-                    then
-                        echo -e stopserver \t $stopserverpid
-                    else
-                        NO="stopserver\n" 
-                    fi
-                    if [ $serverpid -ne 0 ]
-                    then
-                        echo -e server \t $serverpid
-                    else
-                        NO+="server\n"
-                    fi
-                    if [ $clientpid -ne 0 ]
-                    then
-                        echo -e client \t $clientpid
-                    else
-                        NO+="client\n"
-                    fi
-                    if [ $feedqueuepid -ne 0 ]
-                    then
-                        echo -e feedqueue \t $feedqueuepid
-                    else
-                        NO+="feedqueue\n"
-                    fi
-                    if [ $batchpid -ne 0 ]
-                    then
-                        echo -e batch \t $batchpid
-                    else
-                        NO+="batch\n"
-                    fi
-                    echo Here are the processes not running at this time:
-                    echo -e $NO
+                    processes
                     echo Select below to start or stop particular processes
-                    echo If you have arrived here by mistake, select cancel
-                    detailoptions=("Start" "Stop" "Cancel")
-                    select opt2 in "${detailoptions[@]}"
-                        do
-                            case $opt2 in
-                                "Start")
-                                    echo This will let you start scripts
-                                    ;;
-                                "Stop")
-                                    echo This will let you stop scripts
-                                    ;;
-                                "Cancel")
-                                    echo Returning to main menu
-                                    ;;
-                                *)
-                                    echo Invalid selection.  Try again.
-                                    ;;
-                            esac
-                        done
+                    echo If you wish to return to the main menu, select cancel.
+                    details
+                    printmenu
 	            ;;
                 "Status")
                     echo Process statuses will appear here
+                    printmenu
                     ;;
                 "Quit")
                     if [[ $stopserverpid -eq 0 && \
