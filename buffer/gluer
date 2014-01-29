@@ -4,16 +4,23 @@ while true
 do
 
     OLDRUN=0
-    RUN=$()
+    OLDFILE=$(ls -t buffer | grep .chopper.log | tail -n 1)
+    RUN=$( cat $OLDFILE | awk 'BEGIN {FS="."}{print $1}' )
+    NEWFILE=($RUN+1).chopper.log
 
-    while [RUN+1 does not exist]
+    while [ ! -f $NEWFILE ];
     do
         sleep 1
     done
 
     OLDRUN=$RUN
     RUN=$RUN+1
+    BIGFILE=$RUN.filtered.root
 
-    for JOBS in OLDRUN file
+    for i in `cat $OLDFILE`;
+    do
+        FILTER=chopped_$i_1.00_0.00.zdab.root
+        hadd FILTER
+    done
 
 done
