@@ -1,0 +1,19 @@
+#! /bin/bash
+
+while true
+do
+
+    OLDRUN=0
+    RUN=$()
+
+    while [RUN+1 does not exist]
+    do
+        sleep 1
+    done
+
+    OLDRUN=$RUN
+    RUN=$RUN+1
+
+    for JOBS in OLDRUN file
+
+done
