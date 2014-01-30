@@ -157,6 +157,8 @@ function details {
 #
 # MAIN LOOP BEGINS HERE
 #
+source ~/rat_env.sh
+
 while true
 do
 
@@ -183,9 +185,9 @@ do
                           "$batchpid" -eq 0 ]];
                     then
                         echo Starting monitoring scripts
-        	        ssh $BUILDER /Users/server/stopserver &
+        	        ssh $BUILDER /Users/snotdaq/server/stopserver &
 	                stopserverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	        ssh $BUILDER /Users/server/server &
+        	        ssh $BUILDER /Users/snotdaq/server/server &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	        buffer/client &
 	                clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
