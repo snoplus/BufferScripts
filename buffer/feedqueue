@@ -4,7 +4,7 @@ DIR=$(dirname $0)
 LOG=jobqueue.log
 
 rm jobqueue
-if [ $(ls processed -l | wc -l) -gt 1 ]
+if [ "$(ls processed -l | wc -l)" -gt 1 ]
 then
     for filename in DIR/processed/*
     do
@@ -15,7 +15,7 @@ fi
 
 while true
 do
-  if [ $(ls $DIR/closed -l | wc -l) -gt 1 ]
+  if [ "$(ls $DIR/closed -l | wc -l)" -gt 1 ]
     then
 # This elaborate command finds the alphabetically first file
 # among those with the oldest time-stamp
