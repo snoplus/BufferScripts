@@ -1,5 +1,17 @@
 #! /bin/bash
 
+LOG=jobqueue.log
+
+rm jobqueue
+if [ $(ls processed -l | wc -1) -gt 1 ]
+then
+    for filename in processed/*
+    do
+        echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
+        echo added job $NUM to queue >> $LOG
+    done
+fi
+
 while true
 do
   if [ $(ls closed -l | wc -l) -gt 1 ]
@@ -34,8 +46,8 @@ do
 /rat/inzdab/read processed/$FILE
 EOF
 
-    echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log >> jobqueue
-    echo added job $NUM to queue
+    echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
+    echo added job $NUM to queue >> $LOG
 
     mv ./closed/$FILE ./processed/$FILE
   
