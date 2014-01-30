@@ -5,7 +5,7 @@
 
 # Specifying where to read from
 BUILDER=snotdaq@snoplusbuilder1.snolab.ca
-PIPE=server/pipe
+PIPE=/Users/snotdaq/server/pipe
 LOG=client.log
 DIR=$(dirname $0)
 
@@ -36,7 +36,7 @@ do
     BIGFILE=$( $FILE | awk 'BEGIN {FS="/"}{print $4}' )
 
     ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
-                           | (./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD >> $LOG; ssh $BUILDER echo true > /Users/snotdaq/server/filereceived) 
+                           | ($DIR/chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD >> $LOG; ssh $BUILDER echo true > /Users/snotdaq/server/filereceived) 
 
     echo Finished chopping >> $LOG
 

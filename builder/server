@@ -1,7 +1,7 @@
 #! /bin/bash
 DIR=$(dirname $0)
 DATA=~/data_temp
-LOG=server.log
+LOG=$DIR/server.log
 FL=$DIR/served.txt
 
 while true
@@ -24,8 +24,8 @@ $FILE
 EOF
 
     echo Pushing $FILE to pipe >> $LOG
-    tail -c +1 $DIR/tmp/filename.txt > pipe
-    tail -f -c +1 $FILE > pipe
+    tail -c +1 $DIR/tmp/filename.txt > $DIR/pipe
+    tail -f -c +1 $FILE > $DIR/pipe
     echo Reached end of $FILE >> $LOG
     echo $FILE >> $LOG
     echo $FILE >> $FL 

@@ -4,11 +4,11 @@ DIR=$(dirname $0)
 LOG=jobqueue.log
 
 rm jobqueue
-if [ "$(ls processed -l | wc -l)" -gt 1 ]
+if [ "$(ls $DIR/processed -l | wc -l)" -gt 1 ]
 then
     for filename in $DIR/processed/*
     do
-        echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
+        echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> $DIR/jobqueue
         echo added job $NUM to queue >> $LOG
     done
 fi
@@ -47,7 +47,7 @@ do
 /rat/inzdab/read processed/$FILE
 EOF
 
-    echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
+    echo "rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac" >> $DIR/jobqueue
     echo added job $NUM to queue >> $LOG
 
     mv $DIR/closed/$FILE $DIR/processed/$FILE
