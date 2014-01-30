@@ -28,31 +28,31 @@ function printdetailmenu {
 # This function prints lists of running and not-running processes
 function processes {
     echo Here are the processes running at this time:
-    if [ $stopserverpid -ne 0 ]
+    if [ "$stopserverpid" -ne 0 ]
     then
         echo -e \t stopserver \t $stopserverpid
     else
         NO="\tstopserver\n"
     fi
-    if [ $serverpid -ne 0 ]
+    if [ "$serverpid" -ne 0 ]
     then
         echo -e \t server \t $serverpid
     else
         NO+="\tserver\n"
     fi
-    if [ $clientpid -ne 0 ]
+    if [ "$clientpid" -ne 0 ]
     then
         echo -e \t client \t $clientpid
     else
         NO+="\tclient\n"
     fi
-    if [ $feedqueuepid -ne 0 ]
+    if [ "$feedqueuepid" -ne 0 ]
     then
         echo -e \t feedqueue \t $feedqueuepid
     else
         NO+="\tfeedqueue\n"
     fi
-    if [ $batchpid -ne 0 ]
+    if [ "$batchpid" -ne 0 ]
     then
         echo -e \t batch \t $batchpid
     else
@@ -71,7 +71,7 @@ function startselect {
         do
             case $opt3 in
                 "server")
-                    if [ $serverpid -eq 0 ]
+                    if [ "$serverpid" -eq 0 ]
                     then
                         ssh $BUILDER /Users/snotdaq/server/server &
                         serverpid=$(jobs -l | tail -n 1 | awk {print $2})
@@ -80,7 +80,7 @@ function startselect {
                     fi
                     ;;
                 "client")
-                    if [ $clientpid -eq 0 ]
+                    if [ "$clientpid" -eq 0 ]
                     then
                         buffer/client &
                         clientpid=$(jobs -l | tail -n 1 | awk {print $2})
@@ -89,7 +89,7 @@ function startselect {
                     fi
                     ;;
                 "stopserver")
-                    if [ $stopserverpid -eq 0 ]
+                    if [ "$stopserverpid" -eq 0 ]
                     then
                         ssh $BUILDER /Users/snotdaq/server/stopserver &
                         stopserverpid=$(jobs -l | tail -n 1 | awk {print $2})
@@ -98,7 +98,7 @@ function startselect {
                     fi
                     ;;
                 "feedqueue")
-                    if [ $feedqueuepid -eq 0 ]
+                    if [ "$feedqueuepid" -eq 0 ]
                     then
                         buffer/feedqueue &
                         feedqueuepid=$(jobs -l | tail -n 1 | awk {print $2})
@@ -107,7 +107,7 @@ function startselect {
                     fi
                     ;;
                 "batch")
-                    if [ $batchpid -eq 0 ]
+                    if [ "$batchpid" -eq 0 ]
                     then
                         buffer/batch &
                         batchpid=$(jobs -l | tail -n 1 | awk {print $2})
@@ -176,11 +176,11 @@ do
 	do
 	    case $opt in
         	"Start")
-                    if [[ $stopserverpid -eq 0 && \
-                          $serverpid -eq 0 && \
-                          $clientpid -eq 0 && \
-                          $feedqueuepid -eq 0 && \
-                          $batchpid -eq 0 ]];
+                    if [[ "$stopserverpid" -eq 0 && \
+                          "$serverpid" -eq 0 && \
+                          "$clientpid" -eq 0 && \
+                          "$feedqueuepid" -eq 0 && \
+                          "$batchpid" -eq 0 ]];
                     then
                         echo Starting monitoring scripts
         	        ssh $BUILDER /Users/server/stopserver &
@@ -202,23 +202,23 @@ do
         	    ;;
 	        "Stop")
         	    echo Killing monitoring processes
-                    if [ $serverpid -ne 0 ]
+                    if [ "$serverpid" -ne 0 ]
                     then
 	                kill $serverpid
                     fi
-                    if [ $clientpid -ne 0 ]
+                    if [ "$clientpid" -ne 0 ]
                     then
         	        kill $clientpid
                     fi
-                    if [ $stopserverpid -ne 0 ]
+                    if [ "$stopserverpid" -ne 0 ]
                     then
 	                kill $stopserverpid
                     fi
-                    if [ $feedqueuepid -ne 0 ]
+                    if [ "$feedqueuepid" -ne 0 ]
                     then
         	        kill $feedqueuepid
                     fi
-                    if [ $batchpid -ne 0 ]
+                    if [ "$batchpid" -ne 0 ]
                     then
 	                kill $batchpid
                     fi
@@ -236,11 +236,11 @@ do
                     printmenu
                     ;;
                 "Quit")
-                    if [[ $stopserverpid -eq 0 && \
-                          $serverpid -eq 0 && \
-                          $clientpid -eq 0 && \
-                          $feedqueuepid -eq 0 && \
-                          $batchpid -eq 0 ]];
+                    if [[ "$stopserverpid" -eq 0 && \
+                          "$serverpid" -eq 0 && \
+                          "$clientpid" -eq 0 && \
+                          "$feedqueuepid" -eq 0 && \
+                          "$batchpid" -eq 0 ]];
                     then
                         echo Goodbye
                         exit
