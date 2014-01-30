@@ -9,7 +9,7 @@ do
 # Get list of files needing serving
     ls -tr $DATA/*.zdab > $DIR/ls.txt
 
-    if [ $(comm -23 $DIR/ls.txt $FL | wc -l) -gt 0 ]
+    if [ "$(comm -23 $DIR/ls.txt $FL | wc -l)" -gt 0 ]
         then
             FILE=$(comm -23 $DIR/ls.txt $FL | head -n 1)
     else
