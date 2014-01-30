@@ -1,5 +1,5 @@
 #! /bin/bash
-
+DIR=$(dirname $0)
 LOG=batch.log
 
-tail -f -c +1 jobqueue | parallel -j8 --retries 4 --progress >> $LOG
+tail -f -c +1 $DIR/jobqueue | parallel -j8 --retries 4 --progress >> $LOG

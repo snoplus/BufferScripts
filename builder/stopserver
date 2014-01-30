@@ -1,6 +1,8 @@
 #! /bin/bash
+
+DIR=$(dirname $0)
 FILE=filereceived
-LOG=stopserver.log
+LOG=$DIR/stopserver.log
 
 while true
 do

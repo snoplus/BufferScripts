@@ -1,24 +1,25 @@
 #! /bin/bash
 
+DIR=$(dirname $0)
 LOG=jobqueue.log
 
 rm jobqueue
 if [ $(ls processed -l | wc -1) -gt 1 ]
 then
-    for filename in processed/*
+    for filename in DIR/processed/*
     do
-        echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
+        echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
         echo added job $NUM to queue >> $LOG
     done
 fi
 
 while true
 do
-  if [ $(ls closed -l | wc -l) -gt 1 ]
+  if [ $(ls $DIR/closed -l | wc -l) -gt 1 ]
     then
 # This elaborate command finds the alphabetically first file
 # among those with the oldest time-stamp
-      FILE=$( ls closed -l | grep `ls closed -lt | tail -n1 | awk 'BEGIN {FS=" "}{print $8}'` | head -n1 | awk 'BEGIN {FS=" "}{print $9}' )
+      FILE=$( ls $DIR/closed -l | grep `ls $DIR/closed -lt | tail -n1 | awk 'BEGIN {FS=" "}{print $8}'` | head -n1 | awk 'BEGIN {FS=" "}{print $9}' )
       NUM=`echo $FILE | awk 'BEGIN {FS="_"}{print $2}'`
       CHUNK=`echo $FILE | awk 'BEGIN {FS="_"}{print $3}'`
       cat > /tmp/fitter.sh.$NUM.mac << EOF
@@ -46,10 +47,10 @@ do
 /rat/inzdab/read processed/$FILE
 EOF
 
-    echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
+    echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> jobqueue
     echo added job $NUM to queue >> $LOG
 
-    mv ./closed/$FILE ./processed/$FILE
+    mv $DIR/closed/$FILE $DIR/processed/$FILE
   
   else
     sleep 1
