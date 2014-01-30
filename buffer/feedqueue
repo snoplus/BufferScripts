@@ -4,7 +4,7 @@ DIR=$(dirname $0)
 LOG=jobqueue.log
 
 rm jobqueue
-if [ "$(ls $DIR/processed -l | wc -l)" -gt 1 ]
+if [ "$(ls $DIR/processed | wc -l)" -gt 0 ]
 then
     for filename in $DIR/processed/*
     do
@@ -15,7 +15,7 @@ fi
 
 while true
 do
-  if [ "$(ls $DIR/closed -l | wc -l)" -gt 1 ]
+  if [ "$(ls $DIR/closed | wc -l)" -gt 0 ]
     then
 # This elaborate command finds the alphabetically first file
 # among those with the oldest time-stamp
@@ -44,7 +44,7 @@ do
 /rat/procset filter "true"
 /rat/procset file "$FILE.root"
 
-/rat/inzdab/read processed/$FILE
+/rat/inzdab/read $DIR/processed/$FILE
 EOF
 
     echo "rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac" >> $DIR/jobqueue
