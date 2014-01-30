@@ -4,7 +4,7 @@ DIR=$(dirname $0)
 LOG=jobqueue.log
 
 rm jobqueue
-if [ $(ls processed -l | wc -1) -gt 1 ]
+if [ $(ls processed -l | wc -l) -gt 1 ]
 then
     for filename in DIR/processed/*
     do
