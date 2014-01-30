@@ -30,31 +30,31 @@ function processes {
     echo Here are the processes running at this time:
     if [ "$stopserverpid" -ne 0 ]
     then
-        echo -e \t stopserver \t $stopserverpid
+        echo -e "\t stopserver \t $stopserverpid"
     else
         NO="\tstopserver\n"
     fi
     if [ "$serverpid" -ne 0 ]
     then
-        echo -e \t server \t $serverpid
+        echo -e "\t server \t $serverpid"
     else
         NO+="\tserver\n"
     fi
     if [ "$clientpid" -ne 0 ]
     then
-        echo -e \t client \t $clientpid
+        echo -e "\t client \t $clientpid"
     else
         NO+="\tclient\n"
     fi
     if [ "$feedqueuepid" -ne 0 ]
     then
-        echo -e \t feedqueue \t $feedqueuepid
+        echo -e "\t feedqueue \t $feedqueuepid"
     else
         NO+="\tfeedqueue\n"
     fi
     if [ "$batchpid" -ne 0 ]
     then
-        echo -e \t batch \t $batchpid
+        echo -e "\t batch \t $batchpid"
     else
         NO+="\tbatch\n"
     fi
@@ -206,6 +206,7 @@ do
         	    echo Killing monitoring processes
                     if [ "$serverpid" -ne 0 ]
                     then
+                        ssh $BUILDER killall server
 	                kill $serverpid
                         serverpid=0
                     fi
@@ -216,6 +217,7 @@ do
                     fi
                     if [ "$stopserverpid" -ne 0 ]
                     then
+                        ssh $BUILDER killall stopserver
 	                kill $stopserverpid
                         stopserverpid=0
                     fi
