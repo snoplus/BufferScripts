@@ -18,6 +18,8 @@ function printmenu {
     echo "5) Quit"
 }
 function printdetailmenu {
+    echo Start and Stop allow you to control specific scripts.
+    echo Select Cancel to return to main menu.
     echo "1) Start"
     echo "2) Stop"
     echo "3) Cancel"
@@ -181,9 +183,9 @@ do
                           $batchpid -eq 0 ]];
                     then
                         echo Starting monitoring scripts
-        	        ssh $BUILDER ~/Users/server/stopserver &
+        	        ssh $BUILDER /Users/server/stopserver &
 	                stopserverpid=$(jobs -l | tail -n 1 | awk {print $2})
-        	        ssh $BUILDER ~/Users/server/server &
+        	        ssh $BUILDER /Users/server/server &
     	                serverpid=$(jobs -l | tail -n 1 | awk {print $2})
         	        buffer/client &
 	                clientpid=$(jobs -l | tail -n 1 | awk {print $2})
