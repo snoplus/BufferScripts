@@ -6,6 +6,7 @@
 # Specifying where to read from
 BUILDER=snotdaq@snoplusbuilder1.snolab.ca
 PIPE=server/pipe
+LOG=client.log
 
 # Specifying where to find database
 HOST=snotpenn01
@@ -34,16 +35,16 @@ do
     BIGFILE=$( $FILE | awk 'BEGIN {FS="/"}{print $4}' )
 
     ssh $BUILDER cat $PIPE | ourtee -a $BIGFILE \
-                           | (./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD; ssh $BUILDER echo true > /Users/snotdaq/server/filereceived) 
+                           | (./chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD >> $LOG; ssh $BUILDER echo true > /Users/snotdaq/server/filereceived) 
 
-    echo Finished chopping
+    echo Finished chopping >> $LOG
 
     JOB=$( ls -tr closed/chopped* | tail -n 1 | awk 'BEGIN {FS="_"}{print $2}' )
-    LOG=$RUN.chopper.log
+    JOBLOG=$RUN.chopper.log
 
     for ((j=$OLDJOB+1; j<=$JOB; j++))
     do
-        echo $j >> $LOG
+        echo $j >> $JOBLOG
     done
 
     OLDJOB=$JOB

@@ -1,16 +1,17 @@
 #! /bin/bash
 FILE=filereceived
+LOG=stopserver.log
 
 while true
 do
 
     if [ -f $FILE ]
         then
-            echo File received
+            echo File received >> $LOG
             kill $(pgrep tail)
             rm $FILE
         else
-            echo waiting
+            echo waiting >> $LOG
             sleep 1
     fi
 

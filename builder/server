@@ -14,7 +14,7 @@ do
             FILE=$(comm -23 ls.txt $FL | head -n 1)
     else
         sleep 1
-        echo Waiting for data > server.log
+        echo Waiting for data >> $LOG
     fi
 
 # If we have a new file, serve it and the filename to the buffer
@@ -23,11 +23,11 @@ do
 $FILE
 EOF
 
-    echo Pushing $FILE to pipe
+    echo Pushing $FILE to pipe >> $LOG
     tail -c +1 tmp/filename.txt > pipe
     tail -f -c +1 $FILE > pipe
-    echo Reached end of $FILE
-    echo $FILE >> server.log
+    echo Reached end of $FILE >> $LOG
+    echo $FILE >> $LOG
     echo $FILE >> $FL 
 
 done
