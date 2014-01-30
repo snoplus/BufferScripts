@@ -205,22 +205,27 @@ do
                     if [ "$serverpid" -ne 0 ]
                     then
 	                kill $serverpid
+                        serverpid=0
                     fi
                     if [ "$clientpid" -ne 0 ]
                     then
         	        kill $clientpid
+                        clientpid=0
                     fi
                     if [ "$stopserverpid" -ne 0 ]
                     then
 	                kill $stopserverpid
+                        stopserverpid=0
                     fi
                     if [ "$feedqueuepid" -ne 0 ]
                     then
         	        kill $feedqueuepid
+                        feedqueuepid=0
                     fi
                     if [ "$batchpid" -ne 0 ]
                     then
 	                kill $batchpid
+                        batchpi=0
                     fi
                     printmenu
         	    ;;
