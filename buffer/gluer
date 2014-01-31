@@ -31,16 +31,18 @@ do
             COUNT+=1
         done
         cat > /tmp/rootmacro.C << EOF
-TFile* file = new TFile("$FILER","update);
-gDirectory->Delete("macro;1");
-gDirectory->Delete("log;1");
-gDirectory->Delete("db;1");
-dDirectory->Delete("runT;1");
-file->Close();
-.q
+
+{
+    TFile* file = new TFile("$FILER","update);
+    gDirectory->Delete("macro;1");
+    gDirectory->Delete("log;1");
+    gDirectory->Delete("db;1");
+    gDirectory->Delete("runT;1");
+    file->Close();
+}
 
 EOF
-        root /tmp/rootmacro.C
+        root -b -q /tmp/rootmacro.C
         rm /tmp/rootmacro.C
         ARGS+=FILTER
     done
