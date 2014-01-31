@@ -8,7 +8,7 @@ do
     RUN=$( cat $OLDFILE | awk 'BEGIN {FS="."}{print $1}' )
     NEWFILE=($RUN+1).chopper.log
 
-    while [ ! -f $NEWFILE ];
+    while [ ! -f $NEWFILE ]
     do
         sleep 1
     done
@@ -17,10 +17,33 @@ do
     RUN=$RUN+1
     BIGFILE=$RUN.filtered.root
 
-    for i in `cat $OLDFILE`;
+    for i in `cat $OLDFILE`
     do
-        FILTER=chopped_$i_1.00_0.00.zdab.root
-        hadd FILTER
+        FILTER="chopped_$i_1.00_0.00.zdab.root "
+        COUNT=0
+        while [ ! -f $FILTER ]
+        do
+            if [ "$COUNT" -gt 60 ]
+            then
+                echo Gluer Error: Human Operator, where are my files?
+            fi
+            sleep 10
+            COUNT+=1
+        done
+        cat > /tmp/rootmacro.C << EOF
+TFile* file = new TFile("$FILER","update);
+gDirectory->Delete("macro;1");
+gDirectory->Delete("log;1");
+gDirectory->Delete("db;1");
+dDirectory->Delete("runT;1");
+file->Close();
+.q
+
+EOF
+        root /tmp/rootmacro.C
+        rm /tmp/rootmacro.C
+        ARGS+=FILTER
     done
+    hadd $RUN.l2.root $ARGS
 
 done
