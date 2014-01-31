@@ -15,7 +15,8 @@ do
 
     OLDRUN=$RUN
     RUN=$RUN+1
-    BIGFILE=$RUN.filtered.root
+    BIGFILE=$RUN.L2.root
+    FIRST=0
 
     for i in `cat $OLDFILE`
     do
@@ -30,7 +31,12 @@ do
             sleep 10
             COUNT+=1
         done
-        cat > /tmp/rootmacro.C << EOF
+        if [ "$FIRST" -eq 0 ]
+        then
+            ARGS=$FILTER
+            FIRST=1
+        else
+            cat > /tmp/rootmacro.C << EOF
 
 {
     TFile* file = new TFile("$FILER","update);
@@ -42,10 +48,11 @@ do
 }
 
 EOF
-        root -b -q /tmp/rootmacro.C
-        rm /tmp/rootmacro.C
-        ARGS+=FILTER
+            root -b -q /tmp/rootmacro.C
+            rm /tmp/rootmacro.C
+            ARGS+=$FILTER
+        fi
     done
-    hadd $RUN.l2.root $ARGS
+    hadd $BIGFILE $ARGS
 
 done
