@@ -1,17 +1,7 @@
 #! /bin/bash
 
-DIR=$(dirname $0)
+DIR=.
 LOG=jobqueue.log
-
-rm jobqueue
-if [ "$(ls $DIR/processed | wc -l)" -gt 0 ]
-then
-    for filename in $DIR/processed/*
-    do
-        echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac >> $DIR/jobqueue
-        echo added job $NUM to queue >> $LOG
-    done
-fi
 
 while true
 do
@@ -23,7 +13,12 @@ do
       NUM=`echo $FILE | awk 'BEGIN {FS="_"}{print $2}'`
       CHUNK=`echo $FILE | awk 'BEGIN {FS="_"}{print $3}'`
       cat > /tmp/fitter.sh.$NUM.mac << EOF
-    
+
+/PhysicsList/OmitMuonicProcesses true
+/PhysicsList/OmitHadronicProcesses true
+/PhysicsList/OmitCerenkov true
+/PhysicsList/Optical/OmitBoundaryEffects true
+/PhysicsList/OmitHadronicPhysicsList true
 /rat/db/set DETECTOR geo_file "geo/snoplus.geo"
 
 /run/initialize
