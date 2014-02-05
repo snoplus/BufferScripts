@@ -2,4 +2,7 @@
 DIR=$(dirname $0)
 LOG=batch.log
 
-tail -f -c +1 $DIR/jobqueue | parallel -j8 --retries 4 --progress >> $LOG
+source ~/rat_env.sh
+
+tail -f -c +1 $DIR/jobqueue | parallel -j12 --retries 4 --progress >> $LOG
+

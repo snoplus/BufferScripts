@@ -1,31 +1,38 @@
 #! /bin/bash
-DIR=$(dirname $0)
 DATA=~/data_temp
-LOG=$DIR/server.log
-FL=$DIR/served.txt
+LOG=server.log
+FL=served.txt
 
 while true
 do
 # Get list of files needing serving
-    ls -tr $DATA/*.zdab > $DIR/ls.txt
+    ls -tr $DATA/*.zdab > ls.txt
 
-    if [ "$(comm -23 $DIR/ls.txt $FL | wc -l)" -gt 0 ]
-        then
-            FILE=$(comm -23 $DIR/ls.txt $FL | head -n 1)
-    else
-        sleep 1
-        echo Waiting for data >> $LOG
-    fi
+    while [ $(comm -23 ls.txt $FL | wc -l) -lt 1 ]
+        do
+            sleep 1
+            echo Waiting for data >> $LOG
+        done
+
+    FILE=$(comm -23 ls.txt $FL | head -n 1)
 
 # If we have a new file, serve it and the filename to the buffer
-    cat > $DIR/tmp/filename.txt << EOF
+    cat > tmp/filename.txt << EOF
 
 $FILE
 EOF
 
+    ln $FILE readfile
     echo Pushing $FILE to pipe >> $LOG
-    tail -c +1 $DIR/tmp/filename.txt > $DIR/pipe
-    tail -f -c +1 $FILE > $DIR/pipe
+    tail -c +1 tmp/filename.txt > pipe
+    tail -f -c +1 readfile > pipe &
+    PID=$(jobs -l | tail -n 1 | awk '{print $2}')
+    while [ -f ! filereceived]
+        do
+            sleep 1
+        done
+    rm filereceived
+    kill $PID
     echo Reached end of $FILE >> $LOG
     echo $FILE >> $LOG
     echo $FILE >> $FL 

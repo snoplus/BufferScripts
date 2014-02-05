@@ -32,11 +32,12 @@ do
 # then, receive the file; finally, write list of jobs associated to run
 
     FILE=$(ssh $BUILDER cat $PIPE)
+    echo $FILE
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $4}' )
 
     ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
-                           | ($DIR/chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD >> $LOG; ssh $BUILDER echo true > /Users/snotdaq/server/filereceived) 
+                           | ($DIR/chopper -i /dev/stdin -o chopped -c 1 -l 0 -s $HOST -u $USER -p $PSWD >> $LOG; ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
     echo Finished chopping >> $LOG
 
