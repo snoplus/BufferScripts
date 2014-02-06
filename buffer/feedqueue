@@ -19,7 +19,7 @@ do
 /PhysicsList/OmitCerenkov true
 /PhysicsList/Optical/OmitBoundaryEffects true
 /PhysicsList/OmitHadronicPhysicsList true
-/rat/db/set DETECTOR geo_file "geo/snoplus.geo"
+/rat/db/set DETECTOR geo_file "geo/empty.geo"
 
 /run/initialize
 /rat/proc calibratePMT
