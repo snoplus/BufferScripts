@@ -1,6 +1,6 @@
 #! /bin/bash
 
-BUILDER=snotdaq@snoplusbuilder1.snolab.ca
+BUILDER=snotdaq@builder1.sp.snolab.ca
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
