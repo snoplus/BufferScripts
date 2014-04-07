@@ -4,8 +4,8 @@
 # (1) copies them to the Buffer and (2) feeds them to the chopper
 
 # Specifying where to read from
-BUILDER=snotdaq@snoplusbuilder1.snolab.ca
-PIPE=server/pipe
+BUILDER=klabe@cps3
+PIPE=~/bufferscripts/builder/pipe
 
 # Specifying where to find database
 HOST=snotpenn01
