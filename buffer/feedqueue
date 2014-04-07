@@ -1,3 +1,9 @@
+# This script prepares RAT macros for running L2 jobs on the chopped
+# data.  It moves chopped files from the closed to the processed directory
+# to indicate that a macro has been written.  The macros are written to the
+# /tmp/ directory.  For each job processed, it writes a line to its log and
+# also writes to the jobqueue file.
+
 #! /bin/bash
 
 DIR=.

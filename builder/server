@@ -20,6 +20,10 @@ do
 # Get list of files needing serving
     ls -tr $DATA/*.zdab > ls.txt
 
+# If there is no $FL file, assume we want to start from present
+    if [ -f ! $FL]
+        ls -tr $DATA/*.zdab > $FL
+
     while [ $(comm -23 ls.txt $FL | wc -l) -lt 1 ]
         do
             sleep 1
