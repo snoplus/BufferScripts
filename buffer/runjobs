@@ -1,3 +1,6 @@
+# This script actually runs the RAT jobs found in the jobqueue file.
+# It writes out the stdout output of RAT to batch.log.
+
 #! /bin/bash
 DIR=$(dirname $0)
 LOG=batch.log

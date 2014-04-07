@@ -3,7 +3,6 @@
 BUILDER=snotdaq@snoplusbuilder1.snolab.ca
 
 # Variables in which to store PIDs of the various monitoring scripts
-stopserverpid=0
 serverpid=0
 clientpid=0
 feedqueuepid=0
@@ -28,12 +27,6 @@ function printdetailmenu {
 # This function prints lists of running and not-running processes
 function processes {
     echo Here are the processes running at this time:
-    if [ "$stopserverpid" -ne 0 ]
-    then
-        echo -e "\t stopserver \t $stopserverpid"
-    else
-        NO="\tstopserver\n"
-    fi
     if [ "$serverpid" -ne 0 ]
     then
         echo -e "\t server \t $serverpid"
@@ -66,7 +59,7 @@ function processes {
 function startselect {
     echo Select the number of the script you wish to start.
     echo If you do not wish to start any processes at this time, select cancel to return to the previous menu.
-    startoptions=("server" "client" "stopserver" "feedqueue" "batch" "cancel")
+    startoptions=("server" "client" "feedqueue" "batch" "cancel")
     select opt3 in "${startoptions[@]}"
         do
             case $opt3 in
@@ -86,15 +79,6 @@ function startselect {
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client before starting it again.
-                    fi
-                    ;;
-                "stopserver")
-                    if [ "$stopserverpid" -eq 0 ]
-                    then
-                        ssh $BUILDER /Users/snotdaq/server/stopserver &
-                        stopserverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                    else
-                        echo stopserver already running.  You must stop stopserver before starting it again.
                     fi
                     ;;
                 "feedqueue")
@@ -178,15 +162,12 @@ do
 	do
 	    case $opt in
         	"Start")
-                    if [[ "$stopserverpid" -eq 0 && \
-                          "$serverpid" -eq 0 && \
+                    if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
                           "$feedqueuepid" -eq 0 && \
                           "$batchpid" -eq 0 ]];
                     then
                         echo Starting monitoring scripts
-        	        ssh $BUILDER /Users/snotdaq/server/stopserver &
-	                stopserverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	        ssh $BUILDER /Users/snotdaq/server/server &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	        buffer/client &
@@ -215,12 +196,6 @@ do
         	        kill $clientpid
                         clientpid=0
                     fi
-                    if [ "$stopserverpid" -ne 0 ]
-                    then
-                        ssh $BUILDER killall stopserver
-	                kill $stopserverpid
-                        stopserverpid=0
-                    fi
                     if [ "$feedqueuepid" -ne 0 ]
                     then
         	        kill $feedqueuepid
@@ -245,8 +220,7 @@ do
                     printmenu
                     ;;
                 "Quit")
-                    if [[ "$stopserverpid" -eq 0 && \
-                          "$serverpid" -eq 0 && \
+                    if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
                           "$feedqueuepid" -eq 0 && \
                           "$batchpid" -eq 0 ]];
