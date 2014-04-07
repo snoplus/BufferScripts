@@ -1,3 +1,7 @@
+# This script can operate and monitor the other BufferScripts needed
+# to run the L2 trigger.  It keeps track of the PIDs of the various
+# processes.
+
 #! /bin/bash
 
 BUILDER=snotdaq@builder1.sp.snolab.ca
