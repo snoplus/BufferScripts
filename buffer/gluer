@@ -1,3 +1,8 @@
+# This script collects together the small files of events passing the L2
+# filter into a single large file for storage.  The list of files it uses
+# is ###.chopper.log, which is actually written by the client script.
+# Also responsible for general upkeep.
+
 #! /bin/bash
 
 while true
