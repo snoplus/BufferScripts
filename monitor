@@ -7,6 +7,7 @@ serverpid=0
 clientpid=0
 feedqueuepid=0
 batchpid=0
+gluerpid=0
 
 #This function prints the main menu options
 function printmenu {
@@ -51,6 +52,12 @@ function processes {
     else
         NO+="\tbatch\n"
     fi
+    if [ "$gluerpid" -ne 0 ]
+    then
+        echo -e "\t gluer \t $gluerpid"
+    else
+        NO+="\tgluer\n"
+    fi
     echo Here are the processes not running at this time:
     echo -e $NO
 }
@@ -59,7 +66,7 @@ function processes {
 function startselect {
     echo Select the number of the script you wish to start.
     echo If you do not wish to start any processes at this time, select cancel to return to the previous menu.
-    startoptions=("server" "client" "feedqueue" "batch" "cancel")
+    startoptions=("server" "client" "feedqueue" "batch" "gluer" "cancel")
     select opt3 in "${startoptions[@]}"
         do
             case $opt3 in
@@ -97,6 +104,15 @@ function startselect {
                         batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo batch already running.  You must stop batch before starting it again.
+                    fi
+                    ;;
+                "gluer")
+                    if [ "$gluerpid" -eq 0 ]
+                    then
+                        buffer/gluer &
+                        gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                    else
+                        echo gluer already running.  You must stop gluer before starting it again.
                     fi
                     ;;
                 "cancel")
@@ -165,18 +181,21 @@ do
                     if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
                           "$feedqueuepid" -eq 0 && \
-                          "$batchpid" -eq 0 ]];
+                          "$batchpid" -eq 0 && \
+                          "$gluerpid" -eq 0 ]];
                     then
                         echo Starting monitoring scripts
         	        ssh $BUILDER /Users/snotdaq/server/server &
-    	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+    	            serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	        buffer/client &
 	                clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	        buffer/feedqueue &
 	                feedqueuepid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        buffer/batch &
+                    buffer/batch &
 	                batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        printmenu
+                    buffer/gluer &
+                    gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                    printmenu
                     else
                         echo Some processes were already running.  Please stop all scripts before 
                         echo using the Start All option.  If you do not want to stop running processes, 
@@ -188,23 +207,28 @@ do
                     if [ "$serverpid" -ne 0 ]
                     then
                         ssh $BUILDER killall server
-	                kill $serverpid
+	                    kill $serverpid
                         serverpid=0
                     fi
                     if [ "$clientpid" -ne 0 ]
                     then
-        	        kill $clientpid
+        	            kill $clientpid
                         clientpid=0
                     fi
                     if [ "$feedqueuepid" -ne 0 ]
                     then
-        	        kill $feedqueuepid
+        	            kill $feedqueuepid
                         feedqueuepid=0
                     fi
                     if [ "$batchpid" -ne 0 ]
                     then
-	                kill $batchpid
+	                    kill $batchpid
                         batchpi=0
+                    fi
+                    if [ "$gluerpid" -ne 0 ]
+                    then
+                        kill $gluerpid
+                        gluerpid=0
                     fi
                     printmenu
         	    ;;
@@ -223,7 +247,8 @@ do
                     if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
                           "$feedqueuepid" -eq 0 && \
-                          "$batchpid" -eq 0 ]];
+                          "$batchpid" -eq 0 && \
+                          "$gluerpid" -eq 0 ]];
                     then
                         echo Goodbye
                         exit
