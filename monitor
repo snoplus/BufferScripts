@@ -1,6 +1,7 @@
 # This script can operate and monitor the other BufferScripts needed
 # to run the L2 trigger.  It keeps track of the PIDs of the various
-# processes.
+# processes.  At start, it also ensures that the necessary files and
+# directory structures are present, and, if not, constructs them.
 
 #! /bin/bash
 
@@ -188,18 +189,28 @@ do
                           "$batchpid" -eq 0 && \
                           "$gluerpid" -eq 0 ]];
                     then
-                        echo Starting monitoring scripts
-        	        ssh $BUILDER /Users/snotdaq/server/server &
-    	            serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	        buffer/client &
-	                clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	        buffer/feedqueue &
-	                feedqueuepid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                    buffer/batch &
-	                batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                    buffer/gluer &
-                    gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                    printmenu
+                        echo Preparing file structure...
+                        ssh $BUILDER rm /Users/snotdaq/server/pipe
+                        ssh $BUILDER mkfifo /Users/snotdaq/server/pipe
+                        if [ ! -d buffer/closed ]
+                            mkdir buffer/closed
+                        fi
+                        if [ ! -d buffer/processed ]
+                            mkdir buffer/processed
+                        fi
+                        echo File structure prepared.
+                        echo Starting monitoring scripts...
+        	            ssh $BUILDER /Users/snotdaq/server/server &
+    	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+        	            buffer/client &
+	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+        	            buffer/feedqueue &
+	                    feedqueuepid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        buffer/batch &
+	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        buffer/gluer &
+                        gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        printmenu
                     else
                         echo Some processes were already running.  Please stop all scripts before 
                         echo using the Start All option.  If you do not want to stop running processes, 
