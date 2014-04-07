@@ -1,17 +1,25 @@
 #! /bin/bash
 
+DIR=.
+LOG=jobqueue.log
+
 while true
 do
-  if [ $(ls closed -l | wc -l) -gt 1 ]
+  if [ "$(ls $DIR/closed | wc -l)" -gt 0 ]
     then
 # This elaborate command finds the alphabetically first file
 # among those with the oldest time-stamp
-      FILE=$( ls closed -l | grep `ls closed -lt | tail -n1 | awk 'BEGIN {FS=" "}{print $8}'` | head -n1 | awk 'BEGIN {FS=" "}{print $9}' )
+      FILE=$( ls $DIR/closed -l | grep `ls $DIR/closed -lt | tail -n1 | awk 'BEGIN {FS=" "}{print $8}'` | head -n1 | awk 'BEGIN {FS=" "}{print $9}' )
       NUM=`echo $FILE | awk 'BEGIN {FS="_"}{print $2}'`
       CHUNK=`echo $FILE | awk 'BEGIN {FS="_"}{print $3}'`
       cat > /tmp/fitter.sh.$NUM.mac << EOF
-    
-/rat/db/set DETECTOR geo_file "geo/snoplus.geo"
+
+/PhysicsList/OmitMuonicProcesses true
+/PhysicsList/OmitHadronicProcesses true
+/PhysicsList/OmitCerenkov true
+/PhysicsList/Optical/OmitBoundaryEffects true
+/PhysicsList/OmitHadronicPhysicsList true
+/rat/db/set DETECTOR geo_file "geo/empty.geo"
 
 /run/initialize
 /rat/proc calibratePMT
@@ -31,13 +39,13 @@ do
 /rat/procset filter "true"
 /rat/procset file "$FILE.root"
 
-/rat/inzdab/read processed/$FILE
+/rat/inzdab/read $DIR/processed/$FILE
 EOF
 
-    echo rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log >> jobqueue
-    echo added job $NUM to queue
+    echo "rat /tmp/fitter.sh.$NUM.mac -l rat.$NUM.log; rm $DIR/processed/$FILE; rm /tmp/fitter.sh.$NUM.mac" >> $DIR/jobqueue
+    echo added job $NUM to queue >> $LOG
 
-    mv ./closed/$FILE ./processed/$FILE
+    mv $DIR/closed/$FILE $DIR/processed/$FILE
   
   else
     sleep 1

@@ -1,6 +1,266 @@
 #! /bin/bash
 
-./builder/server &
-./buffer/client &
-./buffer/feedrat
+BUILDER=snotdaq@snoplusbuilder1.snolab.ca
 
+# Variables in which to store PIDs of the various monitoring scripts
+stopserverpid=0
+serverpid=0
+clientpid=0
+feedqueuepid=0
+batchpid=0
+
+#This function prints the main menu options
+function printmenu {
+    echo "1) Start"
+    echo "2) Stop"
+    echo "3) Details"
+    echo "4) Status"
+    echo "5) Quit"
+}
+function printdetailmenu {
+    echo Start and Stop allow you to control specific scripts.
+    echo Select Cancel to return to main menu.
+    echo "1) Start"
+    echo "2) Stop"
+    echo "3) Cancel"
+}
+
+# This function prints lists of running and not-running processes
+function processes {
+    echo Here are the processes running at this time:
+    if [ "$stopserverpid" -ne 0 ]
+    then
+        echo -e "\t stopserver \t $stopserverpid"
+    else
+        NO="\tstopserver\n"
+    fi
+    if [ "$serverpid" -ne 0 ]
+    then
+        echo -e "\t server \t $serverpid"
+    else
+        NO+="\tserver\n"
+    fi
+    if [ "$clientpid" -ne 0 ]
+    then
+        echo -e "\t client \t $clientpid"
+    else
+        NO+="\tclient\n"
+    fi
+    if [ "$feedqueuepid" -ne 0 ]
+    then
+        echo -e "\t feedqueue \t $feedqueuepid"
+    else
+        NO+="\tfeedqueue\n"
+    fi
+    if [ "$batchpid" -ne 0 ]
+    then
+        echo -e "\t batch \t $batchpid"
+    else
+        NO+="\tbatch\n"
+    fi
+    echo Here are the processes not running at this time:
+    echo -e $NO
+}
+
+#These functions allow you to select particular processes for action
+function startselect {
+    echo Select the number of the script you wish to start.
+    echo If you do not wish to start any processes at this time, select cancel to return to the previous menu.
+    startoptions=("server" "client" "stopserver" "feedqueue" "batch" "cancel")
+    select opt3 in "${startoptions[@]}"
+        do
+            case $opt3 in
+                "server")
+                    if [ "$serverpid" -eq 0 ]
+                    then
+                        ssh $BUILDER /Users/snotdaq/server/server &
+                        serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                    else
+                        echo server already running.  You must stop server before starting it again.
+                    fi
+                    ;;
+                "client")
+                    if [ "$clientpid" -eq 0 ]
+                    then
+                        buffer/client &
+                        clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                    else
+                        echo client already running.  You must stop client before starting it again.
+                    fi
+                    ;;
+                "stopserver")
+                    if [ "$stopserverpid" -eq 0 ]
+                    then
+                        ssh $BUILDER /Users/snotdaq/server/stopserver &
+                        stopserverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                    else
+                        echo stopserver already running.  You must stop stopserver before starting it again.
+                    fi
+                    ;;
+                "feedqueue")
+                    if [ "$feedqueuepid" -eq 0 ]
+                    then
+                        buffer/feedqueue &
+                        feedqueuepid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                    else
+                        echo feedqueue already running.  You must stop feedqueue before starting it again.
+                    fi
+                    ;;
+                "batch")
+                    if [ "$batchpid" -eq 0 ]
+                    then
+                        buffer/batch &
+                        batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                    else
+                        echo batch already running.  You must stop batch before starting it again.
+                    fi
+                    ;;
+                "cancel")
+                    echo Returning to previous menu
+                    printdetailmenu
+                    break
+                    ;;
+                *)
+                    echo Invalid option.  Try again.
+                    ;;
+            esac
+        done
+}
+
+function stopselect {
+    echo Enter the number of the process you wish to stop.
+}
+
+# This function is the submenu for the details option
+function details {
+    detailoptions=("Start" "Stop" "Cancel")
+    select opt2 in "${detailoptions[@]}"
+        do
+            case $opt2 in
+                "Start")
+                    startselect
+                    ;;
+                "Stop")
+                    stopselect
+                    ;;
+                "Cancel")
+                    echo Returning to main menu
+                    break
+                    ;;
+                *)
+                    echo Invalid selection.  Try again.
+                    ;;
+            esac
+        done
+}
+
+#
+# MAIN LOOP BEGINS HERE
+#
+source ~/rat_env.sh
+
+while true
+do
+
+    echo "*********************************************************************************"
+    echo "**       Welcome to the UChicago SNO+ Monitoring Tools user interface          **"
+    echo "**                                                                             **"
+    echo "**  For simple usage, select "Start" to start all scripts and "Stop" to stop       **"
+    echo "**  all scripts.  If you know what you are doing, select "Details" to start or   **"
+    echo "**  stop specific scripts.  "Status" will allow you to read the log file of      **"
+    echo "**  the different scripts.  To exit the user interface, select "Quit" after      **"
+    echo "**  stopping all processes.                                                    **"
+    echo "**                                                                             **"
+    echo "*********************************************************************************"
+
+    options=("Start" "Stop" "Details" "Status" "Quit")
+    select opt in "${options[@]}"
+	do
+	    case $opt in
+        	"Start")
+                    if [[ "$stopserverpid" -eq 0 && \
+                          "$serverpid" -eq 0 && \
+                          "$clientpid" -eq 0 && \
+                          "$feedqueuepid" -eq 0 && \
+                          "$batchpid" -eq 0 ]];
+                    then
+                        echo Starting monitoring scripts
+        	        ssh $BUILDER /Users/snotdaq/server/stopserver &
+	                stopserverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+        	        ssh $BUILDER /Users/snotdaq/server/server &
+    	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+        	        buffer/client &
+	                clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+        	        buffer/feedqueue &
+	                feedqueuepid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        buffer/batch &
+	                batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        printmenu
+                    else
+                        echo Some processes were already running.  Please stop all scripts before 
+                        echo using the Start All option.  If you do not want to stop running processes, 
+                        echo you can start processes one at a time in the Details options.
+                    fi
+        	    ;;
+	        "Stop")
+        	    echo Killing monitoring processes
+                    if [ "$serverpid" -ne 0 ]
+                    then
+                        ssh $BUILDER killall server
+	                kill $serverpid
+                        serverpid=0
+                    fi
+                    if [ "$clientpid" -ne 0 ]
+                    then
+        	        kill $clientpid
+                        clientpid=0
+                    fi
+                    if [ "$stopserverpid" -ne 0 ]
+                    then
+                        ssh $BUILDER killall stopserver
+	                kill $stopserverpid
+                        stopserverpid=0
+                    fi
+                    if [ "$feedqueuepid" -ne 0 ]
+                    then
+        	        kill $feedqueuepid
+                        feedqueuepid=0
+                    fi
+                    if [ "$batchpid" -ne 0 ]
+                    then
+	                kill $batchpid
+                        batchpi=0
+                    fi
+                    printmenu
+        	    ;;
+	        "Details")
+                    processes
+                    echo Select below to start or stop particular processes
+                    echo If you wish to return to the main menu, select cancel.
+                    details
+                    printmenu
+	            ;;
+                "Status")
+                    echo Process statuses will appear here
+                    printmenu
+                    ;;
+                "Quit")
+                    if [[ "$stopserverpid" -eq 0 && \
+                          "$serverpid" -eq 0 && \
+                          "$clientpid" -eq 0 && \
+                          "$feedqueuepid" -eq 0 && \
+                          "$batchpid" -eq 0 ]];
+                    then
+                        echo Goodbye
+                        exit
+                    else
+                        echo You have unstopped processes.  Please stop all processes before
+                        echo exiting the user interface, or it will be a pain to recover.
+                    fi
+                    ;;
+        	*)
+	            echo Invalid option
+        	    ;;
+	    esac
+	done
+done

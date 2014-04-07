@@ -1,21 +1,32 @@
-#! /bin/bash
+#    This script serves the next unserved Event Builder file to the Buffer.
+# It selects the oldest file from ~/data_temp not on its list of served files
+# and pushes the file, preceded by its name, into the fifo "pipe" located in
+# this directory.
+#    The server does not read what it passes and does not know when it reaches
+# the end of the file.  It therefore relies on the client to advise it that
+# the file has ended (which the Chopper knows because of the structure of
+# zdab files).  This information is passed through an empty filerecieved file
+# written into this directory.
+#    The server records in $LOG the files which it has started and finished 
+# pushing to the pipe.  It also updates the list of served files at $FL.
 
-DIR=~/data_temp
+#! /bin/bash
+DATA=~/data_temp
 LOG=server.log
 FL=served.txt
 
 while true
 do
 # Get list of files needing serving
-    ls -tr $DIR/*.zdab > ls.txt
+    ls -tr $DATA/*.zdab > ls.txt
 
-    if [ $(comm -23 ls.txt $FL | wc -l) -gt 0 ]
-        then
-            FILE=$(comm -23 ls.txt $FL | head -n 1)
-    else
-        sleep 1
-        echo Waiting for data > server.log
-    fi
+    while [ $(comm -23 ls.txt $FL | wc -l) -lt 1 ]
+        do
+            sleep 1
+            echo Waiting for data >> $LOG
+        done
+
+    FILE=$(comm -23 ls.txt $FL | head -n 1)
 
 # If we have a new file, serve it and the filename to the buffer
     cat > tmp/filename.txt << EOF
@@ -23,10 +34,18 @@ do
 $FILE
 EOF
 
-    echo Pushing $FILE to pipe
+    echo Pushing $FILE to pipe >> $LOG
     tail -c +1 tmp/filename.txt > pipe
-    tail -f -c +1 $FILE > pipe
-    echo $FILE >> server.log
+    tail -f -c +1 $FILE > pipe &
+    PID=$(jobs -l | tail -n 1 | awk '{print $2}')
+    while [ -f ! filereceived]
+        do
+            sleep 1
+        done
+    rm filereceived
+    kill $PID
+    echo Reached end of $FILE >> $LOG
+    echo $FILE >> $LOG
     echo $FILE >> $FL 
 
 done
