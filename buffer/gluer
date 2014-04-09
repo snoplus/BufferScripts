@@ -41,23 +41,39 @@ do
             ARGS=$FILTER
             FIRST=1
         else
-            cat > /tmp/rootmacro.C << EOF
 
-{
-    TFile* file = new TFile("$FILER","update);
-    gDirectory->Delete("macro;1");
-    gDirectory->Delete("log;1");
-    gDirectory->Delete("db;1");
-    gDirectory->Delete("runT;1");
-    file->Close();
-}
+#
+#            cat > /tmp/rootmacro.C << EOF
+#
+#{
+#    TFile* file = new TFile("$FILTER","update);
+#    gDirectory->Delete("macro;1");
+#    gDirectory->Delete("log;1");
+#    gDirectory->Delete("db;1");
+#    gDirectory->Delete("runT;1");
+#    file->Close();
+#}
+#
+#EOF
+#            root -b -q /tmp/rootmacro.C
+#            rm /tmp/rootmacro.C
+#            ARGS+=$FILTER
+
+         cat > /tmp/gluer.mac << EOF
+
+/PhysicsList/OmitAll
+/rat/db/set DETECTOR geo_file "geo/empty.geo"
+
+/run/initialize
+
+/rat/proc outroot
+/rat/procset file $NAME
+
+/rat/inroot read $FILE
 
 EOF
-            root -b -q /tmp/rootmacro.C
-            rm /tmp/rootmacro.C
-            ARGS+=$FILTER
-        fi
-    done
-    hadd $BIGFILE $ARGS
+     fi
+     done
+#    hadd $BIGFILE $ARGS
 
 done

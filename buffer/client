@@ -35,9 +35,12 @@ do
     echo $FILE >> $LOG
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
+    FOLDER=$( echo $BIFILE | awk 'BEGIN {FS="."}{print $1}' )
+    
+    mkdir $DIR/$FOLDER
 
     ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
-                           | ($DIR/chopper -i /dev/stdin -o chopped -c 2 -l 0 >> $LOG; ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
+                           | ($DIR/chopper -i /dev/stdin -o chopped -c 2 -l 0 -s $FOLDER >> $LOG; ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
     echo Finished chopping >> $LOG
 
