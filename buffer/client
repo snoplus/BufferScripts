@@ -14,11 +14,6 @@ PIPE=/Users/snotdaq/server/pipe
 LOG=client.log
 DIR=.
 
-# Specifying where to find database
-HOST=snotpenn01
-USER=snoplus
-PSWD=scintillate
-
 # Save the last job in the last file
 OLDJOB=0
 
@@ -42,7 +37,7 @@ do
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $4}' )
 
     ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
-                           | ($DIR/chopper -i /dev/stdin -o chopped -c 2 -l 0 -s $HOST -u $USER -p $PSWD >> $LOG; ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
+                           | ($DIR/chopper -i /dev/stdin -o chopped -c 2 -l 0 >> $LOG; ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
     echo Finished chopping >> $LOG
 
