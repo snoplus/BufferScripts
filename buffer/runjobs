@@ -7,5 +7,5 @@ LOG=batch.log
 
 source ~/rat_env.sh
 
-tail -f -c +1 $DIR/jobqueue | parallel -j4 --retries 4 --progress >> $LOG
+tail -f -c +1 $DIR/jobqueue.txt | parallel -j4 --retries 4 --progress >> $LOG
 
