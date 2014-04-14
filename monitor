@@ -176,9 +176,11 @@ do
                         ssh $BUILDER rm /Users/snotdaq/server/pipe
                         ssh $BUILDER mkfifo /Users/snotdaq/server/pipe
                         if [ ! -d buffer/closed ]
+                        then
                             mkdir buffer/closed
                         fi
                         if [ ! -d buffer/processed ]
+                        then
                             mkdir buffer/processed
                         fi
                         echo File structure prepared.
