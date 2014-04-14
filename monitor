@@ -61,6 +61,11 @@ function processes {
     NO=""
 }
 
+#This function will display the current status of each file in the system
+function printstatus {
+
+}
+
 #These functions allow you to select particular processes for action
 function startselect {
     echo Select the number of the script you wish to start.
@@ -119,6 +124,57 @@ function startselect {
 
 function stopselect {
     echo Enter the number of the process you wish to stop.
+    echo If you do not wish to stop any process at this time, select "Cancel" to return to the previous menu.
+    stopoptions=("sever" "client" "batch" "gluer" "cancel")
+    select opt4 in "($stopoptions[@])"
+        do
+            case $opt4 in
+                "sever")
+                    if [ "serverpid" -neq 0 ]
+                    then
+                        #MUST ssh for this one
+                        serverpid=0
+                    else
+                        echo Server not currently running.  You must start it before stopping it.
+                    fi
+                    ;;
+                "client")
+                    if [ "clientpid" -neq 0]
+                    then
+                        kill $clientpid
+                        clientpid=0
+                    else
+                        echo Client not currently running.  You must start it before stopping it.
+                    fi
+                    ;;
+                "batch")
+                    if [ "batchpid" -neq 0]
+                    then
+                        kill $batchpid
+                        batchpid=0
+                    else
+                        echo Runjobs not currently running.  You must start it before stopping it.
+                    fi
+                    ;;
+                "gluer")
+                    if [ "gluerpid" -neq 0]
+                    then
+                        kill $gluerpid
+                        gluerpid=0
+                    else
+                        echo Gluer not currently running.  You must start it before stopping it.
+                    fi
+                    ;;
+                "cancel")
+                    echo Returning to previous menu.
+                    printdetailmenu
+                    break
+                    ;;
+                *)
+                    echo Invalid menu option.  Please try again.
+                    ;;
+            esac
+        done
 }
 
 # This function is the submenu for the details option
@@ -227,29 +283,38 @@ do
                     printmenu
         	    ;;
 	        "Details")
-                    processes
-                    echo Select below to start or stop particular processes
-                    echo If you wish to return to the main menu, select cancel.
-                    details
-                    printmenu
+                processes
+                echo Select below to start or stop particular processes
+                echo If you wish to return to the main menu, select cancel.
+                details
+                printmenu
 	            ;;
-                "Status")
-                    echo Process statuses will appear here
-                    printmenu
-                    ;;
-                "Quit")
-                    if [[ "$serverpid" -eq 0 && \
-                          "$clientpid" -eq 0 && \
-                          "$batchpid" -eq 0 && \
-                          "$gluerpid" -eq 0 ]];
-                    then
-                        echo Goodbye
-                        exit
-                    else
-                        echo You have unstopped processes.  Please stop all processes before
-                        echo exiting the user interface, or it will be a pain to recover.
-                    fi
-                    ;;
+            "Status")
+                stty -echo -icanon time 10 min 0
+                keypress=''
+                while [[ "x$keypress" == "x" ]]
+                do
+                    echo To stop monitoring and return to Main menu, press any key at any time.
+                    processes
+                    printstatus
+                    read keypress
+                done
+                stty sane 
+                printmenu
+                ;;
+            "Quit")
+                if [[ "$serverpid" -eq 0 && \
+                      "$clientpid" -eq 0 && \
+                      "$batchpid" -eq 0 && \
+                      "$gluerpid" -eq 0 ]];
+                then
+                    echo Goodbye
+                    exit
+                else
+                    echo You have unstopped processes.  Please stop all processes before
+                    echo exiting the user interface, or it will be a pain to recover.
+                fi
+                ;;
         	*)
 	            echo Invalid option
         	    ;;
