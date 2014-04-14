@@ -63,7 +63,12 @@ function processes {
 
 #This function will display the current status of each file in the system
 function printstatus {
-
+    for $i in $(ls -d */)
+    do
+        files1=$(ls $i/zdab | wc -l)
+        files2=$(ls $i/root | wc -l)
+        echo $i  available chunks: $files1  processed chunks: $files2
+    done
 }
 
 #These functions allow you to select particular processes for action
