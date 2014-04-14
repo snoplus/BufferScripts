@@ -10,7 +10,6 @@ BUILDER=snotdaq@builder1.sp.snolab.ca
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
 clientpid=0
-feedqueuepid=0
 batchpid=0
 gluerpid=0
 
@@ -45,12 +44,6 @@ function processes {
     else
         NO+="\tclient\n"
     fi
-    if [ "$feedqueuepid" -ne 0 ]
-    then
-        echo -e "\t feedqueue \t $feedqueuepid"
-    else
-        NO+="\tfeedqueue\n"
-    fi
     if [ "$batchpid" -ne 0 ]
     then
         echo -e "\t batch \t $batchpid"
@@ -71,7 +64,7 @@ function processes {
 function startselect {
     echo Select the number of the script you wish to start.
     echo If you do not wish to start any processes at this time, select cancel to return to the previous menu.
-    startoptions=("server" "client" "feedqueue" "batch" "gluer" "cancel")
+    startoptions=("server" "client" "batch" "gluer" "cancel")
     select opt3 in "${startoptions[@]}"
         do
             case $opt3 in
@@ -91,15 +84,6 @@ function startselect {
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client before starting it again.
-                    fi
-                    ;;
-                "feedqueue")
-                    if [ "$feedqueuepid" -eq 0 ]
-                    then
-                        buffer/feedqueue &
-                        feedqueuepid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                    else
-                        echo feedqueue already running.  You must stop feedqueue before starting it again.
                     fi
                     ;;
                 "batch")
@@ -185,7 +169,6 @@ do
         	"Start")
                     if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
-                          "$feedqueuepid" -eq 0 && \
                           "$batchpid" -eq 0 && \
                           "$gluerpid" -eq 0 ]];
                     then
@@ -204,8 +187,6 @@ do
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	            buffer/client &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	            buffer/feedqueue &
-	                    feedqueuepid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         buffer/batch &
 	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         buffer/gluer &
@@ -229,11 +210,6 @@ do
                     then
         	            kill $clientpid
                         clientpid=0
-                    fi
-                    if [ "$feedqueuepid" -ne 0 ]
-                    then
-        	            kill $feedqueuepid
-                        feedqueuepid=0
                     fi
                     if [ "$batchpid" -ne 0 ]
                     then
@@ -261,7 +237,6 @@ do
                 "Quit")
                     if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
-                          "$feedqueuepid" -eq 0 && \
                           "$batchpid" -eq 0 && \
                           "$gluerpid" -eq 0 ]];
                     then
