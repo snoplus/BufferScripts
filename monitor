@@ -58,6 +58,7 @@ function processes {
     fi
     echo Here are the processes not running at this time:
     echo -e $NO
+    NO=""
 }
 
 #These functions allow you to select particular processes for action
