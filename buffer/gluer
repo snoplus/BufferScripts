@@ -5,6 +5,8 @@
 
 #! /bin/bash
 
+output=$1
+
 while true
 do
 

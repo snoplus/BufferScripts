@@ -12,7 +12,7 @@
 BUILDER=snotdaq@builder1.spdata.snolab.ca
 PIPE=/Users/snotdaq/server/pipe
 LOG=client.log
-DIR=.
+DIR=$1
 
 # Save the last job in the last file
 OLDJOB=0

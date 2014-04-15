@@ -5,7 +5,11 @@
 
 #! /bin/bash
 
+# Organization of locations.  Set directory structure here:
 BUILDER=snotdaq@builder1.sp.snolab.ca
+SERVERDIR=/Users/snotdaq/server
+CLIENTDIR=.
+GRIDREADY=/mnt/data/l2t
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
@@ -63,7 +67,7 @@ function processes {
 
 #This function will display the current status of each file in the system
 function printstatus {
-    for $i in $(ls -d */)
+    for i in $(ls -d ~/gluertest/*/)
     do
         files1=$(ls $i/zdab | wc -l)
         files2=$(ls $i/root | wc -l)
@@ -82,7 +86,7 @@ function startselect {
                 "server")
                     if [ "$serverpid" -eq 0 ]
                     then
-                        ssh $BUILDER /Users/snotdaq/server/server &
+                        ssh $BUILDER $SERVERDIR/server &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo server already running.  You must stop server before starting it again.
@@ -91,7 +95,7 @@ function startselect {
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        buffer/client &
+                        buffer/client $CLIENTDIR &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client before starting it again.
@@ -109,7 +113,7 @@ function startselect {
                 "gluer")
                     if [ "$gluerpid" -eq 0 ]
                     then
-                        buffer/gluer &
+                        buffer/gluer $GRIDREADY &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo gluer already running.  You must stop gluer before starting it again.
@@ -235,25 +239,17 @@ do
                           "$gluerpid" -eq 0 ]];
                     then
                         echo Preparing file structure...
-                        ssh $BUILDER rm /Users/snotdaq/server/pipe
-                        ssh $BUILDER mkfifo /Users/snotdaq/server/pipe
-                        if [ ! -d buffer/closed ]
-                        then
-                            mkdir buffer/closed
-                        fi
-                        if [ ! -d buffer/processed ]
-                        then
-                            mkdir buffer/processed
-                        fi
+                        ssh $BUILDER rm $SERVERDIR/pipe
+                        ssh $BUILDER mkfifo $SERVERDIR/pipe
                         echo File structure prepared.
                         echo Starting monitoring scripts...
-        	            ssh $BUILDER /Users/snotdaq/server/server &
+        	            ssh $BUILDER $SERVERDIR/server &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	            buffer/client &
+        	            buffer/client $CLIENTDIR &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         buffer/batch &
 	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        buffer/gluer &
+                        buffer/gluer $GRIDREADY &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         printmenu
                     else
