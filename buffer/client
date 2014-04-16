@@ -9,10 +9,10 @@
 #! /bin/bash
 
 # Specifying where to read from
-BUILDER=snotdaq@builder1.spdata.snolab.ca
-PIPE=/Users/snotdaq/server/pipe
-LOG=client.log
-DIR=$1
+BUILDER=$1
+PIPE=$2
+DIR=$3
+LOG=$4
 
 # Save the last job in the last file
 OLDJOB=0

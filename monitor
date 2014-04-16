@@ -15,8 +15,12 @@ SERVERFL=$SERVERDIR/served.txt        # file recording which files have been ser
 SERVERDATA=~/data_temp                # Location of the Builder output files
 SERVERLS=$SERVERDIR/ls.txt            # Location to store list of available files
 
-CLIENTDIR=.
-GRIDREADY=/mnt/data/l2t
+PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
+
+CLIENTDIR=.                           #
+CLIENTLOG=$CLIENTDIR/client.log       # Location of the client log file
+
+GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
@@ -102,7 +106,7 @@ function startselect {
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        buffer/client $CLIENTDIR &
+                        buffer/client $BUILDER $PIPE $CLIENTDIR &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client before starting it again.
@@ -246,13 +250,13 @@ do
                           "$gluerpid" -eq 0 ]];
                     then
                         echo Preparing file structure...
-                        ssh $BUILDER rm $SERVERDIR/pipe
-                        ssh $BUILDER mkfifo $SERVERDIR/pipe
+                        ssh $BUILDER rm $PIPE
+                        ssh $BUILDER mkfifo $PIPE
                         echo File structure prepared.
                         echo Starting monitoring scripts...
         	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	            buffer/client $CLIENTDIR &
+        	            buffer/client $BUILDER $PIPE $CLIENTDIR &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         buffer/batch &
 	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
