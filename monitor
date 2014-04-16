@@ -6,8 +6,14 @@
 #! /bin/bash
 
 # Organization of locations.  Set directory structure here:
-BUILDER=snotdaq@builder1.sp.snolab.ca
-SERVERDIR=/Users/snotdaq/server
+BUILDER=snotdaq@builder1.sp.snolab.ca # Event Builder
+
+SERVERDIR=/Users/snotdaq/server       # Directory for the L2 server on the builder
+SERVER=$SERVERDIR/l2server            # filename of L2 server
+SERVERLOG=$SERVERDIR/server.log       # filename of Server log
+SERVERFL=$SERVERDIR/served.txt        # file recording which files have been served
+SERVERDATA=~/data_temp                # Location of the Builder output files
+
 CLIENTDIR=.
 GRIDREADY=/mnt/data/l2t
 
@@ -86,7 +92,7 @@ function startselect {
                 "server")
                     if [ "$serverpid" -eq 0 ]
                     then
-                        ssh $BUILDER $SERVERDIR/server &
+                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo server already running.  You must stop server before starting it again.
@@ -243,7 +249,7 @@ do
                         ssh $BUILDER mkfifo $SERVERDIR/pipe
                         echo File structure prepared.
                         echo Starting monitoring scripts...
-        	            ssh $BUILDER $SERVERDIR/server &
+        	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	            buffer/client $CLIENTDIR &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
@@ -262,7 +268,7 @@ do
         	    echo Killing monitoring processes
                     if [ "$serverpid" -ne 0 ]
                     then
-                        ssh $BUILDER killall server
+                        ssh $BUILDER killall l2server
 	                    kill $serverpid
                         serverpid=0
                     fi
