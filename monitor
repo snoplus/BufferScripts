@@ -13,6 +13,7 @@ SERVER=$SERVERDIR/l2server            # filename of L2 server
 SERVERLOG=$SERVERDIR/server.log       # filename of Server log
 SERVERFL=$SERVERDIR/served.txt        # file recording which files have been served
 SERVERDATA=~/data_temp                # Location of the Builder output files
+SERVERLS=$SERVERDIR/ls.txt            # Location to store list of available files
 
 CLIENTDIR=.
 GRIDREADY=/mnt/data/l2t
@@ -92,7 +93,7 @@ function startselect {
                 "server")
                     if [ "$serverpid" -eq 0 ]
                     then
-                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL &
+                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo server already running.  You must stop server before starting it again.
@@ -249,7 +250,7 @@ do
                         ssh $BUILDER mkfifo $SERVERDIR/pipe
                         echo File structure prepared.
                         echo Starting monitoring scripts...
-        	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL &
+        	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	            buffer/client $CLIENTDIR &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
