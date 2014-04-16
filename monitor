@@ -6,7 +6,7 @@
 #! /bin/bash
 
 # Organization of locations.  Set directory structure here:
-BUILDER=snotdaq@builder1.sp.snolab.ca # Event Builder
+BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
 
 SERVERDIR=/Users/snotdaq/server       # Directory for the L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
@@ -17,8 +17,9 @@ SERVERLS=$SERVERDIR/ls.txt            # Location to store list of available file
 
 PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
 
-CLIENTDIR=.                           #
+CLIENTDIR=~/data                      # Location for unfinished outputs
 CLIENTLOG=$CLIENTDIR/client.log       # Location of the client log file
+CHOPPER=~/chopper/chopper             # Location of the chopper program
 
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 
@@ -106,7 +107,7 @@ function startselect {
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        buffer/client $BUILDER $PIPE $CLIENTDIR &
+                        buffer/client $BUILDER $PIPE $CLIENTDIR $CHOPPER &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client before starting it again.
@@ -256,7 +257,7 @@ do
                         echo Starting monitoring scripts...
         	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	            buffer/client $BUILDER $PIPE $CLIENTDIR &
+        	            buffer/client $BUILDER $PIPE $CLIENTDIR $CHOPPER &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         buffer/batch &
 	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
