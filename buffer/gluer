@@ -6,62 +6,52 @@
 #! /bin/bash
 
 output=$1
+DATADIR=$2
+LS=$3
+FL=$4
 
 while true
 do
 
-    OLDRUN=0
-    OLDFILE=$(ls -t buffer | grep .chopper.log | tail -n 1)
-    RUN=$( cat $OLDFILE | awk 'BEGIN {FS="."}{print $1}' )
-    NEWFILE=($RUN+1).chopper.log
+    # Get list of subruns needing to be reassembled:
+    ls $DATADIR > $LS # available subruns
+    for i in $LS
+      if [ ! -f output/$i ]
+        SUBRUN=$i
+      fi
 
-    while [ ! -f $NEWFILE ]
+    # Check whether all files are processed
+    num=$(ls $DATADIR/$SUBRUN/zdab | wc -l)
+    COUNT=0
+    while [ "$num" -gt 0 ]
     do
+        echo $num files remaining to process in subrun $SUBRUN.
         sleep 1
+        num2=$(ls $DATADIR/$SUBRUN/zdab | wc -l)
+        if [ "$num2" = "$num" ]
+        then
+            COUNT+=1
+        fi
+        if [ "$num2" -lt "$num" ]
+        then
+            COUNT=0
+        fi
+        num=$num2
+        if [ "$COUNT" -gt 60 ]
+        then
+            echo ERROR: Files for run $SUBRUN are not getting processed.
+            echo ERROR: Please correct the problem.
+            echo Gluer moving on to next $SUBRUN.
+            SUBRUN=
+        fi
     done
 
-    OLDRUN=$RUN
-    RUN=$RUN+1
-    BIGFILE=$RUN.L2.root
-    FIRST=0
+    # Prepare RAT macro for gluing files
+    # First, make a list of all files
+    ls $DATADIR/$SUBRUN/rat > $FL
 
-    for i in `cat $OLDFILE`
-    do
-        FILTER="chopped_$i_1.00_0.00.zdab.root "
-        COUNT=0
-        while [ ! -f $FILTER ]
-        do
-            if [ "$COUNT" -gt 60 ]
-            then
-                echo Gluer Error: Human Operator, where are my files?
-            fi
-            sleep 10
-            COUNT+=1
-        done
-        if [ "$FIRST" -eq 0 ]
-        then
-            ARGS=$FILTER
-            FIRST=1
-        else
-
-#
-#            cat > /tmp/rootmacro.C << EOF
-#
-#{
-#    TFile* file = new TFile("$FILTER","update);
-#    gDirectory->Delete("macro;1");
-#    gDirectory->Delete("log;1");
-#    gDirectory->Delete("db;1");
-#    gDirectory->Delete("runT;1");
-#    file->Close();
-#}
-#
-#EOF
-#            root -b -q /tmp/rootmacro.C
-#            rm /tmp/rootmacro.C
-#            ARGS+=$FILTER
-
-         cat > /tmp/gluer.mac << EOF
+    # Write macro body
+    cat > $DATADIR/$SUBRUN/gluer.mac << EOF
 
 /PhysicsList/OmitAll
 /rat/db/set DETECTOR geo_file "geo/empty.geo"
@@ -71,11 +61,21 @@ do
 /rat/proc outroot
 /rat/procset file $NAME
 
-/rat/inroot read $FILE
-
 EOF
-     fi
-     done
-#    hadd $BIGFILE $ARGS
+    
+    # Add read lines for each file on our list
+    for i in $FL
+        cat "/rat/read inzdab $DATADIR/$SUBRUN/rat/$i" >> $DATADIR/$SUBRUN/gluer.mac
+
+    # Run job and clean up files
+    source rat_env.sh
+    if[ rat $DATADIR/$SUBRUN/gluer.mac ]
+    then
+        rm $DATADIR/$SUBRUN/gluer.mac
+        for i in $FL
+            rm $DATADIR/$SUBRUN/rat/$i
+    else
+        echo ERROR: Gluer RAT job has failed!  You need to try recombining chopped files again!
+    fi
 
 done
