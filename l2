@@ -21,6 +21,8 @@ CLIENTDIR=~/data                      # Location for unfinished outputs
 CLIENTLOG=$CLIENTDIR/client.log       # Location of the client log file
 CHOPPER=~/chopper/chopper             # Location of the chopper program
 
+RUNJOBLOG=batch.log                   # Location of runjob's log
+
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 
 # Variables in which to store PIDs of the various monitoring scripts

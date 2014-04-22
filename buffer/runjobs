@@ -4,7 +4,7 @@
 
 #! /bin/bash
 DIR=$(dirname $0)
-LOG=batch.log
+LOG=$1
 
 source ~/rat_env.sh
 
