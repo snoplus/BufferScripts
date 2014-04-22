@@ -8,17 +8,32 @@
 output=$1
 DATADIR=$2
 LS=$3
-FL=$4
+ERRORLIST=$4
+FL=$5
+
+# This function will set the value of SUBRUN to the name of the next 
+# subrun needing gluing
+function NextSubrun{
+# Get list of subruns needing to be reassembled
+ls $DATADIR > $LS
+for i in $LS
+    if [ ! -f $output/$i ]
+    then
+# Ensure candidate is not on list of skipped subruns
+        if [ $(grep $ERRORLIST $i | wc -l) -eq 0 ]
+        then
+            SUBRUN=$i
+            break
+        fi
+    fi
+}
+
 
 while true
 do
 
-    # Get list of subruns needing to be reassembled:
-    ls $DATADIR > $LS # available subruns
-    for i in $LS
-      if [ ! -f output/$i ]
-        SUBRUN=$i
-      fi
+    # Get next available subrun
+    NextSubrun
 
     # Check whether all files are processed
     num=$(ls $DATADIR/$SUBRUN/zdab | wc -l)
@@ -42,7 +57,8 @@ do
             echo ERROR: Files for run $SUBRUN are not getting processed.
             echo ERROR: Please correct the problem.
             echo Gluer moving on to next $SUBRUN.
-            SUBRUN=
+            cat $SUBRUN >> $ERRORLIST
+            NextSubrun #Skip to next subrun
         fi
     done
 

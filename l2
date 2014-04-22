@@ -26,6 +26,7 @@ RUNJOBLOG=LOGDIR/batch.log            # Location of runjob's log
 
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 GLUERLS=$LOGDIR/gluerls.txt           # filename of Gluer's list of available subruns
+GLUERERR=$LOGDIR/gluererror.txt       # filename of Gluer's list of failed subruns
 GLUERFL=$LOGDIR/gluerfl.txt           # filename of Gluer's list of chopped files
 
 # Variables in which to store PIDs of the various monitoring scripts
@@ -130,7 +131,7 @@ function startselect {
                 "gluer")
                     if [ "$gluerpid" -eq 0 ]
                     then
-                        buffer/gluer $GRIDREADY $CLIENTDIR &
+                        buffer/gluer $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo gluer already running.  You must stop gluer before starting it again.
@@ -268,7 +269,7 @@ do
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         buffer/batch &
 	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        buffer/gluer $GRIDREADY &
+                        buffer/gluer $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         printmenu
                     else
