@@ -1,4 +1,4 @@
-# This script can operate and monitor the other BufferScripts needed
+# This script can operate and monitor the BufferScripts needed
 # to run the L2 trigger.  It keeps track of the PIDs of the various
 # processes.  At start, it also ensures that the necessary files and
 # directory structures are present, and, if not, constructs them.
@@ -7,6 +7,7 @@
 
 # Organization of locations.  Set directory structure here:
 BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
+LOGDIR=~/bufferscripts/log            # Central location for L2 log files
 
 SERVERDIR=/Users/snotdaq/server       # Directory for the L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
@@ -18,10 +19,10 @@ SERVERLS=$SERVERDIR/ls.txt            # Location to store list of available file
 PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
 
 CLIENTDIR=~/data                      # Location for unfinished outputs
-CLIENTLOG=$CLIENTDIR/client.log       # Location of the client log file
+CLIENTLOG=$LOGDIR/client.log          # Location of the client log file
 CHOPPER=~/chopper/chopper             # Location of the chopper program
 
-RUNJOBLOG=batch.log                   # Location of runjob's log
+RUNJOBLOG=LOGDIR/batch.log            # Location of runjob's log
 
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 
@@ -81,7 +82,7 @@ function processes {
 
 #This function will display the current status of each file in the system
 function printstatus {
-    for i in $(ls -d ~/gluertest/*/)
+    for i in $(ls -d $CLIENTDIR/*/)
     do
         files1=$(ls $i/zdab | wc -l)
         files2=$(ls $i/root | wc -l)
@@ -255,6 +256,8 @@ do
                         echo Preparing file structure...
                         ssh $BUILDER rm $PIPE
                         ssh $BUILDER mkfifo $PIPE
+                        if [ ! -d $LOGDIR ]
+                            mkdir $LOGDIR
                         echo File structure prepared.
                         echo Starting monitoring scripts...
         	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
