@@ -3,18 +3,19 @@
 # never flushed.  It writes out the stdout output of RAT to batch.log.
 
 #! /bin/bash
-DIR=$(dirname $0)
+DIRLOCAL=$(dirname $0)
 LOG=$1
+DIR=$2
 
 source ~/rat_env.sh
 
 # First reconstruct the job queue
-if [ "$(ls ./*/zdab/* | wc -l)" -gt 0 ]
+if [ "$(ls $DIR/*/zdab/* | wc -l)" -gt 0 ]
 then
   killall -SIGUSR1 chopper
   sleep 1
-  rm jobqueue.txt
-  for i in $(ls ./*/zdab/* | wc -l) do
+  rm DIRLOCAL/jobqueue.txt
+  for i in $(ls $DIR/*/zdab/* | wc -l) do
     SUBRUN=$(cat $i | awk 'BEGIN {FS="/"}{print $2}' )
     INDEX=$(cat $i | awk 'BEGIN {FS="/"}{print $4}' | awk 'BEGIN {FS="_"}{print $2}' )
     echo "./job $SUBRUN $INDEX $i" >> jobqueue.txt
@@ -23,5 +24,5 @@ then
 fi
 
 # Then run the jobs
-tail -f -c +1 $DIR/jobqueue.txt | parallel -j4 --retries 4 --progress >> $LOG
+tail -f -c +1 $DIRLOCAL/jobqueue.txt | parallel -j4 --retries 4 --progress >> $LOG
 

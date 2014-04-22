@@ -118,7 +118,7 @@ function startselect {
                 "batch")
                     if [ "$batchpid" -eq 0 ]
                     then
-                        buffer/batch &
+                        buffer/batch $RUNJOBLOG $CLIENTDIR &
                         batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo batch already running.  You must stop batch before starting it again.
