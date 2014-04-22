@@ -59,7 +59,7 @@ do
 /run/initialize
 
 /rat/proc outroot
-/rat/procset file $NAME
+/rat/procset file $output/$SUBRUN
 
 EOF
     

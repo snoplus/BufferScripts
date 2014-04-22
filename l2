@@ -25,6 +25,8 @@ CHOPPER=~/chopper/chopper             # Location of the chopper program
 RUNJOBLOG=LOGDIR/batch.log            # Location of runjob's log
 
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
+GLUERLS=$LOGDIR/gluerls.txt           # filename of Gluer's list of available subruns
+GLUERFL=$LOGDIR/gluerfl.txt           # filename of Gluer's list of chopped files
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
@@ -128,7 +130,7 @@ function startselect {
                 "gluer")
                     if [ "$gluerpid" -eq 0 ]
                     then
-                        buffer/gluer $GRIDREADY &
+                        buffer/gluer $GRIDREADY $CLIENTDIR &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo gluer already running.  You must stop gluer before starting it again.
