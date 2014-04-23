@@ -10,6 +10,7 @@ BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
 BS=$HOME/BufferScripts                # Home directory of the Buffer Scripts
 LOGDIR=$BS/log                        # Central location for L2 log files
 
+LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
 SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
 SERVERLOG=$SERVERDIR/server.log       # filename of Server log
@@ -286,6 +287,7 @@ do
                         echo Preparing file structure...
                         ssh $BUILDER rm $PIPE
                         ssh $BUILDER mkfifo $PIPE
+                        scp $LOCALSERVER $BUILDER:$SERVER
                         if [ ! -d $LOGDIR ]
                         then
                             mkdir $LOGDIR
