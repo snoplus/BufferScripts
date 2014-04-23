@@ -90,7 +90,9 @@ EOF
 
     # Run job and clean up files
     source rat_env.sh
-    if[ rat $DATADIR/$SUBRUN/gluer.mac ]
+    rat $DATADIR/$SUBRUN/gluer.mac
+    rc=$?
+    if[ "$rc" -eq 0 ]
     then
         rm $DATADIR/$SUBRUN/gluer.mac
         for i in $FL
