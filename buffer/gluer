@@ -83,7 +83,10 @@ EOF
     
     # Add read lines for each file on our list
     for i in $FL
-        echo /rat/read inzdab $DATADIR/$SUBRUN/rat/$i >> $DATADIR/$SUBRUN/gluer.mac
+    do
+        echo /rat/read inzdab $DATADIR/$SUBRUN/rat/$i \
+             >> $DATADIR/$SUBRUN/gluer.mac
+    done
 
     # Run job and clean up files
     source rat_env.sh
