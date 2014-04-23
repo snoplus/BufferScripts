@@ -42,6 +42,7 @@ function printmenu {
     echo "3) Details"
     echo "4) Status"
     echo "5) Quit"
+    echo "6) Help"
 }
 function printdetailmenu {
     echo Start and Stop allow you to control specific scripts.
@@ -227,6 +228,20 @@ function details {
         done
 }
 
+# This function prints the welcome message
+function printwelcome {
+echo "*********************************************************************************"
+echo "**           Welcome to the SNO+ Level II Trigger user interface               **"
+echo "**                                                                             **"
+echo "**  For simple usage, select 'Start' to start all scripts and 'Stop' to stop   **"
+echo "**  all scripts.  If you know what you are doing, select 'Details' to start or **"
+echo "**  stop specific scripts.  'Status' will allow you to read the log file of    **"
+echo "**  the different scripts.  To exit the user interface, select 'Quit' after    **"
+echo "**  stopping all processes.  To print this message, select 'Help'.             **"
+echo "**                                                                             **"
+echo "*********************************************************************************"
+}
+
 #
 # MAIN LOOP BEGINS HERE
 #
@@ -234,19 +249,9 @@ source ~/rat_env.sh
 
 while true
 do
+    printwelcome
 
-    echo "*********************************************************************************"
-    echo "**       Welcome to the UChicago SNO+ Monitoring Tools user interface          **"
-    echo "**                                                                             **"
-    echo "**  For simple usage, select "Start" to start all scripts and "Stop" to stop       **"
-    echo "**  all scripts.  If you know what you are doing, select "Details" to start or   **"
-    echo "**  stop specific scripts.  "Status" will allow you to read the log file of      **"
-    echo "**  the different scripts.  To exit the user interface, select "Quit" after      **"
-    echo "**  stopping all processes.                                                    **"
-    echo "**                                                                             **"
-    echo "*********************************************************************************"
-
-    options=("Start" "Stop" "Details" "Status" "Quit")
+    options=("Start" "Stop" "Details" "Status" "Quit" "Help")
     select opt in "${options[@]}"
 	do
 	    case $opt in
@@ -260,7 +265,13 @@ do
                         ssh $BUILDER rm $PIPE
                         ssh $BUILDER mkfifo $PIPE
                         if [ ! -d $LOGDIR ]
+                        then
                             mkdir $LOGDIR
+                        fi
+                        if [ ! -d $CLIENTDIR ]
+                        then
+                            mkdir $CLIENTDIR
+                        fi
                         echo File structure prepared.
                         echo Starting monitoring scripts...
         	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
@@ -336,8 +347,13 @@ do
                     echo exiting the user interface, or it will be a pain to recover.
                 fi
                 ;;
+            "Help")
+                printwelcome
+                printmenu
+                ;;
         	*)
 	            echo Invalid option
+                printmenu
         	    ;;
 	    esac
 	done
