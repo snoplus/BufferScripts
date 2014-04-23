@@ -159,7 +159,7 @@ function stopselect {
     echo Enter the number of the process you wish to stop.
     echo If you do not wish to stop any process at this time, select "Cancel" to return to the previous menu.
     stopoptions=("sever" "client" "batch" "gluer" "cancel")
-    select opt4 in "($stopoptions[@])"
+    select opt4 in "${stopoptions[@]}"
         do
             case $opt4 in
                 "sever")
