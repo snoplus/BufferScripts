@@ -171,7 +171,7 @@ function stopselect {
         do
             case $opt4 in
                 "sever")
-                    if [ "serverpid" -ne 0 ]
+                    if [ "$serverpid" -ne 0 ]
                     then
                         ssh $BUILDER killall l2server
                         kill $serverpid
@@ -182,7 +182,7 @@ function stopselect {
                     fi
                     ;;
                 "client")
-                    if [ "clientpid" -ne 0 ]
+                    if [ "$clientpid" -ne 0 ]
                     then
                         kill $clientpid
                         clientpid=0
@@ -192,7 +192,7 @@ function stopselect {
                     fi
                     ;;
                 "batch")
-                    if [ "batchpid" -ne 0 ]
+                    if [ "$batchpid" -ne 0 ]
                     then
                         kill $batchpid
                         batchpid=0
@@ -202,7 +202,7 @@ function stopselect {
                     fi
                     ;;
                 "gluer")
-                    if [ "gluerpid" -ne 0 ]
+                    if [ "$gluerpid" -ne 0 ]
                     then
                         kill $gluerpid
                         gluerpid=0
