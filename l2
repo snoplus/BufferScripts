@@ -6,32 +6,32 @@
 #! /bin/bash
 
 # Organization of locations.  Set directory structure here:
-BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
-BS=~/BufferScripts                    # Home directory of the Buffer Scripts
-LOGDIR=$BS/log                      # Central location for L2 log files
+BUILDER='snotdaq@builder1.sp.snolab.ca' # Access to Event Builder
+BS=$HOME/BufferScripts                  # Home directory of the Buffer Scripts
+LOGDIR=$BS/log                          # Central location for L2 log files
 
-SERVERDIR=/Users/snotdaq/server       # Directory for the L2 server on the builder
-SERVER=$SERVERDIR/l2server            # filename of L2 server
-SERVERLOG=$SERVERDIR/server.log       # filename of Server log
-SERVERFL=$SERVERDIR/served.txt        # file recording which files have been served
-SERVERDATA=~/data_temp                # Directory for the Builder output files
-SERVERLS=$SERVERDIR/ls.txt            # filename to store list of available files
+SERVERDIR='/Users/snotdaq/server'       # Directory for the L2 server on the builder
+SERVER=$SERVERDIR/l2server              # filename of L2 server
+SERVERLOG=$SERVERDIR/server.log         # filename of Server log
+SERVERFL=$SERVERDIR/served.txt          # file recording which files have been served
+SERVERDATA=$HOME/data_temp              # Directory for the Builder output files
+SERVERLS=$SERVERDIR/ls.txt              # filename to store list of available files
 
-PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
+PIPE=$SERVERDIR/pipe                    # Location of builder > buffer pipe
 
-CLIENT=$BS/buffer/client            # Location of the client script
-CLIENTDIR=~/data                      # Directory for unfinished outputs
-CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
-CHOPPER=~/chopper/chopper             # Location of the chopper program
+CLIENT=$BS/buffer/client                # Location of the client script
+CLIENTDIR=$HOME/data                    # Directory for unfinished outputs
+CLIENTLOG=$LOGDIR/client.log            # filename of the client log file
+CHOPPER=~/chopper/chopper               # Location of the chopper program
 
-RUNJOB=$BS/buffer/runjobs           # Location of the runjobs script
-RUNJOBLOG=LOGDIR/runjobs.log          # filename of runjob's log
+RUNJOB=$BS/buffer/runjobs               # Location of the runjobs script
+RUNJOBLOG=LOGDIR/runjobs.log            # filename of runjob's log
 
-GRIDREADY=/mnt/data/l2t               # Output directory for finished products
-GLUER=$BS/buffer/gluer              # Location of the gluer script
-GLUERLS=$LOGDIR/gluerls.txt           # filename of gluer's list of available subruns
-GLUERERR=$LOGDIR/gluererror.txt       # filename of gluer's list of failed subruns
-GLUERFL=$LOGDIR/gluerfl.txt           # filename of gluer's list of chopped files
+GRIDREADY='/mnt/data/l2t'               # Output directory for finished products
+GLUER=$BS/buffer/gluer                  # Location of the gluer script
+GLUERLS=$LOGDIR/gluerls.txt             # filename of gluer's list of available subruns
+GLUERERR=$LOGDIR/gluererror.txt         # filename of gluer's list of failed subruns
+GLUERFL=$LOGDIR/gluerfl.txt             # filename of gluer's list of chopped files
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
