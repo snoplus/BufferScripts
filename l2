@@ -15,7 +15,7 @@ SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
 SERVERLOG=$SERVERDIR/server.log       # filename of Server log
 SERVERFL=$SERVERDIR/served.txt        # file recording served files 
-SERVERDATA=$HOME/data_temp            # Directory for the Builder output files
+SERVERDATA=/Users/snotdaq/data_temp   # Directory for the Builder output files
 SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
 
 PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
