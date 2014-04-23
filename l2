@@ -352,6 +352,7 @@ do
                     echo You have unstopped processes.  Please stop all processes before
                     echo exiting the user interface, or it will be a pain to recover.
                 fi
+                printmenu
                 ;;
             "Help")
                 printwelcome

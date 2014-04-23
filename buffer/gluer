@@ -17,6 +17,7 @@ function NextSubrun {
 # Get list of subruns needing to be reassembled
 ls $DATADIR > $LS
 for i in $LS
+do
     if [ ! -f $output/$i ]
     then
 # Ensure candidate is not on list of skipped subruns
@@ -26,6 +27,7 @@ for i in $LS
             break
         fi
     fi
+done
 }
 
 
