@@ -13,16 +13,16 @@ SERVERDIR=/Users/snotdaq/server       # Directory for the L2 server on the build
 SERVER=$SERVERDIR/l2server            # filename of L2 server
 SERVERLOG=$SERVERDIR/server.log       # filename of Server log
 SERVERFL=$SERVERDIR/served.txt        # file recording which files have been served
-SERVERDATA=~/data_temp                # Location of the Builder output files
-SERVERLS=$SERVERDIR/ls.txt            # Location to store list of available files
+SERVERDATA=~/data_temp                # Directory for the Builder output files
+SERVERLS=$SERVERDIR/ls.txt            # filename to store list of available files
 
 PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
 
-CLIENTDIR=~/data                      # Location for unfinished outputs
-CLIENTLOG=$LOGDIR/client.log          # Location of the client log file
+CLIENTDIR=~/data                      # Directory for unfinished outputs
+CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
 CHOPPER=~/chopper/chopper             # Location of the chopper program
 
-RUNJOBLOG=LOGDIR/batch.log            # Location of runjob's log
+RUNJOBLOG=LOGDIR/batch.log            # filename of runjob's log
 
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 GLUERLS=$LOGDIR/gluerls.txt           # filename of Gluer's list of available subruns
@@ -35,7 +35,7 @@ clientpid=0
 batchpid=0
 gluerpid=0
 
-#This function prints the main menu options
+# These functions print the menu options
 function printmenu {
     echo "1) Start"
     echo "2) Stop"
@@ -83,7 +83,7 @@ function processes {
     NO=""
 }
 
-#This function will display the current status of each file in the system
+# This function will display the current status of each file in the system
 function printstatus {
     for i in $(ls -d $CLIENTDIR/*/)
     do
@@ -93,7 +93,7 @@ function printstatus {
     done
 }
 
-#These functions allow you to select particular processes for action
+# These functions allow you to select particular processes for action
 function startselect {
     echo Select the number of the script you wish to start.
     echo If you do not wish to start any processes at this time, select cancel to return to the previous menu.
