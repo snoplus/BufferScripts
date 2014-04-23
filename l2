@@ -160,7 +160,8 @@ function stopselect {
                 "sever")
                     if [ "serverpid" -neq 0 ]
                     then
-                        #MUST ssh for this one
+                        ssh $BUILDER killall l2server
+                        kill $serverpid
                         serverpid=0
                     else
                         echo Server not currently running.  You must start it before stopping it.
