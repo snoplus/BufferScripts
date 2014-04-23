@@ -26,7 +26,7 @@ CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
 CHOPPER=~/chopper/chopper             # Location of the chopper program
 
 RUNJOB=$BS/buffer/runjobs             # Location of the runjobs script
-RUNJOBLOG=LOGDIR/runjobs.log          # filename of runjob's log
+RUNJOBLOG=$LOGDIR/runjobs.log         # filename of runjob's log
 
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 GLUER=$BS/buffer/gluer                # Location of the gluer script
