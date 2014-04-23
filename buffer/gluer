@@ -94,9 +94,12 @@ EOF
     then
         rm $DATADIR/$SUBRUN/gluer.mac
         for i in $FL
+        do
             rm $DATADIR/$SUBRUN/rat/$i
+        done
     else
-        echo ERROR: Gluer RAT job has failed!  You need to try recombining chopped files again!
+        echo ERROR: Gluer RAT job has failed!  You need to try recombining \
+              chopped files again!
     fi
 
 done
