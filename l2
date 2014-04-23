@@ -173,7 +173,7 @@ function stopselect {
                     fi
                     ;;
                 "client")
-                    if [ "clientpid" -neq 0]
+                    if [ "clientpid" -neq 0 ]
                     then
                         kill $clientpid
                         clientpid=0
@@ -182,7 +182,7 @@ function stopselect {
                     fi
                     ;;
                 "batch")
-                    if [ "batchpid" -neq 0]
+                    if [ "batchpid" -neq 0 ]
                     then
                         kill $batchpid
                         batchpid=0
@@ -191,7 +191,7 @@ function stopselect {
                     fi
                     ;;
                 "gluer")
-                    if [ "gluerpid" -neq 0]
+                    if [ "gluerpid" -neq 0 ]
                     then
                         kill $gluerpid
                         gluerpid=0
