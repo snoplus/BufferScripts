@@ -15,14 +15,17 @@ then
   killall -SIGUSR1 chopper
   sleep 1
   rm DIRLOCAL/jobqueue.txt
-  for i in $(ls $DIR/*/zdab/* | wc -l) do
+  for i in $(ls $DIR/*/zdab/* | wc -l)
+  do
     SUBRUN=$(cat $i | awk 'BEGIN {FS="/"}{print $2}' )
-    INDEX=$(cat $i | awk 'BEGIN {FS="/"}{print $4}' | awk 'BEGIN {FS="_"}{print $2}' )
+    INDEX=$(cat $i | awk 'BEGIN {FS="/"}{print $4}' | \
+            awk 'BEGIN {FS="_"}{print $2}' )
     echo ./job $SUBRUN $INDEX $i >> jobqueue.txt
   done
   killall -SIGUSR2 chopper
 fi
 
 # Then run the jobs
-tail -f -c +1 $DIRLOCAL/jobqueue.txt | parallel -j4 --retries 4 --progress >> $LOG
+tail -f -c +1 $DIRLOCAL/jobqueue.txt | parallel -j4 --retries 4 --progress \
+   >> $LOG
 
