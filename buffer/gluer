@@ -13,7 +13,7 @@ FL=$5
 
 # This function will set the value of SUBRUN to the name of the next 
 # subrun needing gluing
-function NextSubrun{
+function NextSubrun {
 # Get list of subruns needing to be reassembled
 ls $DATADIR > $LS
 for i in $LS
