@@ -23,13 +23,15 @@ do
 
 # If there is no $FL file, assume we want to start from present
     if [ -f ! $FL]
+    then
         ls -tr $DATA/*.zdab > $FL
+    fi
 
     while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
-        do
-            sleep 1
-            echo Waiting for data >> $LOG
-        done
+    do
+        sleep 1
+        echo Waiting for data >> $LOG
+    done
 
     FILE=$(comm -23 $LS $FL | head -n 1)
 
