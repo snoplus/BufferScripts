@@ -10,12 +10,12 @@ BUILDER='snotdaq@builder1.sp.snolab.ca' # Access to Event Builder
 BS=$HOME/BufferScripts                  # Home directory of the Buffer Scripts
 LOGDIR=$BS/log                          # Central location for L2 log files
 
-SERVERDIR='/Users/snotdaq/server'       # Directory for the L2 server on the builder
+SERVERDIR='/Users/snotdaq/server'       # Directory of L2 server on the builder
 SERVER=$SERVERDIR/l2server              # filename of L2 server
 SERVERLOG=$SERVERDIR/server.log         # filename of Server log
-SERVERFL=$SERVERDIR/served.txt          # file recording which files have been served
+SERVERFL=$SERVERDIR/served.txt          # file recording served files 
 SERVERDATA=$HOME/data_temp              # Directory for the Builder output files
-SERVERLS=$SERVERDIR/ls.txt              # filename to store list of available files
+SERVERLS=$SERVERDIR/ls.txt              # filename for list of available files
 
 PIPE=$SERVERDIR/pipe                    # Location of builder > buffer pipe
 
@@ -29,9 +29,9 @@ RUNJOBLOG=LOGDIR/runjobs.log            # filename of runjob's log
 
 GRIDREADY='/mnt/data/l2t'               # Output directory for finished products
 GLUER=$BS/buffer/gluer                  # Location of the gluer script
-GLUERLS=$LOGDIR/gluerls.txt             # filename of gluer's list of available subruns
-GLUERERR=$LOGDIR/gluererror.txt         # filename of gluer's list of failed subruns
-GLUERFL=$LOGDIR/gluerfl.txt             # filename of gluer's list of chopped files
+GLUERLS=$LOGDIR/gluerls.txt             # filename of list of available subruns
+GLUERERR=$LOGDIR/gluererror.txt         # filename of list of failed subruns
+GLUERFL=$LOGDIR/gluerfl.txt             # filename of list of chopped files
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
@@ -102,7 +102,8 @@ function printstatus {
 # These functions allow you to select particular processes for action
 function startselect {
     echo Select the number of the script you wish to start.
-    echo If you do not wish to start any processes at this time, select cancel to return to the previous menu.
+    echo If you do not wish to start any processes at this time, select cancel \
+          to return to the previous menu.
     startoptions=("server" "client" "batch" "gluer" "cancel")
     select opt3 in "${startoptions[@]}"
         do
@@ -110,10 +111,12 @@ function startselect {
                 "server")
                     if [ "$serverpid" -eq 0 ]
                     then
-                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
+                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
+                             $SERVERLS &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
-                        echo server already running.  You must stop server before starting it again.
+                        echo server already running.  You must stop server \
+                              before starting it again.
                     fi
                     ;;
                 "client")
@@ -122,7 +125,8 @@ function startselect {
                         $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
-                        echo client already running.  You must stop client before starting it again.
+                        echo client already running.  You must stop client \
+                              before starting it again.
                     fi
                     ;;
                 "batch")
@@ -131,16 +135,19 @@ function startselect {
                         $RUNJOB $RUNJOBLOG $CLIENTDIR &
                         batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
-                        echo batch already running.  You must stop batch before starting it again.
+                        echo batch already running.  You must stop batch \
+                              before starting it again.
                     fi
                     ;;
                 "gluer")
                     if [ "$gluerpid" -eq 0 ]
                     then
-                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
+                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR \
+                         $GLUERFL &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
-                        echo gluer already running.  You must stop gluer before starting it again.
+                        echo gluer already running.  You must stop gluer \
+                              before starting it again.
                     fi
                     ;;
                 "cancel")
@@ -157,46 +164,51 @@ function startselect {
 
 function stopselect {
     echo Enter the number of the process you wish to stop.
-    echo If you do not wish to stop any process at this time, select "Cancel" to return to the previous menu.
+    echo If you do not wish to stop any process at this time, select "Cancel" \
+          to return to the previous menu.
     stopoptions=("sever" "client" "batch" "gluer" "cancel")
     select opt4 in "${stopoptions[@]}"
         do
             case $opt4 in
                 "sever")
-                    if [ "serverpid" -neq 0 ]
+                    if [ "serverpid" -ne 0 ]
                     then
                         ssh $BUILDER killall l2server
                         kill $serverpid
                         serverpid=0
                     else
-                        echo Server not currently running.  You must start it before stopping it.
+                        echo Server not currently running.  You must start it \
+                              before stopping it.
                     fi
                     ;;
                 "client")
-                    if [ "clientpid" -neq 0 ]
+                    if [ "clientpid" -ne 0 ]
                     then
                         kill $clientpid
                         clientpid=0
                     else
-                        echo Client not currently running.  You must start it before stopping it.
+                        echo Client not currently running.  You must start it \
+                              before stopping it.
                     fi
                     ;;
                 "batch")
-                    if [ "batchpid" -neq 0 ]
+                    if [ "batchpid" -ne 0 ]
                     then
                         kill $batchpid
                         batchpid=0
                     else
-                        echo Runjobs not currently running.  You must start it before stopping it.
+                        echo Runjobs not currently running.  You must start it \
+                              before stopping it.
                     fi
                     ;;
                 "gluer")
-                    if [ "gluerpid" -neq 0 ]
+                    if [ "gluerpid" -ne 0 ]
                     then
                         kill $gluerpid
                         gluerpid=0
                     else
-                        echo Gluer not currently running.  You must start it before stopping it.
+                        echo Gluer not currently running.  You must start it \
+                              before stopping it.
                     fi
                     ;;
                 "cancel")
@@ -280,19 +292,23 @@ do
                         fi
                         echo File structure prepared.
                         echo Starting level 2 scripts...
-        	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
+        	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
+                             $SERVERLS &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
         	            $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         $RUNJOB &
 	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
+                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR \
+                         $GLUERFL &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         printmenu
                     else
-                        echo Some processes were already running.  Please stop all scripts before 
-                        echo using the Start All option.  If you do not want to stop running processes, 
-                        echo you can start processes one at a time in the Details options.
+                        echo Some processes were already running.  Please stop \
+                              all scripts before using the Start All option.  \
+                              If you do not want to stop running processes, \
+                              you can start processes one at a time in the \
+                              Details options.
                     fi
         	    ;;
 	        "Stop")
@@ -332,7 +348,8 @@ do
                 keypress=''
                 while [[ "x$keypress" == "x" ]]
                 do
-                    echo To stop monitoring and return to Main menu, press any key at any time.
+                    echo To stop monitoring and return to Main menu, press \
+                          any key at any time.
                     processes
                     printstatus
                     read keypress
@@ -349,8 +366,9 @@ do
                     echo Goodbye
                     exit
                 else
-                    echo You have unstopped processes.  Please stop all processes before
-                    echo exiting the user interface, or it will be a pain to recover.
+                    echo You have unstopped processes.  Please stop all \
+                         processes before exiting the user interface, or it \
+                         will be a pain to recover.
                 fi
                 printmenu
                 ;;
