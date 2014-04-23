@@ -7,7 +7,8 @@
 
 # Organization of locations.  Set directory structure here:
 BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
-LOGDIR=~/bufferscripts/log            # Central location for L2 log files
+HOME=~/BufferScripts                  # Home directory of the Buffer Scripts
+LOGDIR=$HOME/log                      # Central location for L2 log files
 
 SERVERDIR=/Users/snotdaq/server       # Directory for the L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
@@ -18,16 +19,19 @@ SERVERLS=$SERVERDIR/ls.txt            # filename to store list of available file
 
 PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
 
+CLIENT=$HOME/buffer/client            # Location of the client script
 CLIENTDIR=~/data                      # Directory for unfinished outputs
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
 CHOPPER=~/chopper/chopper             # Location of the chopper program
 
-RUNJOBLOG=LOGDIR/batch.log            # filename of runjob's log
+RUNJOB=$HOME/buffer/runjobs           # Location of the runjobs script
+RUNJOBLOG=LOGDIR/runjobs.log          # filename of runjob's log
 
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
-GLUERLS=$LOGDIR/gluerls.txt           # filename of Gluer's list of available subruns
-GLUERERR=$LOGDIR/gluererror.txt       # filename of Gluer's list of failed subruns
-GLUERFL=$LOGDIR/gluerfl.txt           # filename of Gluer's list of chopped files
+GLUER=$HOME/buffer/gluer              # Location of the gluer script
+GLUERLS=$LOGDIR/gluerls.txt           # filename of gluer's list of available subruns
+GLUERERR=$LOGDIR/gluererror.txt       # filename of gluer's list of failed subruns
+GLUERFL=$LOGDIR/gluerfl.txt           # filename of gluer's list of chopped files
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
@@ -114,7 +118,7 @@ function startselect {
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        buffer/client $BUILDER $PIPE $CLIENTDIR $CHOPPER &
+                        $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client before starting it again.
@@ -123,7 +127,7 @@ function startselect {
                 "batch")
                     if [ "$batchpid" -eq 0 ]
                     then
-                        buffer/batch $RUNJOBLOG $CLIENTDIR &
+                        $RUNJOB $RUNJOBLOG $CLIENTDIR &
                         batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo batch already running.  You must stop batch before starting it again.
@@ -132,7 +136,7 @@ function startselect {
                 "gluer")
                     if [ "$gluerpid" -eq 0 ]
                     then
-                        buffer/gluer $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
+                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo gluer already running.  You must stop gluer before starting it again.
@@ -274,14 +278,14 @@ do
                             mkdir $CLIENTDIR
                         fi
                         echo File structure prepared.
-                        echo Starting monitoring scripts...
+                        echo Starting level 2 scripts...
         	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL $SERVERLS &
     	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	            buffer/client $BUILDER $PIPE $CLIENTDIR $CHOPPER &
+        	            $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
 	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        buffer/batch &
+                        $RUNJOB &
 	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        buffer/gluer $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
+                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR $GLUERFL &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         printmenu
                     else
