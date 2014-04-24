@@ -276,9 +276,9 @@ do
 
     options=("Start" "Stop" "Details" "Status" "Quit" "Help")
     select opt in "${options[@]}"
-	do
-	    case $opt in
-        	"Start")
+    do
+        case $opt in
+            "Start")
                     if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
                           "$batchpid" -eq 0 && \
@@ -298,13 +298,13 @@ do
                         fi
                         echo File structure prepared.
                         echo Starting level 2 scripts...
-        	            ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
+                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
                              $SERVERLS &
-    	                serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-        	            $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
-	                    clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
+                        clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         $RUNJOB &
-	                    batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR \
                          $GLUERFL &
                         gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
@@ -316,23 +316,23 @@ do
                               you can start processes one at a time in the \
                               Details options.
                     fi
-        	    ;;
-	        "Stop")
-        	    echo Killing monitoring processes
+                ;;
+            "Stop")
+                echo Killing monitoring processes
                     if [ "$serverpid" -ne 0 ]
                     then
                         ssh $BUILDER killall l2server
-	                    kill $serverpid
+                        kill $serverpid
                         serverpid=0
                     fi
                     if [ "$clientpid" -ne 0 ]
                     then
-        	            kill $clientpid
+                        kill $clientpid
                         clientpid=0
                     fi
                     if [ "$batchpid" -ne 0 ]
                     then
-	                    kill $batchpid
+                        kill $batchpid
                         batchpi=0
                     fi
                     if [ "$gluerpid" -ne 0 ]
@@ -341,14 +341,14 @@ do
                         gluerpid=0
                     fi
                     printmenu
-        	    ;;
-	        "Details")
+                ;;
+            "Details")
                 processes
                 echo Select below to start or stop particular processes
                 echo If you wish to return to the main menu, select cancel.
                 details
                 printmenu
-	            ;;
+                ;;
             "Status")
                 stty -echo -icanon time 10 min 0
                 keypress=''
@@ -382,10 +382,10 @@ do
                 printwelcome
                 printmenu
                 ;;
-        	*)
-	            echo Invalid option
+            *)
+                echo Invalid option
                 printmenu
-        	    ;;
-	    esac
-	done
+                ;;
+        esac
+    done
 done
