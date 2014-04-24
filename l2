@@ -381,9 +381,9 @@ do
                     echo Goodbye
                     exit
                 else
-                    echo You have unstopped processes.  Please stop all \
-                         processes before exiting the user interface, or it \
-                         will be a pain to recover.
+                    echo Some of the scripts are still running.  Please stop \
+                         all processes before exiting the user interface, or \
+                         it will be a pain to recover.
                 fi
                 printmenu
                 ;;
