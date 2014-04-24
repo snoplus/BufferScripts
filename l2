@@ -36,6 +36,7 @@ GLUERFL=$LOGDIR/gluerfl.txt           # filename of list of chopped files
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
+builderpid=0
 clientpid=0
 batchpid=0
 gluerpid=0
@@ -115,6 +116,9 @@ function startselect {
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
                              $SERVERLS &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        builderpid=$(ssh $BUILDER ps -u snotdaq \
+                                     | grep l2server | grep /bin/bash \
+                                     | awk '{print $2}' )
                     else
                         echo server already running.  You must stop server \
                               before starting it again.
@@ -174,7 +178,8 @@ function stopselect {
                 "sever")
                     if [ "$serverpid" -ne 0 ]
                     then
-                        ssh $BUILDER killall l2server
+                        ssh $BUILDER kill $builderpid
+                        builderpid=0
                         kill $serverpid
                         serverpid=0
                     else
@@ -301,6 +306,9 @@ do
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
                              $SERVERLS &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        builderpid=$(ssh $BUILDER ps -u snotdaq \
+                                      | grep l2server | grep /bin/bash \
+                                      | awk '{print $2}')
                         $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         $RUNJOB &
@@ -321,7 +329,8 @@ do
                 echo Killing monitoring processes
                     if [ "$serverpid" -ne 0 ]
                     then
-                        ssh $BUILDER killall l2server
+                        ssh $BUILDER kill $builderpid
+                        builderpid=0
                         kill $serverpid
                         serverpid=0
                     fi
