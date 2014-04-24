@@ -23,7 +23,7 @@ do
     ls -tr $DATA/*.zdab > $LS
 
 # If there is no $FL file, assume we want to start from present
-    if [ -f ! $FL]
+    if [ -f ! $FL ]
     then
         ls -tr $DATA/*.zdab > $FL
     fi
