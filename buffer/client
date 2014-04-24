@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # This client script receives newly-built files from the server script
 # and (1) writes them out to the Buffer and (2) feeds them to the chopper.
 # When the chopper has run to completion, it touches the file filereceived
@@ -5,8 +7,6 @@
 # the output of the Chopper as well as statements when files are complete.
 # The client also writes a joblog file for each builder file at
 # $RUN.chopper.log to record the job numbers associated to that file.
-
-#! /bin/bash
 
 # Specifying where to read from
 BUILDER=$1

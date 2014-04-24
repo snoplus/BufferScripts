@@ -1,9 +1,9 @@
+#!/bin/bash
+
 # This script can operate and monitor the BufferScripts needed
 # to run the L2 trigger.  It keeps track of the PIDs of the various
 # processes.  At start, it also ensures that the necessary files and
 # directory structures are present, and, if not, constructs them.
-
-#! /bin/bash
 
 # Organization of locations.  Set directory structure here:
 BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder

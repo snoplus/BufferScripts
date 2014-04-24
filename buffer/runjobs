@@ -1,8 +1,9 @@
+#!/bin/bash
+
 # This script actually runs the RAT jobs found in the jobqueue file.
 # On start-up, it reconstructs the queue since old jobs are otherwise
 # never flushed.  It writes out the stdout output of RAT to batch.log.
 
-#! /bin/bash
 DIRLOCAL=$(dirname $0)
 LOG=$1
 DIR=$2

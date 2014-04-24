@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #    This script serves the next unserved Event Builder file to the Buffer.
 # It selects the oldest file from ~/data_temp not on its list of served files
 # and pushes the file, preceded by its name, into the fifo "pipe" located in
@@ -10,7 +12,6 @@
 #    The server records in $LOG the files which it has started and finished 
 # pushing to the pipe.  It also updates the list of served files at $FL.
 
-#! /bin/bash
 DATA=$1
 LOG=$2
 FL=$3
