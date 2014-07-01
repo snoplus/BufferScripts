@@ -122,7 +122,7 @@ function startselect {
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
+                        $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER $JOBQUEUE &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client \
@@ -304,7 +304,7 @@ do
                         builderpid=$(ssh $BUILDER ps -u snotdaq \
                                       | grep l2server | grep /bin/bash \
                                       | awk '{print $2}')
-                        $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER &
+                        $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER $JOBQUEUE &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         $RUNJOB &
                         batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
