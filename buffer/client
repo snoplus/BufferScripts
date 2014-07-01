@@ -42,10 +42,13 @@ do
     
 # Receive file
     ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
-                           | ($CHOPPER -i /dev/stdin -o l2 -r >> $LOG; 
+                           | ($CHOPPER -i /dev/stdin -o $RUN_$SUBRUN -r >> $LOG; 
                               ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
-    echo $RUN_$SUBRUN >> $JOBQUEUE
-    echo Finished chopping >> $LOG
+# Prepare for conversion
+    echo 
+# RAT MACRO HEREDOC HERE 
+    echo ./job $MAC $RUN_$SUBRUN $FILE >> $JOBQUEUE
+    echo Stonehenge done with $RUN_$SUBRUN >> $LOG
 
 done
