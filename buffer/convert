@@ -2,3 +2,20 @@
 
 # Script to convert ZDAB files to ROOT as they are prepared by Stonehenge
 # For use with the L2 Master Script
+
+JOBQUEUE=$1
+
+source ~/rat_env.sh
+
+# Check if there is anything to do
+while [ "$($JOBQUEUE | wc -l)" -eq 0 ]
+do
+  echo No files to process, waiting
+  sleep 10
+done
+
+# Periodically update the jobqueue
+#?????#
+
+# Run the jobs
+tail -f -c +1 $JOBQUEUE | parallel -j4 --retries 4 --progress >> $LOG
