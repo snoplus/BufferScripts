@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Script to convert ZDAB files to ROOT as they are prepared by Stonehenge
+# For use with the L2 Master Script

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-if rat $1/mac/$2.mac -l rat.$1.$2.log
-then
-    rm $3
-    rm $1/mac/$2.mac
-else
-    return 1
-fi

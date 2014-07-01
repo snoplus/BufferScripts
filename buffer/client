@@ -17,6 +17,7 @@ PIPE=$2
 DIR=$3
 LOG=$4
 CHOPPER=$5
+JOBQUEUE=$6
 
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
@@ -30,12 +31,13 @@ trap exit 2
 while true
 do
 # For each file coming from the builder, first receive the filename
-# then, receive the file; finally, write list of jobs associated to run
+# then, receive the file; finally, write the item into the jobqueue
 
 # Receive and parse filename
     FILE=$(ssh $BUILDER cat $PIPE)
     echo $FILE >> $LOG
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
+    SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $4}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
     
 # Receive file
@@ -43,6 +45,7 @@ do
                            | ($CHOPPER -i /dev/stdin -o l2 -r >> $LOG; 
                               ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
+    echo $RUN_$SUBRUN >> $JOBQUEUE
     echo Finished chopping >> $LOG
 
 done

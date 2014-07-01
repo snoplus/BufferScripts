@@ -25,14 +25,9 @@ CLIENTDIR=$HOME/data                  # Directory for unfinished outputs
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
 CHOPPER=~/chopper/chopper             # Location of the chopper program
 
-RUNJOB=$BS/buffer/runjobs             # Location of the runjobs script
-RUNJOBLOG=$LOGDIR/runjobs.log         # filename of runjob's log
-
+CONVERT=$BS/convert                   # ZDAB -> Root conversion script
+JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
-GLUER=$BS/buffer/gluer                # Location of the gluer script
-GLUERLS=$LOGDIR/gluerls.txt           # filename of list of available subruns
-GLUERERR=$LOGDIR/gluererror.txt       # filename of list of failed subruns
-GLUERFL=$LOGDIR/gluerfl.txt           # filename of list of chopped files
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
