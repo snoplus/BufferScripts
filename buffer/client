@@ -8,15 +8,15 @@
 # The client also writes a joblog file for each builder file at
 # $RUN.chopper.log to record the job numbers associated to that file.
 
+# This script is designed for use with the L2 Master Script.  It can be run
+# independently by giving it the arguments listed below:
+
 # Specifying where to read from
 BUILDER=$1
 PIPE=$2
 DIR=$3
 LOG=$4
 CHOPPER=$5
-
-# Save the last job in the last file
-OLDJOB=0
 
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
@@ -37,28 +37,12 @@ do
     echo $FILE >> $LOG
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
-    FOLDER=$( echo $BIFILE | awk 'BEGIN {FS="."}{print $1}' )
     
-# Open new directories for the new file
-    mkdir $DIR/$FOLDER
-    mkdir $DIR/$FOLDER/zdab
-    mkdir $DIR/$FOLDER/root
-    mkdir $DIR/$FOLDER/mac
-
 # Receive file
     ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
-                           | ($CHOPPER -i /dev/stdin -o chopped -c 2 -l 0 -s $FOLDER >> $LOG; ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
+                           | ($CHOPPER -i /dev/stdin -o l2 -r >> $LOG; 
+                              ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
     echo Finished chopping >> $LOG
-
-    JOB=$( ls -tr $DIR/$FOLDER/zdab/chopped* | tail -n 1 | awk 'BEGIN {FS="_"}{print $2}' )
-    JOBLOG=$DIR/$RUN.chopper.log
-
-    for ((j=$OLDJOB+1; j<=$JOB; j++))
-    do
-        echo $j >> $JOBLOG
-    done
-
-    OLDJOB=$JOB
 
 done

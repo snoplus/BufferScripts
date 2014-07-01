@@ -45,13 +45,12 @@ EOF
     echo Pushing $FILE to pipe >> $LOG
     tail -c +1 tmp/filename.txt > pipe
     tail -f -c +1 $FILE > pipe &
-    PID=$(jobs -l | tail -n 1 | awk '{print $2}')
     while [ ! -f filereceived ]
     do
         sleep 1
     done
     rm filereceived
-    kill $PID
+    kill %?tail
     echo Reached end of $FILE >> $LOG
     echo $FILE >> $LOG
     echo $FILE >> $FL 

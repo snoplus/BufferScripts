@@ -190,7 +190,7 @@ function stopselect {
                 "client")
                     if [ "$clientpid" -ne 0 ]
                     then
-                        kill $clientpid
+                        kill %?client
                         clientpid=0
                     else
                         echo Client not currently running.  You must start it \
@@ -200,7 +200,7 @@ function stopselect {
                 "batch")
                     if [ "$batchpid" -ne 0 ]
                     then
-                        kill $batchpid
+                        kill %?runjobs
                         batchpid=0
                     else
                         echo Runjobs not currently running.  You must start it \
@@ -210,7 +210,7 @@ function stopselect {
                 "gluer")
                     if [ "$gluerpid" -ne 0 ]
                     then
-                        kill $gluerpid
+                        kill %?gluerr
                         gluerpid=0
                     else
                         echo Gluer not currently running.  You must start it \
@@ -336,17 +336,17 @@ do
                     fi
                     if [ "$clientpid" -ne 0 ]
                     then
-                        kill $clientpid
+                        kill %?client
                         clientpid=0
                     fi
                     if [ "$batchpid" -ne 0 ]
                     then
-                        kill $batchpid
+                        kill %?runjobs
                         batchpi=0
                     fi
                     if [ "$gluerpid" -ne 0 ]
                     then
-                        kill $gluerpid
+                        kill %?gluer
                         gluerpid=0
                     fi
                     printmenu
