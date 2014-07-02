@@ -39,16 +39,29 @@ do
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $4}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
+    NAME=$RUN"_"$SUBRUN
     
 # Receive file
     ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
-                           | ($CHOPPER -i /dev/stdin -o $RUN_$SUBRUN -r >> $LOG; 
+                           | ($CHOPPER -i /dev/stdin -o $NAME -r >> $LOG; 
                               ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
 # Prepare for conversion
-    echo 
-# RAT MACRO HEREDOC HERE 
+    cat > $MAC/$NAME << EOF
+
+/PhysicsList/OmitAll true
+
+/run/initialize
+
+/rat/proclast outroot
+/rat/procset file "$NAME.root"
+
+/rat/inzdab/read $NAME.zdab
+
+exit
+EOF
+
     echo ./job $MAC $RUN_$SUBRUN $FILE >> $JOBQUEUE
-    echo Stonehenge done with $RUN_$SUBRUN >> $LOG
+    echo Stonehenge done with $RUN"_"$SUBRUN >> $LOG
 
 done
