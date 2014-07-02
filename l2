@@ -9,6 +9,9 @@
 BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
 BS=$HOME/BufferScripts                # Home directory of the Buffer Scripts
 LOGDIR=$BS/log                        # Central location for L2 log files
+ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
+MAC=$BS/mac                           # Directory for conversion macros
+GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 
 LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
 SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
@@ -21,13 +24,11 @@ SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
 PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
 
 CLIENT=$BS/buffer/client              # Location of the client script
-CLIENTDIR=$HOME/data                  # Directory for unfinished outputs
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
 CHOPPER=~/chopper/chopper             # Location of the chopper program
+JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
 
 CONVERT=$BS/convert                   # ZDAB -> Root conversion script
-JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
-GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
