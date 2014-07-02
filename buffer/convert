@@ -4,6 +4,7 @@
 # For use with the L2 Master Script
 
 JOBQUEUE=$1
+LOG=
 
 source ~/rat_env.sh
 
@@ -18,4 +19,4 @@ done
 #?????#
 
 # Run the jobs
-tail -f -c +1 $JOBQUEUE | parallel -j4 --retries 4 --progress >> $LOG
+tail -f -c +1 $JOBQUEUE | parallel -j4 --retries 4 --joblog $LOG
