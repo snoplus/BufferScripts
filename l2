@@ -33,8 +33,7 @@ GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 serverpid=0
 builderpid=0
 clientpid=0
-batchpid=0
-gluerpid=0
+convertpid=0
 
 # These functions print the menu options
 function printmenu {
@@ -68,17 +67,11 @@ function processes {
     else
         NO+="\tclient\n"
     fi
-    if [ "$batchpid" -ne 0 ]
+    if [ "$convertpid" -ne 0 ]
     then
-        echo -e "\t batch \t $batchpid"
+        echo -e "\t convert \t $convertpid"
     else
-        NO+="\tbatch\n"
-    fi
-    if [ "$gluerpid" -ne 0 ]
-    then
-        echo -e "\t gluer \t $gluerpid"
-    else
-        NO+="\tgluer\n"
+        NO+="\tconvert\n"
     fi
     echo Here are the processes not running at this time:
     echo -e $NO
@@ -101,7 +94,7 @@ function startselect {
     echo Select the number of the script you wish to start.
     echo If you do not wish to start any processes at this time, select cancel \
           to return to the previous menu.
-    startoptions=("server" "client" "batch" "gluer" "cancel")
+    startoptions=("server" "client" "convert" "cancel")
     select opt3 in "${startoptions[@]}"
         do
             case $opt3 in
@@ -129,24 +122,14 @@ function startselect {
                               before starting it again.
                     fi
                     ;;
-                "batch")
-                    if [ "$batchpid" -eq 0 ]
+                "convert")
+                    if [ "$convertpid" -eq 0 ]
                     then
-                        $RUNJOB $RUNJOBLOG $CLIENTDIR &
-                        batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                       # $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR \
+                       # $GLUERFL &
+                        convertpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
-                        echo batch already running.  You must stop batch \
-                              before starting it again.
-                    fi
-                    ;;
-                "gluer")
-                    if [ "$gluerpid" -eq 0 ]
-                    then
-                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR \
-                         $GLUERFL &
-                        gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                    else
-                        echo gluer already running.  You must stop gluer \
+                        echo convert already running.  You must stop convert \
                               before starting it again.
                     fi
                     ;;
@@ -166,7 +149,7 @@ function stopselect {
     echo Enter the number of the process you wish to stop.
     echo If you do not wish to stop any process at this time, select "Cancel" \
           to return to the previous menu.
-    stopoptions=("sever" "client" "batch" "gluer" "cancel")
+    stopoptions=("sever" "client" "convert" "cancel")
     select opt4 in "${stopoptions[@]}"
         do
             case $opt4 in
@@ -192,23 +175,13 @@ function stopselect {
                               before stopping it.
                     fi
                     ;;
-                "batch")
-                    if [ "$batchpid" -ne 0 ]
+                "convert")
+                    if [ "$convertpid" -ne 0 ]
                     then
-                        kill %?runjobs
-                        batchpid=0
+                        kill %?convert
+                        convertpid=0
                     else
-                        echo Runjobs not currently running.  You must start it \
-                              before stopping it.
-                    fi
-                    ;;
-                "gluer")
-                    if [ "$gluerpid" -ne 0 ]
-                    then
-                        kill %?gluerr
-                        gluerpid=0
-                    else
-                        echo Gluer not currently running.  You must start it \
+                        echo Convert not currently running.  You must start it \
                               before stopping it.
                     fi
                     ;;
@@ -281,8 +254,7 @@ do
             "Start")
                     if [[ "$serverpid" -eq 0 && \
                           "$clientpid" -eq 0 && \
-                          "$batchpid" -eq 0 && \
-                          "$gluerpid" -eq 0 ]];
+                          "$convertpid" -eq 0 ]];
                     then
                         echo Preparing file structure...
                         ssh $BUILDER rm $PIPE
@@ -306,11 +278,9 @@ do
                                       | awk '{print $2}')
                         $CLIENT $BUILDER $PIPE $CLIENTDIR $CHOPPER $JOBQUEUE &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        $RUNJOB &
-                        batchpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        $GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR \
-                         $GLUERFL &
-                        gluerpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        #$GLUER $GRIDREADY $CLIENTDIR $GLUERLS $GLUERERR \
+                        #$GLUERFL &
+                        convertpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         printmenu
                     else
                         echo Some processes were already running.  Please stop \
@@ -334,15 +304,10 @@ do
                         kill %?client
                         clientpid=0
                     fi
-                    if [ "$batchpid" -ne 0 ]
+                    if [ "$convertpid" -ne 0 ]
                     then
-                        kill %?runjobs
-                        batchpi=0
-                    fi
-                    if [ "$gluerpid" -ne 0 ]
-                    then
-                        kill %?gluer
-                        gluerpid=0
+                        kill %?convert
+                        convertpid=0
                     fi
                     printmenu
                 ;;
@@ -369,9 +334,9 @@ do
                 ;;
             "Quit")
                 if [[ "$serverpid" -eq 0 && \
+                      "$builderpid" -eq 0 && \
                       "$clientpid" -eq 0 && \
-                      "$batchpid" -eq 0 && \
-                      "$gluerpid" -eq 0 ]];
+                      "$convertpid" -eq 0 ]];
                 then
                     echo Goodbye
                     exit
