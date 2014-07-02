@@ -5,8 +5,16 @@
 
 JOBQUEUE=$1
 LOG=
+MAC=
 
 source ~/rat_env.sh
+
+# If we are starting up, refresh the jobqueue
+rm $JOBQUEUE
+for i in $MAC
+do
+  echo ./job >> $JOBQUEUE
+done
 
 # Check if there is anything to do
 while [ "$($JOBQUEUE | wc -l)" -eq 0 ]
@@ -14,9 +22,6 @@ do
   echo No files to process, waiting
   sleep 10
 done
-
-# Periodically update the jobqueue
-#?????#
 
 # Run the jobs
 tail -f -c +1 $JOBQUEUE | parallel -j4 --retries 4 --joblog $LOG
