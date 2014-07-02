@@ -6,8 +6,9 @@
 JOBQUEUE=$1
 LOG=
 MAC=
+RATENV=
 
-source ~/rat_env.sh
+source $RATENV
 
 # If we are starting up, refresh the jobqueue
 rm $JOBQUEUE
