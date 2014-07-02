@@ -11,13 +11,14 @@
 # This script is designed for use with the L2 Master Script.  It can be run
 # independently by giving it the arguments listed below:
 
-# Specifying where to read from
+# Specifying where things are located
 BUILDER=$1
 PIPE=$2
-DIR=$3
+L1=$3
 LOG=$4
 CHOPPER=$5
 JOBQUEUE=$6
+MAC=$7
 
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
@@ -42,7 +43,7 @@ do
     NAME=$RUN"_"$SUBRUN
     
 # Receive file
-    ssh $BUILDER cat $PIPE | ourtee -a $DIR/$BIGFILE \
+    ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
                            | ($CHOPPER -i /dev/stdin -o $NAME -r >> $LOG; 
                               ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 

@@ -4,9 +4,9 @@
 # For use with the L2 Master Script
 
 JOBQUEUE=$1
-LOG=
-MAC=
-RATENV=
+LOG=$2
+MAC=$3
+RATENV=$4
 
 source $RATENV
 
