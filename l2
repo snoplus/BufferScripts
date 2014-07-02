@@ -265,9 +265,13 @@ do
                         then
                             mkdir $LOGDIR
                         fi
-                        if [ ! -d $CLIENTDIR ]
+                        if [ ! -d $ZDAB ]
                         then
-                            mkdir $CLIENTDIR
+                            mkdir $ZDAB
+                        fi
+                        if [ ! -d $MAC ]
+                        then
+                            mkdir $MAC
                         fi
                         echo File structure prepared.
                         echo Starting level 2 scripts...
