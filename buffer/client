@@ -19,6 +19,7 @@ LOG=$4
 CHOPPER=$5
 JOBQUEUE=$6
 MAC=$7
+PASSWORDFILE=$8
 
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
@@ -40,11 +41,12 @@ do
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $4}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
-    NAME=$RUN"_"$SUBRUN
+    NAME=$RUN"_"$SUBRUN 
+    PASSWORD=$(cat $PASSWORDFILE)
     
 # Receive file
     ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
-                           | ($CHOPPER -i /dev/stdin -o $NAME -r >> $LOG; 
+                           | ($CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG; 
                               ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
 # Prepare for conversion
