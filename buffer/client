@@ -28,6 +28,15 @@ trap "" SIGPIPE
 exec tee $*
 }
 
+heartbeat()
+{
+while true
+do
+  curl --data 'name=L2&status=ok' -u snoplus:$PASSWORD snopl.us/monitoring/heatbeat
+  sleep 5
+done
+}
+
 trap exit 2
 
 while true
@@ -44,6 +53,9 @@ do
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
     
+# Begin heartbeat
+    heartbeat&
+
 # Receive file
     ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
                            | ($CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG; 
