@@ -39,6 +39,9 @@ done
 
 trap exit 2
 
+# Begin heartbeat
+  heartbeat& # Keep this out of loop to prevent interruption
+
 while true
 do
 # For each file coming from the builder, first receive the filename
@@ -53,9 +56,6 @@ do
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
     
-# Begin heartbeat
-    heartbeat&
-
 # Receive file
     ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
                            | ($CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG; 
