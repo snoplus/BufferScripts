@@ -28,19 +28,7 @@ trap "" SIGPIPE
 exec tee $*
 }
 
-heartbeat()
-{
-while true
-do
-  curl --data 'name=L2&status=ok' -u snoplus:$PASSWORD snopl.us/monitoring/heatbeat
-  sleep 5
-done
-}
-
 trap exit 2
-
-# Begin heartbeat
-  heartbeat& # Keep this out of loop to prevent interruption
 
 while true
 do
@@ -49,7 +37,7 @@ do
 
 # Receive and parse filename
     FILE=$(ssh $BUILDER cat $PIPE)
-    echo $FILE >> $LOG
+    echo INFO - Receiving file $FILE
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $4}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
@@ -77,6 +65,6 @@ exit
 EOF
 
     echo ./job $MAC $RUN_$SUBRUN $FILE >> $JOBQUEUE
-    echo Stonehenge done with $RUN"_"$SUBRUN >> $LOG
+    echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN
 
 done

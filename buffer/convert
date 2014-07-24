@@ -20,7 +20,7 @@ done
 # Check if there is anything to do
 while [ "$($JOBQUEUE | wc -l)" -eq 0 ]
 do
-  echo No files to process, waiting
+  echo INFO - No files to process, waiting
   sleep 10
 done
 
