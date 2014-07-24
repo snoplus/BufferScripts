@@ -19,7 +19,6 @@ MONITOR=$HOME/monitor.py              # Location of the monitoring script
 LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
 SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
-SERVERLOG=$SERVERDIR/server.log       # filename of Server log
 SERVERFL=$SERVERDIR/served.txt        # file recording served files 
 SERVERDATA=/Users/snotdaq/data_temp   # Directory for the Builder output files
 SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
@@ -107,7 +106,7 @@ function startselect {
                 "server")
                     if [ "$serverpid" -eq 0 ]
                     then
-                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
+                        ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
                              $SERVERLS 2>&1 | $MONITOR L2-server &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         builderpid=$(ssh $BUILDER ps -u snotdaq \
@@ -285,7 +284,7 @@ do
                         fi
                         echo File structure prepared.
                         echo Starting level 2 scripts...
-                        ssh $BUILDER $SERVER $SERVERDATA $SERVERLOG $SERVERFL \
+                        ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
                              $SERVERLS 2>&1 | $MONITOR L2-server &
                         serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         builderpid=$(ssh $BUILDER ps -u snotdaq \

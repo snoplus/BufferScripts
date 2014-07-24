@@ -13,9 +13,8 @@
 # pushing to the pipe.  It also updates the list of served files at $FL.
 
 DATA=$1
-LOG=$2
-FL=$3
-LS=$4
+FL=$2
+LS=$3
 
 while true
 do
@@ -29,9 +28,14 @@ do
     fi
 
     while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
+    COUNT=0
     do
         sleep 1
-        echo Waiting for data >> $LOG
+        COUNT=$(($COUNT+1))
+        if [ `expr $COUNT % 600` -eq 0]
+        then
+          echo INFO - Waiting for data
+        fi
     done
 
     FILE=$(comm -23 $LS $FL | head -n 1)
@@ -42,7 +46,7 @@ do
 $FILE
 EOF
 
-    echo Pushing $FILE to pipe >> $LOG
+    echo INFO - Pushing $FILE to pipe
     tail -c +1 tmp/filename.txt > pipe
     tail -f -c +1 $FILE > pipe &
     while [ ! -f filereceived ]
@@ -51,8 +55,7 @@ EOF
     done
     rm filereceived
     kill %?tail
-    echo Reached end of $FILE >> $LOG
-    echo $FILE >> $LOG
+    echo INFO - Reached end of $FILE
     echo $FILE >> $FL 
 
 done
