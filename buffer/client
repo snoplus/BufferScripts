@@ -20,6 +20,7 @@ CHOPPER=$5
 JOBQUEUE=$6
 MAC=$7
 PASSWORDFILE=$8
+GRIDREADY=$9
 
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
@@ -50,21 +51,21 @@ do
                               ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
 
 # Prepare for conversion
-    cat > $MAC/$NAME << EOF
+    cat > $MAC/$NAME.mac << EOF
 
 /PhysicsList/OmitAll true
 
 /run/initialize
 
 /rat/proclast outroot
-/rat/procset file "$NAME.root"
+/rat/procset file "$NAME.l2.root"
 
 /rat/inzdab/read $NAME.zdab
 
 exit
 EOF
 
-    echo ./job $MAC $RUN_$SUBRUN $FILE >> $JOBQUEUE
+    echo ./job $MAC $RUN_$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
     echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN
 
 done

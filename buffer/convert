@@ -14,7 +14,11 @@ source $RATENV
 rm $JOBQUEUE
 for i in $MAC
 do
-  echo ./job >> $JOBQUEUE
+  RUN=$( echo $i | awk 'BEGIN {FS="_"}{print $1}' )
+  SUBRUN=$( echo $i | awk 'BEGIN {FS="_"}{print $2}' | 
+            awk 'BEGIN {FS="."}{print $1}' )
+  NAME=$RUN"_"$SUBRUN".zdab"
+  echo ./job $MAC $RUN_$SUBRUN $NAME >> $JOBQUEUE
 done
 
 # Check if there is anything to do

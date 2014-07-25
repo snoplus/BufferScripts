@@ -1,7 +1,8 @@
 #!/bin/bash
 
-if rat $1/mac/$2.mac -l rat.$1.$2.log
+if rat $1/$2.mac -l rat.$2.log
 then
+  mv $2.l2.root $4/$2.l2.root
   rm $3
-  rm $1/mac/$2.mac
+  rm $1/$2.mac
 fi

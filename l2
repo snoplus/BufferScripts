@@ -121,7 +121,7 @@ function startselect {
                     if [ "$clientpid" -eq 0 ]
                     then
                         $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE 2>&1 | $MONITOR L2-client &
+                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
                         echo client already running.  You must stop client \
@@ -291,7 +291,7 @@ do
                                       | grep l2server | grep /bin/bash \
                                       | awk '{print $2}')
                         $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE 2>&1 | $MONITOR L2-client &
+                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
                         clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 
                           $MONITOR L2-convert &
