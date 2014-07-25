@@ -12,7 +12,7 @@ source $RATENV
 
 # If we are starting up, refresh the jobqueue
 rm $JOBQUEUE
-for i in $MAC
+for i in $(ls $MAC)
 do
   RUN=$( echo $i | awk 'BEGIN {FS="_"}{print $1}' )
   SUBRUN=$( echo $i | awk 'BEGIN {FS="_"}{print $2}' | 
