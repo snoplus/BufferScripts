@@ -14,7 +14,7 @@ ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
 MAC=$BS/mac                           # Directory for conversion macros
 GRIDREADY=/mnt/data/l2t               # Output directory for finished products
 RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
-MONITOR=$HOME/monitor.py              # Location of the monitoring script
+MONITOR=$HOME/minard/scripts/monitor.py # Location of the monitoring script
 
 LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
 SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
