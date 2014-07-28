@@ -16,6 +16,7 @@ MAC=$BS/mac                           # Directory for conversion macros
 GRIDREADY=$FILESYSTEM/l2t             # Output directory for finished products
 RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
 MONITOR=$HOME/minard/scripts/monitor.py # Location of the monitoring script
+DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
 LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
 SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
@@ -141,7 +142,7 @@ function startselect {
                 "convert")
                     if [ "$convertpid" -eq 0 ]
                     then
-                       $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 
+                       $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | \
                        $MONITOR L2-convert &
                         convertpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                     else
@@ -152,7 +153,8 @@ function startselect {
                 "janitor")
                     if [ "$janitorpid" -eq 0 ]
                     then
-                      $JANITOR 2>&1 | $MONITOR L1-delete &
+                      $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
+                        L1-delete &
                       convertpid=$(jobs - l | tail -n 1 | awk '{print $2}')
                     else
                         echo janitor already running.  You must stop janitor \
@@ -326,7 +328,8 @@ do
                         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 
                           $MONITOR L2-convert &
                         convertpid=$(jobs -l | tail -n 1 | awk '{print $2}')
-                        $JANITOR 2>&1 | $MONITOR L1-delete &
+                        $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
+                          L1-delete &
                         janitorpid=$(jobs -l | tail -n 1 | awk '{print $2}')
                         printmenu
                     else
