@@ -119,7 +119,7 @@ function startselect {
                     then
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
                              $SERVERLS 2>&1 | $MONITOR L2-server &
-                        serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u snotdaq \
                                      | grep l2server | grep /bin/bash \
                                      | awk '{print $2}' )
@@ -133,7 +133,7 @@ function startselect {
                     then
                         $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
                           $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
-                        clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        clientpid=$(jobs -lp | tail -n 1)
                     else
                         echo client already running.  You must stop client \
                               before starting it again.
@@ -144,7 +144,7 @@ function startselect {
                     then
                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | \
                        $MONITOR L2-convert &
-                        convertpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        convertpid=$(jobs -lp | tail -n 1)
                     else
                         echo convert already running.  You must stop convert \
                               before starting it again.
@@ -155,7 +155,7 @@ function startselect {
                     then
                       $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
                         L1-delete &
-                      convertpid=$(jobs - l | tail -n 1 | awk '{print $2}')
+                      convertpid=$(jobs -lp | tail -n 1)
                     else
                         echo janitor already running.  You must stop janitor \
                              before starting it again.
@@ -318,19 +318,19 @@ do
                         echo Starting level 2 scripts...
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
                              $SERVERLS 2>&1 | $MONITOR L2-server &
-                        serverpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u snotdaq \
                                       | grep l2server | grep /bin/bash \
                                       | awk '{print $2}')
                         $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
                           $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
-                        clientpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        clientpid=$(jobs -lp | tail -n 1)
                         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 
                           $MONITOR L2-convert &
-                        convertpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        convertpid=$(jobs -lp | tail -n 1)
                         $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
                           L1-delete &
-                        janitorpid=$(jobs -l | tail -n 1 | awk '{print $2}')
+                        janitorpid=$(jobs -lp | tail -n 1)
                         printmenu
                     else
                         echo Some processes were already running.  Please stop \
