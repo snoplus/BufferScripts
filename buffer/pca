@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# This script manages the copying of pca calibration data to the nearline 
+# monitoring computer for analysis
+
+PCADATA=/home/trigger/PCAdata
+CLIENTFILE=
+
+while[ true ]
+do
+
+  if [ ls $PCADATA | wc -l -gt 0 ]
+    RUN=
+    NEWRUN=
+    while [ $RUN -eq $NEWRUN ]
+    do
+      sleep 60
+    done
+    for [i in ls $PCADATA]
+    do
+      if [ scp i ]
+        rm i
+      fi
+    done
+    
+  else
+    sleep 60
+  fi
+
+done
