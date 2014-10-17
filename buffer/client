@@ -21,6 +21,7 @@ JOBQUEUE=$6
 MAC=$7
 PASSWORDFILE=$8
 GRIDREADY=$9
+PCAFILE=/trigger/home/PCAdata/run.txt
 
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
@@ -40,15 +41,35 @@ do
     FILE=$(ssh $BUILDER cat $PIPE)
     echo INFO - Receiving file $FILE
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
+    cat $RUN > $PCAFILE
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $4}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
     
-# Receive file
-    ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
-                           | ($CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG; 
-                              ssh $BUILDER touch /Users/snotdaq/server/filereceived ) 
+# Receive file - try three times, report errors
+    TEST=0
+    TRIES=0
+    while (( TEST == 0 && TRIES < 3))
+    do
+        ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
+                               | $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG 
+        if [$? -gt 0 ]
+          TRIES=$( $TRIES + 1)
+          echo WARNING - Stonehenge exited on file $FILE.
+          if [ $TRIES -lt 3 ]
+            echo INFO - Trying to read file $FILE again.
+          else
+            echo ERROR - Three failures trying to process file $FILE.  Moving on.
+          fi
+        else
+          TEST=1
+          echo SUCCESS - Stonehenge finished processing file $FILE successfully.
+        fi
+    done 
+
+# Report that the file was received
+    ssh $BUILDER touch /Users/snotdaq/server/filereceived
 
 # Prepare for conversion
     cat > $MAC/$NAME.mac << EOF

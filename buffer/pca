@@ -4,7 +4,7 @@
 # monitoring computer for analysis
 
 PCADATA=/home/trigger/PCAdata
-CLIENTFILE=
+CLIENTFILE=/home/trigger/PCAdata/run.txt
 
 while[ true ]
 do
