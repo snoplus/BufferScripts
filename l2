@@ -119,7 +119,7 @@ function startselect {
                     if [ "$serverpid" -eq 0 ]
                     then
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS $PIPE 2>&1 | $PYTHON $MONITOR L2-server &
+                             $SERVERLS $PIPE | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u klabe \
                                      | grep l2server | grep /bin/bash \
@@ -133,7 +133,7 @@ function startselect {
                     if [ "$clientpid" -eq 0 ]
                     then
                         $CLIENT $BUILDER $PIPE $L1 $CLIENTLOG $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $PYTHON $MONITOR L2-client &
+                          $MAC $PASSWORDFILE $GRIDREADY | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                     else
                         echo client already running.  You must stop client \
@@ -143,7 +143,7 @@ function startselect {
                 "convert")
                     if [ "$convertpid" -eq 0 ]
                     then
-                       $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | \
+                       $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | \
                        $PYTHON $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
                     else
@@ -154,7 +154,7 @@ function startselect {
                 "janitor")
                     if [ "$janitorpid" -eq 0 ]
                     then
-                      $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $PYTHON $MONITOR \
+                      $JANITOR $FILESYSTEM $L1 $DONTDELETE | $PYTHON $MONITOR \
                         L1-delete &
                       convertpid=$(jobs -lp | tail -n 1)
                     else
@@ -322,18 +322,18 @@ do
                         echo File structure prepared.
                         echo Starting level 2 scripts...
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS $PIPE 2>&1 | $PYTHON $MONITOR L2-server &
+                             $SERVERLS $PIPE | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u klabe \
                                       | grep l2server | grep /bin/bash \
                                       | awk '{print $2}')
                         $CLIENT $BUILDER $PIPE $L1 $CLIENTLOG $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $PYTHON $MONITOR L2-client &
+                          $MAC $PASSWORDFILE $GRIDREADY | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
-                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 
+                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | 
                           $PYTHON $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
-                        $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $PYTHON $MONITOR \
+                        $JANITOR $FILESYSTEM $L1 $DONTDELETE | $PYTHON $MONITOR \
                           L1-delete &
                         janitorpid=$(jobs -lp | tail -n 1)
                         printmenu
