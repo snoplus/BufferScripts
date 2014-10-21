@@ -16,21 +16,21 @@ MAC=$BS/mac                           # Directory for conversion macros
 GRIDREADY=$FILESYSTEM/l2t             # Output directory for finished products
 RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
 PYTHON=$HOME/Python-2.7.8/python      # Location of python version needed for minard
-MONITOR=$HOME/heartbeat/monitor.py    # Location of the monitoring script
+MONITOR=$HOME/minard/bin/monitor.py   # Location of the monitoring script
 DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
 LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
-SERVERDIR=$LOCALSERVER                # Directory of L2 server on the builder
+SERVERDIR=$BS/builder                 # Directory of L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
 SERVERFL=$SERVERDIR/served.txt        # file recording served files 
 SERVERDATA=$HOME/zdabs                # Directory for the Builder output files
 SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
 
-PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
+PIPE=$SERVERDATA/pipe                 # Location of builder > buffer pipe
 
 CLIENT=$BS/buffer/client              # Location of the client script
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
-CHOPPER=~/chopper/chopper             # Location of the chopper program
+CHOPPER=~/chopper/stonehenge.sh       # Location of the chopper program
 JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
 PASSWORDFILE=$HOME/password.txt       # File holding our password
 
@@ -121,7 +121,7 @@ function startselect {
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
                              $SERVERLS 2>&1 | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
-                        builderpid=$(ssh $BUILDER ps -u snotdaq \
+                        builderpid=$(ssh $BUILDER ps -u klabe \
                                      | grep l2server | grep /bin/bash \
                                      | awk '{print $2}' )
                     else
@@ -320,7 +320,7 @@ do
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
                              $SERVERLS 2>&1 | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
-                        builderpid=$(ssh $BUILDER ps -u snotdaq \
+                        builderpid=$(ssh $BUILDER ps -u klabe \
                                       | grep l2server | grep /bin/bash \
                                       | awk '{print $2}')
                         $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
