@@ -37,7 +37,7 @@ PASSWORDFILE=$HOME/password.txt       # File holding our password
 CONVERT=$BS/buffer/convert            # ZDAB -> Root conversion script
 CONVERTLOG=$LOGDIR/convert.log        # Conversion log
 
-JANITOR=$BS/janitor                   # L1 file manager
+JANITOR=$BS/buffer/janitor            # L1 file manager
 
 # Variables in which to store PIDs of the various monitoring scripts
 serverpid=0
