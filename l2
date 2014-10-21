@@ -23,7 +23,7 @@ LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
 SERVERDIR=$BS/builder                 # Directory of L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
 SERVERFL=$SERVERDIR/served.txt        # file recording served files 
-SERVERDATA=$HOME/zdabs                # Directory for the Builder output files
+SERVERDATA=$HOME/testbuilder          # Directory for the Builder output files
 SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
 
 PIPE=$BS/builder/pipe                 # Location of builder > buffer pipe
@@ -132,7 +132,7 @@ function startselect {
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
+                        $CLIENT $BUILDER $PIPE $L1 $CLIENTLOG $CHOPPER $JOBQUEUE \
                           $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                     else
@@ -327,7 +327,7 @@ do
                         builderpid=$(ssh $BUILDER ps -u klabe \
                                       | grep l2server | grep /bin/bash \
                                       | awk '{print $2}')
-                        $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
+                        $CLIENT $BUILDER $PIPE $L1 $CLIENTLOG $CHOPPER $JOBQUEUE \
                           $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 

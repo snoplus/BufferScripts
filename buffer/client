@@ -21,7 +21,7 @@ JOBQUEUE=$6
 MAC=$7
 PASSWORDFILE=$8
 GRIDREADY=$9
-PCAFILE=/trigger/home/PCAdata/run.txt
+PCAFILE=~/run.txt
 
 # ATTN: This function must be run in a subshell, e.g., in a pipeline
 ourtee()
