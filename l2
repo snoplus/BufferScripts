@@ -15,6 +15,7 @@ ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
 MAC=$BS/mac                           # Directory for conversion macros
 GRIDREADY=$FILESYSTEM/l2t             # Output directory for finished products
 RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
+PYTHON=$HOME/Python-2.7.8/python      # Location of python version needed for minard
 MONITOR=$HOME/heartbeat/monitor.py    # Location of the monitoring script
 DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
@@ -118,7 +119,7 @@ function startselect {
                     if [ "$serverpid" -eq 0 ]
                     then
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS 2>&1 | $MONITOR L2-server &
+                             $SERVERLS 2>&1 | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u snotdaq \
                                      | grep l2server | grep /bin/bash \
@@ -132,7 +133,7 @@ function startselect {
                     if [ "$clientpid" -eq 0 ]
                     then
                         $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
+                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                     else
                         echo client already running.  You must stop client \
@@ -143,7 +144,7 @@ function startselect {
                     if [ "$convertpid" -eq 0 ]
                     then
                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | \
-                       $MONITOR L2-convert &
+                       $PYTHON $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
                     else
                         echo convert already running.  You must stop convert \
@@ -153,7 +154,7 @@ function startselect {
                 "janitor")
                     if [ "$janitorpid" -eq 0 ]
                     then
-                      $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
+                      $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $PYTHON $MONITOR \
                         L1-delete &
                       convertpid=$(jobs -lp | tail -n 1)
                     else
@@ -317,18 +318,18 @@ do
                         echo File structure prepared.
                         echo Starting level 2 scripts...
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS 2>&1 | $MONITOR L2-server &
+                             $SERVERLS 2>&1 | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u snotdaq \
                                       | grep l2server | grep /bin/bash \
                                       | awk '{print $2}')
                         $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
+                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 
-                          $MONITOR L2-convert &
+                          $PYTHON $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
-                        $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
+                        $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $PYTHON $MONITOR \
                           L1-delete &
                         janitorpid=$(jobs -lp | tail -n 1)
                         printmenu
