@@ -31,7 +31,7 @@ PIPE=$SERVERDATA/pipe                 # Location of builder > buffer pipe
 CLIENT=$BS/buffer/client              # Location of the client script
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
 CHOPPER=~/chopper/stonehenge.sh       # Location of the chopper program
-JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
+JOBQUEUE=$BS/buffer/jobqueue.txt      # List of subruns to convert
 PASSWORDFILE=$HOME/password.txt       # File holding our password
 
 CONVERT=$BS/buffer/convert            # ZDAB -> Root conversion script
