@@ -55,9 +55,11 @@ do
         ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
                                | $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG 
         if [$? -gt 0 ]
+        then
           TRIES=$( $TRIES + 1)
           echo WARNING - Stonehenge exited on file $FILE.
           if [ $TRIES -lt 3 ]
+          then
             echo INFO - Trying to read file $FILE again.
           else
             echo ERROR - Three failures trying to process file $FILE.  Moving on.
