@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# This script is used to delete L1 files from the buffer as it fills up.
+
+FILESYSTEM=$1
+L1=$2
+DONTDELETE=$3
+
+while true
+do
+
+  PERCENTFULL=$( df | grep $FILESYSTEM | awk '{print $4}' | sed 's/%//' )
+  if [ $PERCENTFULL -lt 90 ]
+  then
+    echo INFO - Buffer $PERCENTFULL% full
+    sleep 60;
+  else
+    FILE=$(ls $L1 | head -n 1)
+    if [ $(ls $DONTDELETE | wc -l) -eq 0 ]
+    then
+      rm $L1/$FILE;
+      echo INFO - Buffer filling up.  Removing file $FILE
+    else
+      if [ $PERCENTFULL -gt 99 ]
+      then
+        rm $L1/$FILE;
+        echo WARNING - Buffer more than 99% full.  Removing file $FILE despite deletion lock!
+      else
+        echo WARNING - Buffer more than 90% full but deletion is locked!
+      fi
+    fi
+  fi
+
+done
