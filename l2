@@ -6,23 +6,23 @@
 # directory structures are present, and, if not, constructs them.
 
 # Organization of locations.  Set directory structure here:
-BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
-BS=$HOME/BufferScripts                # Home directory of the Buffer Scripts
+BUILDER=klabe@cps3.uchicago.edu       # Access to Event Builder
+BS=$HOME/bufferscripts                # Home directory of the Buffer Scripts
 LOGDIR=$BS/log                        # Central location for L2 log files
-FILESYSTEM=/mnt/data                  # Buffer filesystem
+FILESYSTEM=/cp/home/cp/klabe          # Buffer filesystem
 L1=$FILESYSTEM/l1data                 # Directory for raw data
 ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
 MAC=$BS/mac                           # Directory for conversion macros
 GRIDREADY=$FILESYSTEM/l2t             # Output directory for finished products
 RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
-MONITOR=$HOME/minard/scripts/monitor.py # Location of the monitoring script
+MONITOR=$HOME/heartbeat/monitor.py    # Location of the monitoring script
 DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
 LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
-SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
+SERVERDIR=$LOCALSERVER                # Directory of L2 server on the builder
 SERVER=$SERVERDIR/l2server            # filename of L2 server
 SERVERFL=$SERVERDIR/served.txt        # file recording served files 
-SERVERDATA=/Users/snotdaq/data_temp   # Directory for the Builder output files
+SERVERDATA=$HOME/zdabs                # Directory for the Builder output files
 SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
 
 PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
