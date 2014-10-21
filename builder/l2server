@@ -32,7 +32,7 @@ do
     do
         sleep 1
         COUNT=$(($COUNT+1))
-        if [ `expr $COUNT % 600` -eq 0 ]
+        if [ $($COUNT % 600) -eq 0 ]
         then
           echo INFO - Waiting for data
         fi
