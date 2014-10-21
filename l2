@@ -26,7 +26,7 @@ SERVERFL=$SERVERDIR/served.txt        # file recording served files
 SERVERDATA=$HOME/zdabs                # Directory for the Builder output files
 SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
 
-PIPE=$SERVERDATA/pipe                 # Location of builder > buffer pipe
+PIPE=$BS/builder/pipe                 # Location of builder > buffer pipe
 
 CLIENT=$BS/buffer/client              # Location of the client script
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
@@ -119,7 +119,7 @@ function startselect {
                     if [ "$serverpid" -eq 0 ]
                     then
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS 2>&1 | $PYTHON $MONITOR L2-server &
+                             $SERVERLS $PIPE 2>&1 | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u klabe \
                                      | grep l2server | grep /bin/bash \
@@ -322,7 +322,7 @@ do
                         echo File structure prepared.
                         echo Starting level 2 scripts...
                         ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS 2>&1 | $PYTHON $MONITOR L2-server &
+                             $SERVERLS $PIPE 2>&1 | $PYTHON $MONITOR L2-server &
                         serverpid=$(jobs -lp | tail -n 1)
                         builderpid=$(ssh $BUILDER ps -u klabe \
                                       | grep l2server | grep /bin/bash \

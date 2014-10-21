@@ -15,9 +15,11 @@
 DATA=$1
 FL=$2
 LS=$3
+PIPE=$4
 
 while true
 do
+    echo INFO - L2 Server starting
 # Get list of files needing serving
     ls -tr $DATA/*.zdab > $LS
 
@@ -27,12 +29,12 @@ do
         ls -tr $DATA/*.zdab > $FL
     fi
 
-    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
     COUNT=0
+    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
     do
         sleep 1
         COUNT=$(($COUNT+1))
-        if ! (($COUNT % 600))
+        if [ $(( $COUNT % 60 )) -eq 0 ]
         then
           echo INFO - Waiting for data
         fi
@@ -41,14 +43,13 @@ do
     FILE=$(comm -23 $LS $FL | head -n 1)
 
 # If we have a new file, serve it and the filename to the buffer
-    cat > tmp/filename.txt << EOF
-
+    cat > /tmp/filename.txt << EOF
 $FILE
 EOF
 
     echo INFO - Pushing $FILE to pipe
-    tail -c +1 tmp/filename.txt > pipe
-    tail -f -c +1 $FILE > pipe &
+    tail -c +1 /tmp/filename.txt > $PIPE
+    tail -f -c +1 $FILE > $PIPE &
     while [ ! -f filereceived ]
     do
         sleep 1

@@ -34,6 +34,7 @@ trap exit 2
 
 while true
 do
+    echo INFO - L2 Client starting
 # For each file coming from the builder, first receive the filename
 # then, receive the file; finally, write the item into the jobqueue
 
