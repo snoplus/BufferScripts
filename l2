@@ -34,7 +34,7 @@ CHOPPER=~/chopper/stonehenge.sh       # Location of the chopper program
 JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
 PASSWORDFILE=$HOME/password.txt       # File holding our password
 
-CONVERT=$BS/convert                   # ZDAB -> Root conversion script
+CONVERT=$BS/buffer/convert            # ZDAB -> Root conversion script
 CONVERTLOG=$LOGDIR/convert.log        # Conversion log
 
 JANITOR=$BS/janitor                   # L1 file manager
