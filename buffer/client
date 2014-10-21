@@ -34,7 +34,7 @@ trap exit 2
 
 while true
 do
-    echo INFO - L2 Client starting
+    echo SUCCESS - L2 Client starting
 # For each file coming from the builder, first receive the filename
 # then, receive the file; finally, write the item into the jobqueue
 
@@ -51,10 +51,11 @@ do
 # Receive file - try three times, report errors
     TEST=0
     TRIES=0
-    while (( TEST == 0 && TRIES < 3))
+    while (( TEST == 0 && TRIES < 3 ))
     do
         ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
-                               | $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG 
+                               | $CHOPPER -i /dev/stdin -o $NAME \
+                                  -r $PASSWORD -c ~/chopper/default.cnfg>> $LOG 
         if [$? -gt 0 ]
         then
           TRIES=$( $TRIES + 1)
