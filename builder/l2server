@@ -43,12 +43,9 @@ do
     FILE=$(comm -23 $LS $FL | head -n 1)
 
 # If we have a new file, serve it and the filename to the buffer
-    cat > /tmp/filename.txt << EOF
-$FILE
-EOF
-
+    echo $FILE > tmp/filename.txt 
     echo INFO - Pushing $FILE to pipe
-    tail -c +1 /tmp/filename.txt > $PIPE
+    cat /tmp/filename.txt > $PIPE
     tail -f -c +1 $FILE > $PIPE &
     while [ ! -f filereceived ]
     do
