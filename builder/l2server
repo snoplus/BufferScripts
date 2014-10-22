@@ -43,7 +43,7 @@ do
     FILE=$(comm -23 $LS $FL | head -n 1)
 
 # If we have a new file, serve it and the filename to the buffer
-    echo $FILE > tmp/filename.txt 
+    echo $FILE > /tmp/filename.txt 
     echo INFO - Pushing $FILE to pipe
     cat /tmp/filename.txt > $PIPE
     tail -f -c +1 $FILE > $PIPE &
