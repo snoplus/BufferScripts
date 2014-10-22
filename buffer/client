@@ -41,9 +41,9 @@ do
 # Receive and parse filename
     FILE=$(ssh $BUILDER cat $PIPE)
     echo INFO - Receiving file $FILE
-    RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
+    RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
     cat $RUN > $PCAFILE
-    SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $4}' )
+    SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
