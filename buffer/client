@@ -68,8 +68,7 @@ do
     
 # Receive file - try three times, report errors
     ssh $BUILDER cat $PIPE | tee -a $L1/$BIGFILE \
-                           | $CHOPPER -i /dev/stdin -o $NAME \
-                              -r $PASSWORD -c ~/chopper/default.cnfg>> $LOG 
+                           | chopper
 
 # Prepare for conversion
     cat > $MAC/$NAME.mac << EOF
