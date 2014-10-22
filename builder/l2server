@@ -18,9 +18,9 @@ LS=$3
 PIPE=$4
 SERVERDIR=~/bufferscripts/builder
 
+echo INFO - L2 Server starting
 while true
 do
-    echo INFO - L2 Server starting
 # Get list of files needing serving
     ls -tr $DATA/*.zdab > $LS
 
@@ -54,7 +54,7 @@ do
         echo DEBUG - waiting for filereceived
     done
     echo DEBUG - filereceived
-    rm filereceived
+    rm $SERVERDIR/filereceived
     kill %?tail
     echo INFO - Reached end of $FILE
     echo $FILE >> $FL 
