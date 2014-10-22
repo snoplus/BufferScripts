@@ -16,6 +16,7 @@ DATA=$1
 FL=$2
 LS=$3
 PIPE=$4
+SERVERDIR=~/bufferscripts/builder
 
 while true
 do
@@ -47,10 +48,12 @@ do
     echo INFO - Pushing $FILE to pipe
     cat /tmp/filename.txt > $PIPE
     tail -f -c +1 $FILE > $PIPE &
-    while [ ! -f filereceived ]
+    while [ ! -f $SERVERDIR/filereceived ]
     do
         sleep 1
+        echo DEBUG - waiting for filereceived
     done
+    echo DEBUG - filereceived
     rm filereceived
     kill %?tail
     echo INFO - Reached end of $FILE
