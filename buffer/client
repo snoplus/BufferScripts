@@ -22,10 +22,37 @@ MAC=$7
 PASSWORDFILE=$8
 GRIDREADY=$9
 PCAFILE=~/run.txt
+SERVERDIR=~/bufferscripts/builder
+
+# This function is a wrapper for Stonehenge, which will send the appropriate
+# signals to the server
+chopper()
+{
+$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c ~/chopper/default.cnfg >> $LOG
+echo DEBUG - Stonehenge has exited.
+if [ $? -eq 0]
+then
+  echo SUCCESS - Stonehenge finished processing file $FILE successfully.
+  ssh $BUILDER touch $SERVERDIR/filereceived 
+  TRIES=0
+else
+  TRIES=$( $TRIES + 1)
+  echo WARNING - Stonehenge exited on file $FILE.
+  if [ $TRIES -lt 3 ]
+  then
+    echo INFO - Trying to read file $FILE again.
+    ssh $BUILDER touch $SERVERDIR/filetryagain
+  else
+    echo ERROR - Three failured trying to process file $FILE.  Moving on.
+    ssh $BUILDER touch $SERVERDIR/filefailed
+  fi
+fi
+}
 
 while true
 do
     echo SUCCESS - L2 Client starting
+    TRIES=0
 # For each file coming from the builder, first receive the filename
 # then, receive the file; finally, write the item into the jobqueue
 
@@ -40,32 +67,9 @@ do
     PASSWORD=$(cat $PASSWORDFILE)
     
 # Receive file - try three times, report errors
-    TEST=0
-    TRIES=0
-    while (( TEST == 0 && TRIES < 3 ))
-    do
-        ssh $BUILDER cat $PIPE | tee -a $L1/$BIGFILE \
-                               | $CHOPPER -i /dev/stdin -o $NAME \
-                                  -r $PASSWORD -c ~/chopper/default.cnfg>> $LOG 
-        echo INFO - Stonehenge has exited.
-        if [ $? -gt 0 ]
-        then
-          TRIES=$( $TRIES + 1)
-          echo WARNING - Stonehenge exited on file $FILE.
-          if [ $TRIES -lt 3 ]
-          then
-            echo INFO - Trying to read file $FILE again.
-          else
-            echo ERROR - Three failures trying to process file $FILE.  Moving on.
-          fi
-        else
-          TEST=1
-          echo SUCCESS - Stonehenge finished processing file $FILE successfully.
-        fi
-    done 
-
-# Report that the file was received
-    ssh $BUILDER touch /Users/snotdaq/server/filereceived
+    ssh $BUILDER cat $PIPE | tee -a $L1/$BIGFILE \
+                           | $CHOPPER -i /dev/stdin -o $NAME \
+                              -r $PASSWORD -c ~/chopper/default.cnfg>> $LOG 
 
 # Prepare for conversion
     cat > $MAC/$NAME.mac << EOF
