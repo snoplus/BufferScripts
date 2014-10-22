@@ -30,7 +30,7 @@ chopper()
 {
 $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c ~/chopper/default.cnfg >> $LOG
 echo DEBUG - Stonehenge has exited.
-if [ $? -eq 0]
+if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully.
   ssh $BUILDER touch $SERVERDIR/filereceived 
