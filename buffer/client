@@ -23,15 +23,6 @@ PASSWORDFILE=$8
 GRIDREADY=$9
 PCAFILE=~/run.txt
 
-# ATTN: This function must be run in a subshell, e.g., in a pipeline
-ourtee()
-{
-trap "" SIGPIPE
-exec tee $*
-}
-
-trap exit 2
-
 while true
 do
     echo SUCCESS - L2 Client starting
@@ -53,10 +44,11 @@ do
     TRIES=0
     while (( TEST == 0 && TRIES < 3 ))
     do
-        ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
+        ssh $BUILDER cat $PIPE | tee -a $L1/$BIGFILE \
                                | $CHOPPER -i /dev/stdin -o $NAME \
                                   -r $PASSWORD -c ~/chopper/default.cnfg>> $LOG 
-        if [$? -gt 0 ]
+        echo INFO - Stonehenge has exited.
+        if [ $? -gt 0 ]
         then
           TRIES=$( $TRIES + 1)
           echo WARNING - Stonehenge exited on file $FILE.
