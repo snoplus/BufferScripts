@@ -63,7 +63,7 @@ do
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
     cat $RUN > $PCAFILE
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
-    BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
+    BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
     
