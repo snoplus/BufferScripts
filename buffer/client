@@ -85,7 +85,7 @@ do
 exit
 EOF
 
-    echo ~/bufferscripts/buffer/job $MAC $RUN_$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
+    echo ~/bufferscripts/buffer/job $MAC $RUN"_"$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
     echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN
 
     sleep 1
