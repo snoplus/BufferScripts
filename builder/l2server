@@ -51,7 +51,6 @@ do
     while [ ! -f $SERVERDIR/filereceived ]
     do
         sleep 1
-        echo DEBUG - waiting for filereceived
     done
     echo DEBUG - filereceived
     rm $SERVERDIR/filereceived

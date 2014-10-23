@@ -47,6 +47,7 @@ else
     ssh $BUILDER touch $SERVERDIR/filefailed
   fi
 fi
+kill %?ssh
 }
 
 while true
