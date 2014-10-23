@@ -50,9 +50,9 @@ fi
 kill %?ssh
 }
 
+echo SUCCESS - L2 Client starting
 while true
 do
-    echo SUCCESS - L2 Client starting
     TRIES=0
 # For each file coming from the builder, first receive the filename
 # then, receive the file; finally, write the item into the jobqueue
@@ -61,7 +61,7 @@ do
     FILE=$(ssh $BUILDER cat $PIPE)
     echo INFO - Receiving file $FILE
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
-    cat $RUN > $PCAFILE
+    echo $RUN > $PCAFILE
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
     NAME=$RUN"_"$SUBRUN 
