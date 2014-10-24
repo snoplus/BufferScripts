@@ -49,14 +49,31 @@ do
     cat /tmp/filename.txt > $PIPE
     tail -f -c +1 $FILE > $PIPE &
     PID=$( jobs -lp | tail -n 1)
-    while [ ! -f $SERVERDIR/filereceived ]
+    while [ ! -f $SERVERDIR/filereceived || \
+            ! -f $SERVERDIR/filetryagain || \
+            ! -f $SERVERDIR/filefailed ]
     do
         sleep 1
     done
-    echo DEBUG - filereceived 
-    rm $SERVERDIR/filereceived
-    kill $PID
-    echo INFO - Reached end of $FILE 
-    echo $FILE >> $FL 
-
+    if [ -f $SERVERDIR/filereceived ]
+    then
+      echo DEBUG - filereceived 
+      rm $SERVERDIR/filereceived
+      kill $PID
+      echo INFO - Reached end of $FILE 
+      echo $FILE >> $FL 
+    elif [ -f $SERVERDIR/filetryagain ]
+    then
+      rm $SERVERDIR/filetryagain
+      kill $PID
+      echo INFO - Server will retry sending file $FILE
+    elif [ -f $SERVERDIR/filefailed ]
+    then
+      rm $SERVERDIR/filefailed
+      kill $PID
+      echo INFO - Server will not try to send file $FILE
+      echo $FILE >> $FL
+    else
+      echo DEBUG - You should never see this.
+    fi
 done
