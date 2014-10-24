@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 #    This script serves the next unserved Event Builder file to the Buffer.
 # It selects the oldest file from ~/data_temp not on its list of served files
@@ -45,17 +45,18 @@ do
 
 # If we have a new file, serve it and the filename to the buffer
     echo $FILE > /tmp/filename.txt 
-    echo INFO - Pushing $FILE to pipe
+    echo INFO - Pushing $FILE to pipe 
     cat /tmp/filename.txt > $PIPE
     tail -f -c +1 $FILE > $PIPE &
+    PID=$( jobs -lp | tail -n 1)
     while [ ! -f $SERVERDIR/filereceived ]
     do
         sleep 1
     done
-    echo DEBUG - filereceived
+    echo DEBUG - filereceived 
     rm $SERVERDIR/filereceived
-    kill %?tail
-    echo INFO - Reached end of $FILE
+    kill $PID
+    echo INFO - Reached end of $FILE 
     echo $FILE >> $FL 
 
 done

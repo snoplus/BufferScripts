@@ -29,21 +29,21 @@ SERVERDIR=~/bufferscripts/builder
 chopper()
 {
 $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c ~/chopper/default.cnfg >> $LOG
-echo DEBUG - Stonehenge has exited.
+echo DEBUG - Stonehenge has exited. 
 if [ $? -eq 0 ]
 then
-  echo SUCCESS - Stonehenge finished processing file $FILE successfully.
+  echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
   ssh $BUILDER touch $SERVERDIR/filereceived 
   TRIES=0
 else
   TRIES=$( $TRIES + 1)
-  echo WARNING - Stonehenge exited on file $FILE.
+  echo WARNING - Stonehenge exited on file $FILE. 
   if [ $TRIES -lt 3 ]
   then
-    echo INFO - Trying to read file $FILE again.
+    echo INFO - Trying to read file $FILE again. 
     ssh $BUILDER touch $SERVERDIR/filetryagain
   else
-    echo ERROR - Three failured trying to process file $FILE.  Moving on.
+    echo ERROR - Three failured trying to process file $FILE.  Moving on. 
     ssh $BUILDER touch $SERVERDIR/filefailed
   fi
 fi
@@ -58,7 +58,7 @@ do
 
 # Receive and parse filename
     FILE=$(ssh $BUILDER cat $PIPE)
-    echo INFO - Receiving file $FILE
+    echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
     echo $RUN > $PCAFILE
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
@@ -86,7 +86,7 @@ exit
 EOF
 
     echo ~/bufferscripts/buffer/job $MAC $RUN"_"$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
-    echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN
+    echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN 
 
     sleep 1
 done
