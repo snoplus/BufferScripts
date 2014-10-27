@@ -1,4 +1,4 @@
-#!/bin/bash 
+#/bin/bash 
 
 #    This script serves the next unserved Event Builder file to the Buffer.
 # It selects the oldest file from ~/data_temp not on its list of served files
@@ -45,6 +45,7 @@ do
 
 # If we have a new file, serve it and the filename to the buffer
     echo $FILE > /tmp/filename.txt 
+    scp /tmp/filename.txt klabe@cps3.uchicago.edu:~/bufferscripts/buffer/filename.txt
     echo INFO - Pushing $FILE to pipe 
     tail -f -c +1 $FILE > $PIPE &
     PID=$( jobs -lp | tail -n 1)
