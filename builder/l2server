@@ -1,4 +1,4 @@
-#/bin/bash 
+#!/bin/bash 
 
 #    This script serves the next unserved Event Builder file to the Buffer.
 # It selects the oldest file from ~/data_temp not on its list of served files
