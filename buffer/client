@@ -23,20 +23,20 @@ PASSWORDFILE=$8
 GRIDREADY=$9
 PCAFILE=~/run.txt
 SERVERDIR=~/bufferscripts/builder
+NAMEFILE=/tmp/filename
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
 chopper()
 {
 $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c ~/chopper/default.cnfg >> $LOG
-echo DEBUG - Stonehenge has exited. 
 if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
   ssh $BUILDER touch $SERVERDIR/filereceived 
   TRIES=0
 else
-  TRIES=$( $TRIES + 1)
+  TRIES=$(( TRIES + 1 ))
   echo WARNING - Stonehenge exited on file $FILE. 
   if [ $TRIES -lt 3 ]
   then
@@ -57,7 +57,12 @@ do
 # then, receive the file; finally, write the item into the jobqueue
 
 # Receive and parse filename
-    FILE=$(ssh $BUILDER cat $PIPE)
+    while [ ! -f ~/bufferscripts/buffer/filename.txt ]
+    do
+      sleep 1
+    done
+    FILE=$(cat ~/bufferscripts/buffer/filename.txt)
+    rm ~/bufferscripts/buffer/filename.txt
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
     echo $RUN > $PCAFILE

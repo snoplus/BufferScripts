@@ -46,7 +46,6 @@ do
 # If we have a new file, serve it and the filename to the buffer
     echo $FILE > /tmp/filename.txt 
     echo INFO - Pushing $FILE to pipe 
-    cat /tmp/filename.txt > $PIPE
     tail -f -c +1 $FILE > $PIPE &
     PID=$( jobs -lp | tail -n 1)
     while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ]
