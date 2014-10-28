@@ -53,6 +53,7 @@ fi
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 TRIES=0
+DONE=0
 while true
 do
 # First get appropriate file
@@ -102,6 +103,7 @@ do
       kill $PID
       echo INFO - Reached end of $FILE
       echo $FILE >> $FL
+      DONE=1
     elif [ -f $SERVERDIR/filetryagain ]
     then
       rm $SERVERDIR/filetryagain
@@ -117,8 +119,10 @@ do
       echo DEBUG - Message file disappeared
     fi
 
-# Prepare for conversion
-    cat > $MAC/$NAME.mac << EOF
+# If file successfully received, prepare for conversion
+    if [ $DONE -eq 1 ]
+    then
+      cat > $MAC/$NAME.mac << EOF
 
 /PhysicsList/OmitAll true
 
@@ -132,8 +136,9 @@ do
 exit
 EOF
 
-    echo ~/bufferscripts/buffer/job $MAC $RUN"_"$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
-    echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN 
-
-    sleep 1
+      echo ~/bufferscripts/buffer/job $MAC $RUN"_"$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
+      echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN 
+    else
+      echo ERROR - Stonehenge could not process run $RUN"_"$SUBRUN
+    fi
 done
