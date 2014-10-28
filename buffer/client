@@ -24,6 +24,9 @@ GRIDREADY=$9
 PCAFILE=~/run.txt
 SERVERDIR=~/bufferscripts/builder
 NAMEFILE=/tmp/filename
+DATA=
+FL=
+LS=
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
@@ -49,20 +52,35 @@ else
 fi
 }
 
+# MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 while true
 do
     TRIES=0
-# For each file coming from the builder, first receive the filename
-# then, receive the file; finally, write the item into the jobqueue
+# First get appropriate file
+#////////////////////////////
+# Get list of files needing serving
+    ls -tr $DATA/*.zdab > $LS
 
-# Receive and parse filename
-    while [ ! -f ~/bufferscripts/buffer/filename.txt ]
+# If there is no $FL file, assume we want to start from present
+    if [ ! -f $FL ]
+    then
+      ls -tr $DATA/*.zdab > $FL
+    fi
+    COUNT=0
+    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
     do
       sleep 1
+      COUNT=$((COUNT+1))
+      if [ $(( COUNT % 60 )) -eq 0 ]
+      then
+        echo INFO - Waiting for data
+      fi
     done
-    FILE=$(cat ~/bufferscripts/buffer/filename.txt)
-    rm ~/bufferscripts/buffer/filename.txt
+    FILE=$(comm -23 $LS $FL | head -n 1)
+
+# Prepare to process file
+#//////////////////////////
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
     echo $RUN > $PCAFILE
@@ -72,8 +90,34 @@ do
     PASSWORD=$(cat $PASSWORDFILE)
     
 # Receive file - try three times, report errors
-    ssh $BUILDER cat $PIPE | tee -a $L1/$BIGFILE \
-                           | chopper
+    tail -f -c +1 $FILE | tee -a $L1/$BIGFILE \
+                        | chopper &
+    PID=$( jobs -lp | tail -n 1)
+    while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ]
+    do
+      sleep 1
+    done
+    if [ -f $SERVERDIR/filereceived ]
+    then
+      echo DEBUG - filereceived
+      rm $SERVERDIR/filereceived
+      kill $PID
+      echo INFO - Reached end of $FILE
+      echo $FILE >> $FL
+    elif [ -f $SERVERDIR/filetryagain ]
+    then
+      rm $SERVERDIR/filetryagain
+      kill $PID
+      echo INFO - Server will retry reading file $FILE
+    elif [ -f $SERVERDIR/filefailed ]
+    then
+      rm $SERVERDIR/filefailed
+      kill $PID
+      echo INFO - Server will not try to read file $FILE again.
+      echo $FILE >> $FL
+    else
+      echo DEBUG - Message file disappeared
+    fi
 
 # Prepare for conversion
     cat > $MAC/$NAME.mac << EOF
