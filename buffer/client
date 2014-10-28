@@ -12,21 +12,19 @@
 # independently by giving it the arguments listed below:
 
 # Specifying where things are located
-BUILDER=$1
-PIPE=$2
-L1=$3
-LOG=$4
-CHOPPER=$5
-JOBQUEUE=$6
-MAC=$7
-PASSWORDFILE=$8
-GRIDREADY=$9
+L1=$2
+LOG=$3
+CHOPPER=$4
+JOBQUEUE=$5
+MAC=$6
+PASSWORDFILE=$7
+GRIDREADY=$8
 PCAFILE=~/run.txt
-SERVERDIR=~/bufferscripts/builder
+SERVERDIR=~/bufferscripts/buffer
 NAMEFILE=/tmp/filename
-DATA=
-FL=
-LS=
+DATA=$9
+FL=$10
+LS=$11
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
@@ -36,7 +34,7 @@ $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c ~/chopper/default.cnfg >> $LOG
 if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
-  ssh $BUILDER touch $SERVERDIR/filereceived 
+  touch $SERVERDIR/filereceived 
   TRIES=0
 else
   TRIES=$(( TRIES + 1 ))
@@ -44,10 +42,10 @@ else
   if [ $TRIES -lt 3 ]
   then
     echo INFO - Trying to read file $FILE again. 
-    ssh $BUILDER touch $SERVERDIR/filetryagain
+    touch $SERVERDIR/filetryagain
   else
     echo ERROR - Three failured trying to process file $FILE.  Moving on. 
-    ssh $BUILDER touch $SERVERDIR/filefailed
+    touch $SERVERDIR/filefailed
   fi
 fi
 }
