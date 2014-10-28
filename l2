@@ -19,12 +19,9 @@ PYTHON=$HOME/Python-2.7.8/python      # Location of python version needed for mi
 MONITOR=$HOME/minard/bin/monitor.py   # Location of the monitoring script
 DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
-LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
-SERVERDIR=$BS/builder                 # Directory of L2 server on the builder
-SERVER=$SERVERDIR/l2server            # filename of L2 server
-SERVERFL=$SERVERDIR/served.txt        # file recording served files 
-SERVERDATA=$HOME/testbuilder          # Directory for the Builder output files
-SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
+SSHFS=$HOME/testbuilder               # directory where builder is sshfs mounted
+SERVERFL=$BS/buffer/served.txt        # file recording served files 
+SERVERLS=$BS/buffer/ls.txt            # filename for list of available files
 
 CLIENT=$BS/buffer/client              # Location of the client script
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
@@ -108,8 +105,9 @@ function startselect {
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY | $PYTHON $MONITOR L2-client &
+                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
+                         $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
+                         | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                     else
                         echo client already running.  You must stop client \
@@ -281,8 +279,9 @@ do
                         fi
                         echo File structure prepared.
                         echo Starting level 2 scripts...
-                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY | $PYTHON $MONITOR L2-client &
+                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
+                         $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
+                         | $PYTHON $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | 
                           $PYTHON $MONITOR L2-convert &
