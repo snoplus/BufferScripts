@@ -6,7 +6,7 @@
 # directory structures are present, and, if not, constructs them.
 
 # Organization of locations.  Set directory structure here:
-BUILDER=snotdaq@builder1.sp.snolab.ca # Access to Event Builder
+BUILDER=klabe@cps3.uchicago.edu       # Access to Event Builder
 BS=$HOME/BufferScripts                # Home directory of the Buffer Scripts
 LOGDIR=$BS/log                        # Central location for L2 log files
 FILESYSTEM=/mnt/data                  # Buffer filesystem
@@ -15,32 +15,25 @@ ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
 MAC=$BS/mac                           # Directory for conversion macros
 GRIDREADY=$FILESYSTEM/l2t             # Output directory for finished products
 RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
-MONITOR=$HOME/minard/scripts/monitor.py # Location of the monitoring script
+MONITOR=$HOME/minard/bin/monitor.py   # Location of the monitoring script
 DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
-LOCALSERVER=$BS/builder/l2server      # Location of local copy of L2server code
-SERVERDIR=/Users/snotdaq/server       # Directory of L2 server on the builder
-SERVER=$SERVERDIR/l2server            # filename of L2 server
-SERVERFL=$SERVERDIR/served.txt        # file recording served files 
-SERVERDATA=/Users/snotdaq/data_temp   # Directory for the Builder output files
-SERVERLS=$SERVERDIR/ls.txt            # filename for list of available files
-
-PIPE=$SERVERDIR/pipe                  # Location of builder > buffer pipe
+SSHFS=/local/eventbuilder             # directory where builder is sshfs mounted
+SERVERFL=$BS/buffer/served.txt        # file recording served files 
+SERVERLS=$BS/buffer/ls.txt            # filename for list of available files
 
 CLIENT=$BS/buffer/client              # Location of the client script
 CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
-CHOPPER=~/chopper/chopper             # Location of the chopper program
+CHOPPER=~/chopper/stonehenge.sh       # Location of the chopper program
 JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
 PASSWORDFILE=$HOME/password.txt       # File holding our password
 
-CONVERT=$BS/convert                   # ZDAB -> Root conversion script
+CONVERT=$BS/buffer/convert            # ZDAB -> Root conversion script
 CONVERTLOG=$LOGDIR/convert.log        # Conversion log
 
-JANITOR=$BS/janitor                   # L1 file manager
+JANITOR=$BS/buffer/janitor            # L1 file manager
 
 # Variables in which to store PIDs of the various monitoring scripts
-serverpid=0
-builderpid=0
 clientpid=0
 convertpid=0
 janitorpid=0
@@ -65,12 +58,6 @@ function printdetailmenu {
 # This function prints lists of running and not-running processes
 function processes {
     echo Here are the processes running at this time:
-    if [ "$serverpid" -ne 0 ]
-    then
-        echo -e "\t server \t $serverpid"
-    else
-        NO+="\tserver\n"
-    fi
     if [ "$clientpid" -ne 0 ]
     then
         echo -e "\t client \t $clientpid"
@@ -110,29 +97,16 @@ function startselect {
     echo Select the number of the script you wish to start.
     echo If you do not wish to start any processes at this time, select cancel \
           to return to the previous menu.
-    startoptions=("server" "client" "convert" "janitor" "cancel")
+    startoptions=("client" "convert" "janitor" "cancel")
     select opt3 in "${startoptions[@]}"
         do
             case $opt3 in
-                "server")
-                    if [ "$serverpid" -eq 0 ]
-                    then
-                        ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS 2>&1 | $MONITOR L2-server &
-                        serverpid=$(jobs -lp | tail -n 1)
-                        builderpid=$(ssh $BUILDER ps -u snotdaq \
-                                     | grep l2server | grep /bin/bash \
-                                     | awk '{print $2}' )
-                    else
-                        echo server already running.  You must stop server \
-                              before starting it again.
-                    fi
-                    ;;
                 "client")
                     if [ "$clientpid" -eq 0 ]
                     then
-                        $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
+                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
+                         $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
+                         | $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                     else
                         echo client already running.  You must stop client \
@@ -142,7 +116,7 @@ function startselect {
                 "convert")
                     if [ "$convertpid" -eq 0 ]
                     then
-                       $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | \
+                       $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | \
                        $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
                     else
@@ -153,7 +127,7 @@ function startselect {
                 "janitor")
                     if [ "$janitorpid" -eq 0 ]
                     then
-                      $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
+                      $JANITOR $FILESYSTEM $L1 $DONTDELETE | $MONITOR \
                         L1-delete &
                       convertpid=$(jobs -lp | tail -n 1)
                     else
@@ -177,22 +151,10 @@ function stopselect {
     echo Enter the number of the process you wish to stop.
     echo If you do not wish to stop any process at this time, select "Cancel" \
           to return to the previous menu.
-    stopoptions=("sever" "client" "convert" "janitor" "cancel")
+    stopoptions=("client" "convert" "janitor" "cancel")
     select opt4 in "${stopoptions[@]}"
         do
             case $opt4 in
-                "sever")
-                    if [ "$serverpid" -ne 0 ]
-                    then
-                        ssh $BUILDER kill $builderpid
-                        builderpid=0
-                        kill $serverpid
-                        serverpid=0
-                    else
-                        echo Server not currently running.  You must start it \
-                              before stopping it.
-                    fi
-                    ;;
                 "client")
                     if [ "$clientpid" -ne 0 ]
                     then
@@ -290,14 +252,10 @@ do
     do
         case $opt in
             "Start")
-                    if [[ "$serverpid" -eq 0 && \
-                          "$clientpid" -eq 0 && \
+                    if [[ "$clientpid" -eq 0 && \
                           "$convertpid" -eq 0 ]];
                     then
                         echo Preparing file structure...
-                        ssh $BUILDER rm $PIPE
-                        ssh $BUILDER mkfifo $PIPE
-                        scp $LOCALSERVER $BUILDER:$SERVER
                         if [ ! -d $LOGDIR ]
                         then
                             mkdir $LOGDIR
@@ -314,21 +272,23 @@ do
                         then
                             mkdir $L1
                         fi
+                        if [ ! -f $JOBQUEUE ]
+                        then
+                            touch $JOBQUEUE
+                        fi
+                        if [ ! -d $SSHFS ]
+                        then
+                        fi
                         echo File structure prepared.
                         echo Starting level 2 scripts...
-                        ssh $BUILDER $SERVER $SERVERDATA $SERVERFL \
-                             $SERVERLS 2>&1 | $MONITOR L2-server &
-                        serverpid=$(jobs -lp | tail -n 1)
-                        builderpid=$(ssh $BUILDER ps -u snotdaq \
-                                      | grep l2server | grep /bin/bash \
-                                      | awk '{print $2}')
-                        $CLIENT $BUILDER $PIPE $L1 $CHOPPER $JOBQUEUE \
-                          $MAC $PASSWORDFILE $GRIDREADY 2>&1 | $MONITOR L2-client &
+                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
+                         $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
+                         | $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
-                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV 2>&1 | 
+                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | 
                           $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
-                        $JANITOR $FILESYSTEM $L1 $DONTDELETE 2>&1 | $MONITOR \
+                        $JANITOR $FILESYSTEM $L1 $DONTDELETE | $MONITOR \
                           L1-delete &
                         janitorpid=$(jobs -lp | tail -n 1)
                         printmenu
@@ -342,13 +302,6 @@ do
                 ;;
             "Stop")
                 echo Killing monitoring processes
-                    if [ "$serverpid" -ne 0 ]
-                    then
-                        ssh $BUILDER kill $builderpid
-                        builderpid=0
-                        kill $serverpid
-                        serverpid=0
-                    fi
                     if [ "$clientpid" -ne 0 ]
                     then
                         kill %?client
@@ -388,9 +341,7 @@ do
                 printmenu
                 ;;
             "Quit")
-                if [[ "$serverpid" -eq 0 && \
-                      "$builderpid" -eq 0 && \
-                      "$clientpid" -eq 0 && \
+                if [[ "$clientpid" -eq 0 && \
                       "$convertpid" -eq 0 && \
                       "$janitorpid" -eq 0 ]];
                 then

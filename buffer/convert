@@ -18,11 +18,11 @@ do
   SUBRUN=$( echo $i | awk 'BEGIN {FS="_"}{print $2}' | 
             awk 'BEGIN {FS="."}{print $1}' )
   NAME=$RUN"_"$SUBRUN".zdab"
-  echo ./job $MAC $RUN_$SUBRUN $NAME >> $JOBQUEUE
+  echo ~/bufferscripts/buffer/job $MAC $RUN_$SUBRUN $NAME >> $JOBQUEUE
 done
 
 # Check if there is anything to do
-while [ "$($JOBQUEUE | wc -l)" -eq 0 ]
+while [ "$(cat $JOBQUEUE | wc -l)" -eq 0 ]
 do
   echo INFO - No files to process, waiting
   sleep 10

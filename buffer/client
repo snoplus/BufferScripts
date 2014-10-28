@@ -12,67 +12,119 @@
 # independently by giving it the arguments listed below:
 
 # Specifying where things are located
-BUILDER=$1
-PIPE=$2
-L1=$3
-LOG=$4
-CHOPPER=$5
-JOBQUEUE=$6
-MAC=$7
-PASSWORDFILE=$8
-GRIDREADY=$9
-PCAFILE=/trigger/home/PCAdata/run.txt
+L1=$1
+LOG=$2
+CHOPPER=$3
+JOBQUEUE=$4
+MAC=$5
+PASSWORDFILE=$6
+GRIDREADY=$7
+PCAFILE=~/run.txt
+SERVERDIR=~/BufferScripts/buffer
+NAMEFILE=/tmp/filename
+DATA=$8
+FL=$9
+LS=$10
 
-# ATTN: This function must be run in a subshell, e.g., in a pipeline
-ourtee()
+# This function is a wrapper for Stonehenge, which will send the appropriate
+# signals to the server
+chopper()
 {
-trap "" SIGPIPE
-exec tee $*
+$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c ~/chopper/default.cnfg >> $LOG
+if [ $? -eq 0 ]
+then
+  echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
+  touch $SERVERDIR/filereceived 
+  TRIES=0
+else
+  TRIES=$(( TRIES + 1 ))
+  echo WARNING - Stonehenge exited on file $FILE. 
+  if [ $TRIES -lt 3 ]
+  then
+    echo INFO - Trying to read file $FILE again. 
+    touch $SERVERDIR/filetryagain
+  else
+    echo ERROR - Three failured trying to process file $FILE.  Moving on. 
+    touch $SERVERDIR/filefailed
+  fi
+fi
 }
 
-trap exit 2
-
+# MAIN - Control flow begins here
+echo SUCCESS - L2 Client starting
+TRIES=0
+DONE=0
 while true
 do
-# For each file coming from the builder, first receive the filename
-# then, receive the file; finally, write the item into the jobqueue
+# First get appropriate file
+#////////////////////////////
+# Get list of files needing serving
+    ls -tr $DATA/*.zdab > $LS
 
-# Receive and parse filename
-    FILE=$(ssh $BUILDER cat $PIPE)
-    echo INFO - Receiving file $FILE
-    RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
-    cat $RUN > $PCAFILE
-    SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $4}' )
-    BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
+# If there is no $FL file, assume we want to start from present
+    if [ ! -f $FL ]
+    then
+      ls -tr $DATA/*.zdab > $FL
+    fi
+    COUNT=0
+    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
+    do
+      sleep 1
+      COUNT=$((COUNT+1))
+      if [ $(( COUNT % 60 )) -eq 0 ]
+      then
+        echo INFO - Waiting for data
+      fi
+    done
+    FILE=$(comm -23 $LS $FL | head -n 1)
+
+# Prepare to process file
+#//////////////////////////
+    echo INFO - Receiving file $FILE 
+    RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
+    echo $RUN > $PCAFILE
+    SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
+    BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
+    TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
     
 # Receive file - try three times, report errors
-    TEST=0
-    TRIES=0
-    while (( TEST == 0 && TRIES < 3))
+    tail -f -c +1 $FILE | tee -a $L1/$TEMPBIGFILE \
+                        | chopper &
+    PID=$( jobs -lp | tail -n 1)
+    while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ]
     do
-        ssh $BUILDER cat $PIPE | ourtee -a $L1/$BIGFILE \
-                               | $CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD >> $LOG 
-        if [$? -gt 0 ]
-          TRIES=$( $TRIES + 1)
-          echo WARNING - Stonehenge exited on file $FILE.
-          if [ $TRIES -lt 3 ]
-            echo INFO - Trying to read file $FILE again.
-          else
-            echo ERROR - Three failures trying to process file $FILE.  Moving on.
-          fi
-        else
-          TEST=1
-          echo SUCCESS - Stonehenge finished processing file $FILE successfully.
-        fi
-    done 
+      sleep 1
+    done
+    if [ -f $SERVERDIR/filereceived ]
+    then
+      echo DEBUG - filereceived
+      rm $SERVERDIR/filereceived
+      kill $PID
+      echo INFO - Reached end of $FILE
+      echo $FILE >> $FL
+      DONE=1
+    elif [ -f $SERVERDIR/filetryagain ]
+    then
+      rm $SERVERDIR/filetryagain
+      kill $PID
+      echo INFO - Server will retry reading file $FILE
+    elif [ -f $SERVERDIR/filefailed ]
+    then
+      rm $SERVERDIR/filefailed
+      kill $PID
+      echo INFO - Server will not try to read file $FILE again.
+      echo $FILE >> $FL
+    else
+      echo DEBUG - Message file disappeared
+    fi
 
-# Report that the file was received
-    ssh $BUILDER touch /Users/snotdaq/server/filereceived
-
-# Prepare for conversion
-    cat > $MAC/$NAME.mac << EOF
+# If file successfully received, prepare for conversion
+    if [ $DONE -eq 1 ]
+    then
+      mv $L1/$TEMPBIGFILE $L1/$BIGFILE
+      cat > $MAC/$NAME.mac << EOF
 
 /PhysicsList/OmitAll true
 
@@ -86,7 +138,9 @@ do
 exit
 EOF
 
-    echo ./job $MAC $RUN_$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
-    echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN
-
+      echo ~/bufferscripts/buffer/job $MAC $RUN"_"$SUBRUN $NAME.zdab $GRIDREADY >> $JOBQUEUE
+      echo SUCCESS - Stonehenge done with run $RUN"_"$SUBRUN 
+    else
+      echo ERROR - Stonehenge could not process run $RUN"_"$SUBRUN
+    fi
 done
