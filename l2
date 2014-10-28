@@ -7,9 +7,9 @@
 
 # Organization of locations.  Set directory structure here:
 BUILDER=klabe@cps3.uchicago.edu       # Access to Event Builder
-BS=$HOME/bufferscripts                # Home directory of the Buffer Scripts
+BS=$HOME/BufferScripts                # Home directory of the Buffer Scripts
 LOGDIR=$BS/log                        # Central location for L2 log files
-FILESYSTEM=/cp/home/cp/klabe          # Buffer filesystem
+FILESYSTEM=/mnt/data                  # Buffer filesystem
 L1=$FILESYSTEM/l1data                 # Directory for raw data
 ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
 MAC=$BS/mac                           # Directory for conversion macros
@@ -19,7 +19,7 @@ PYTHON=$HOME/Python-2.7.8/python      # Location of python version needed for mi
 MONITOR=$HOME/minard/bin/monitor.py   # Location of the monitoring script
 DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
-SSHFS=$HOME/testbuilder               # directory where builder is sshfs mounted
+SSHFS=/local/eventbuilder             # directory where builder is sshfs mounted
 SERVERFL=$BS/buffer/served.txt        # file recording served files 
 SERVERLS=$BS/buffer/ls.txt            # filename for list of available files
 
@@ -276,6 +276,9 @@ do
                         if [ ! -f $JOBQUEUE ]
                         then
                             touch $JOBQUEUE
+                        fi
+                        if [ ! -d $SSHFS ]
+                        then
                         fi
                         echo File structure prepared.
                         echo Starting level 2 scripts...
