@@ -12,19 +12,19 @@
 # independently by giving it the arguments listed below:
 
 # Specifying where things are located
-L1=$2
-LOG=$3
-CHOPPER=$4
-JOBQUEUE=$5
-MAC=$6
-PASSWORDFILE=$7
-GRIDREADY=$8
+L1=$1
+LOG=$2
+CHOPPER=$3
+JOBQUEUE=$4
+MAC=$5
+PASSWORDFILE=$6
+GRIDREADY=$7
 PCAFILE=~/run.txt
 SERVERDIR=~/bufferscripts/buffer
 NAMEFILE=/tmp/filename
-DATA=$9
-FL=$10
-LS=$11
+DATA=$8
+FL=$9
+LS=$10
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
