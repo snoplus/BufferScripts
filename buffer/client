@@ -85,11 +85,12 @@ do
     echo $RUN > $PCAFILE
     SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
+    TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
     
 # Receive file - try three times, report errors
-    tail -f -c +1 $FILE | tee -a $L1/$BIGFILE \
+    tail -f -c +1 $FILE | tee -a $L1/$TEMPBIGFILE \
                         | chopper &
     PID=$( jobs -lp | tail -n 1)
     while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ]
@@ -122,6 +123,7 @@ do
 # If file successfully received, prepare for conversion
     if [ $DONE -eq 1 ]
     then
+      mv $L1/$TEMPBIGFILE $L1/$BIGFILE
       cat > $MAC/$NAME.mac << EOF
 
 /PhysicsList/OmitAll true
