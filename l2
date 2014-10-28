@@ -15,7 +15,6 @@ ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
 MAC=$BS/mac                           # Directory for conversion macros
 GRIDREADY=$FILESYSTEM/l2t             # Output directory for finished products
 RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
-PYTHON=$HOME/Python-2.7.8/python      # Location of python version needed for minard
 MONITOR=$HOME/minard/bin/monitor.py   # Location of the monitoring script
 DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
 
@@ -107,7 +106,7 @@ function startselect {
                     then
                         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
                          $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
-                         | $PYTHON $MONITOR L2-client &
+                         | $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                     else
                         echo client already running.  You must stop client \
@@ -118,7 +117,7 @@ function startselect {
                     if [ "$convertpid" -eq 0 ]
                     then
                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | \
-                       $PYTHON $MONITOR L2-convert &
+                       $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
                     else
                         echo convert already running.  You must stop convert \
@@ -128,7 +127,7 @@ function startselect {
                 "janitor")
                     if [ "$janitorpid" -eq 0 ]
                     then
-                      $JANITOR $FILESYSTEM $L1 $DONTDELETE | $PYTHON $MONITOR \
+                      $JANITOR $FILESYSTEM $L1 $DONTDELETE | $MONITOR \
                         L1-delete &
                       convertpid=$(jobs -lp | tail -n 1)
                     else
@@ -284,12 +283,12 @@ do
                         echo Starting level 2 scripts...
                         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
                          $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
-                         | $PYTHON $MONITOR L2-client &
+                         | $MONITOR L2-client &
                         clientpid=$(jobs -lp | tail -n 1)
                         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | 
-                          $PYTHON $MONITOR L2-convert &
+                          $MONITOR L2-convert &
                         convertpid=$(jobs -lp | tail -n 1)
-                        $JANITOR $FILESYSTEM $L1 $DONTDELETE | $PYTHON $MONITOR \
+                        $JANITOR $FILESYSTEM $L1 $DONTDELETE | $MONITOR \
                           L1-delete &
                         janitorpid=$(jobs -lp | tail -n 1)
                         printmenu
