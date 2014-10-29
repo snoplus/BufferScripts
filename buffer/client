@@ -53,9 +53,9 @@ fi
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 TRIES=0
-DONE=0
 while true
 do
+DONE=0
 # First get appropriate file
 #////////////////////////////
 # Get list of files needing serving
