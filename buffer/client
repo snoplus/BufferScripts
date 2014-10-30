@@ -21,7 +21,6 @@ PASSWORDFILE=$6
 GRIDREADY=$7
 PCAFILE=~/run.txt
 SERVERDIR=~/BufferScripts/buffer
-NAMEFILE=/tmp/filename
 DATA=$8
 FL=$9
 LS=$10
@@ -35,9 +34,7 @@ if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
   touch $SERVERDIR/filereceived 
-  TRIES=0
 else
-  TRIES=$(( TRIES + 1 ))
   echo WARNING - Stonehenge exited on file $FILE. 
   if [ $TRIES -lt 3 ]
   then
@@ -70,7 +67,7 @@ DONE=0
     while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
     do
       sleep 1
-      COUNT=$((COUNT+1))
+      let COUNT++
       if [ $(( COUNT % 60 )) -eq 0 ]
       then
         echo INFO - Waiting for data
@@ -104,18 +101,21 @@ DONE=0
       kill $PID
       echo INFO - Reached end of $FILE
       echo $FILE >> $FL
+      TRIES=0
       DONE=1
     elif [ -f $SERVERDIR/filetryagain ]
     then
       rm $SERVERDIR/filetryagain
       kill $PID
       echo INFO - Server will retry reading file $FILE
+      let TRIES++
     elif [ -f $SERVERDIR/filefailed ]
     then
       rm $SERVERDIR/filefailed
       kill $PID
       echo INFO - Server will not try to read file $FILE again.
       echo $FILE >> $FL
+      TRIES=0
     else
       echo DEBUG - Message file disappeared
     fi
