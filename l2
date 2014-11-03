@@ -312,7 +312,7 @@ do
                         kill %?convert
                         convertpid=0
                     fi
-                    if [ "janitorpid" -ne 0 ]
+                    if [ "$janitorpid" -ne 0 ]
                     then
                         kill %?janitor
                         janitorpid=0
