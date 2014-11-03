@@ -126,7 +126,7 @@ DONE=0
       mv $L1/$TEMPBIGFILE $L1/$BIGFILE
       cat > $MAC/$NAME.mac << EOF
 
-/PhysicsList/OmitAll true
+/rat/physics_list/OmitAll true
 
 /run/initialize
 
