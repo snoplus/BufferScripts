@@ -2,7 +2,7 @@
 
 if rat $1/$2.mac -l rat.$2.log
 then
-  mv $2.l2.root $4/$2.l2.root
+  mv SNOP_$2.l2.root $4/SNOP_$2.l2.root
   rm $3
   rm $1/$2.mac
 fi
