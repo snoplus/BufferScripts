@@ -10,9 +10,9 @@ while true
 do
 
   PERCENTFULL=$( df | grep $FILESYSTEM | awk '{print $4}' | sed 's/%//' )
-  if [ $(( $PERCENTFULL )) -lt 90 ]
+  if [ $PERCENTFULL -lt 90 ]
   then
-    echo INFO - Buffer $PERCENTFULL % full
+    echo INFO - Buffer $PERCENTFULL% full
     sleep 60;
   else
     FILE=$(ls $L1 | head -n 1)
