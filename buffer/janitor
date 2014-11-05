@@ -6,8 +6,10 @@
 FILESYSTEM=$1
 L1=$2
 DONTDELETE=$3
+GRIDREADY=$4
 
 OLDDATE=$(date --utc +%e)
+FIRST=1
 while true
 do
 
@@ -40,11 +42,19 @@ do
   if [ $DATE -ne $OLDDATE ]
   then
     OLDDATE=$DATE
-    ls -tr $L1 | sed -n -e '/$OLDFILE/,$p' > $DATE.txt
+    # If this is the first time this has run, pick any file from within the
+    # last 24 hours; otherwise, select a file modified since the last such selection
+    if [ $FIRST -eq 1 ]
+    then
+      find -mtime 0 $L1 > $DATE.txt
+      FIRST=0
+    else
+      ls -tr $L1 | sed -n -e '/$OLDFILE/,$p' > $DATE.txt
+    fi
     OLDFILE=$(tail -n 1 $DATE.txt)
     FILECOUNT=$(wc -l $DATE.txt)
     RANDFILE=$(head -n $(FILECOUNT-1) $DATE.txt | $BS/buffer/shuf --random-source=/dev/random -n 1)
-    mv $RANDFILE $L2T/$RANDFILE
+    mv $RANDFILE $GRIDREADY/L1/$RANDFILE
   fi
 
 done
