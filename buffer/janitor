@@ -43,7 +43,7 @@ do
     ls -tr $L1 | sed -n -e '/$OLDFILE/,$p' > $DATE.txt
     OLDFILE=$(tail -n 1 $DATE.txt)
     FILECOUNT=$(wc -l $DATE.txt)
-    RANDFILE=$(head -n $(FILECOUNT-1) $DATE.txt | $BS/buffer/shuf /dev/random | head +n 1)
+    RANDFILE=$(head -n $(FILECOUNT-1) $DATE.txt | $BS/buffer/shuf --random-source=/dev/random -n 1)
     mv $RANDFILE $L2T/$RANDFILE
   fi
 
