@@ -1,14 +1,17 @@
 #!/bin/bash
 
 # This script is used to delete L1 files from the buffer as it fills up.
+# It also selects L1 files for sampling.
 
 FILESYSTEM=$1
 L1=$2
 DONTDELETE=$3
 
+OLDDATE=$(date --utc +%e)
 while true
 do
 
+# This part checks whether we need to delete files
   PERCENTFULL=$( df | grep $FILESYSTEM | awk '{print $4}' | sed 's/%//' )
   if [ $PERCENTFULL -lt 90 ]
   then
@@ -23,12 +26,26 @@ do
     else
       if [ $PERCENTFULL -gt 99 ]
       then
-        rm $L1/$FILE;
-        echo WARNING - Buffer more than 99% full.  Removing file $FILE despite deletion lock!
+#        rm $L1/$FILE;
+#        echo WARNING - Buffer more than 99% full.  Removing file $FILE despite deletion lock!
+        echo ERROR - Buffer will soon fill up, but the deletion lock is active!  If you do not take action, it will not be possible to write new data to disk!
       else
         echo WARNING - Buffer more than 90% full but deletion is locked!
       fi
     fi
+  fi
+
+# This part selects a prescale file each day
+  DATE=$(date --utc +%e)
+  if [ $DATE -ne $OLDDATE ]
+  then
+    OLDDATE=$DATE
+    ls -tr $L1 | sed -n -e '/$OLDFILE/,$p' > $DATE.txt
+    OLDFILE=$(tail -n 1 $DATE.txt)
+    FILECOUNT=$(wc -l $DATE.txt)
+    RAND=
+    RANDFILE=$(sed -n '$RANDp' $DATE.txt)
+    mv $RANDFILE $L2T/$RANDFILE
   fi
 
 done
