@@ -29,7 +29,7 @@ LS=$10
 # signals to the server
 chopper()
 {
-$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c ~/chopper/default.cnfg >> $LOG
+$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c $CONFIGFILE >> $LOG
 if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
@@ -50,6 +50,7 @@ fi
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 TRIES=0
+OLDRUN=0
 while true
 do
 DONE=0
@@ -85,6 +86,16 @@ DONE=0
     TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
+
+# Identify the run type and select the appropriate configuration file
+# Until we write the runtype program, it is commented out
+#//////////////////////////
+    if [ RUN -ne OLDRUN ]
+    then
+      OLDRUN=RUN
+#     CONFIGFILE=$(runtype $RUN)
+      CONFIGFILE=~/chopper/default.cnfg
+    fi 
     
 # Receive file - try three times, report errors
     tail -f -c +1 $FILE | tee -a $L1/$TEMPBIGFILE \
