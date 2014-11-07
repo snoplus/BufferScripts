@@ -7,7 +7,12 @@
 
 enum process {client, convert, manager};
 static void printhelp(){
-
+  fprintf(stderr, "This is the L2 Master Program.  It takes the following options:\n"
+                 "-a \t \t starts all scripts\n"
+                 "-k \t \t kills all running scripts\n"
+                 "-s [string] \t starts process [string] if it is not running\n"
+                 "-z [string] \t stops process [string] if it is running\n"
+                 "-h \t \t prints this help text\n");
 }
 
 static void printnamehelp(){
@@ -16,12 +21,15 @@ static void printnamehelp(){
 
 static void parse_cmdline(int argc, char ** argv, char * & startname,
                           char * & stopname, bool & noarg, bool & killall){
-  const char * const opts = "s:z:hk";
+  if(argc==1)
+    printhelp();
+  const char * const opts = "s:z:hka";
   bool done = false;
   while(!done){
     const char ch = getopt(argc, argv, opts);
     switch(ch){
-      case -1: done = true; noarg = true;  break;
+      case -1: done = true;  break;
+      case 'a': noarg = true; break;
       case 'k': killall = true; break;
       case 's': startname = optarg; break;
       case 'z': stopname = optarg; break;
