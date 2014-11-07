@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 enum process {client, convert, manager};
 static void printhelp(){
@@ -57,7 +58,7 @@ void stopall(){
   system("kill ");
 }
 
-int main(){
+int main(int argc, char* argv[]){
   char * startname = NULL, * stopname = NULL;
   bool noarg = false;
   bool killall = false;
@@ -71,18 +72,20 @@ int main(){
     stopall();
   }
   else{
-    if(startname)
+    if(startname){
       process p = parsename(startname);
       if(!start(p))
         fprintf(stderr, "Tried to start %s, but failed.", startname);
       else
         fprintf(stderr, "Started %s", startname);
-    if(stopname)
+    }
+    if(stopname){
       process p = parsename(stopname);
       if(!stop(p))
         fprintf(stderr, "Tried to stop %s, but failed.", stopname);
       else
         fprintf(stderr, "Stopped %s", stopname);
+    }
   }
   return 0;
 }
