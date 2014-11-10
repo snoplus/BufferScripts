@@ -53,12 +53,41 @@ parsepgid(){
 # This function starts individual scripts
 # If script already running, prints message
 startproc(){
+  parsepgid
   case "$1" in
     "client")
+      if [ $clientpgid -eq 0 ]
+      then
+        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
+        $GRIDREADY $SSHFS $SERVERFL $SERVERLS | $MONITOR L2-client &
+        clientpid=$(jobs -lp | tail -n 1)
+        setpgid($clientpid,$clientpid)
+        clientpgid=$clientpid
+      else
+        echo Client process was already running.
+      fi
       ;;
     "convert")
+      if [ $convertpgid -eq 0 ]
+      then
+        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | $MONITOR L2-convert &
+        convertpid=$(jobs -lp | tail -n 1)
+        setpgid($convertpid, $convertpid)
+        convertpgid=$convertpid
+      else
+        echo Convert process was already running.
+      fi
       ;;
     "manager")
+      if [ $managerpgid -eq 0 ]
+      then
+        $MANAGER $FILESYSTEM $L1 $DONTDELETE | $MONITOR L1-delete &
+        managerpid=$(jobs -lp | tail -n 1)
+        setpgid($managerpid, $managerpid)
+        managerpgid=$managerpid
+      else
+        echo Manager process was already running.
+      fi 
       ;;
     *)
       echo "Invalid process name passed\n"
@@ -71,7 +100,41 @@ startproc(){
 # This function kills individual scripts and their decendents
 # If the script is not running, prints message.
 stopproc(){
-
+  parsepgid
+  case "$1" in
+  "client")
+    if [ $clientpgid -ne 0 ]
+    then
+      kill -- -$clientpgid
+      clientpgid=0
+    else
+      echo Client process was not running.
+    fi
+    ;;
+  "convert")
+    if [ $convertpgid -ne 0 ]
+    then
+      kill -- -$convertpgid
+      convertpgid=0
+    else
+      echo Convert process was not running.
+    fi
+    ;;
+  "manager")
+    if [ $managerpgid -ne 0 ]
+    then
+      kill -- -$managerpgid
+      managerpgid=0
+    else
+      echo Manager process was not running.
+    fi
+    ;;
+  *)
+    echo Invalid process name passed.
+    echo Valid options are client, convert, and manager.
+    exit 1
+    ;;
+  esac
 }
 
 # This function sets up the L2 scripts to start
@@ -118,7 +181,11 @@ start_all(){
 }
 
 stop_all(){
-
+  echo Killing L2 processes
+  stopprocess client
+  stopprocess convert
+  stopprocess manager
+  ;;
 }
 
 # MAIN
@@ -148,5 +215,5 @@ do
   *)
     echo "Invalid argument\n"
     ;;
-   esac
+  esac
 done
