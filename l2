@@ -32,6 +32,7 @@ CONVERT=$BS/buffer/convert
 CONVERTLOG=$LOGDIR/convert.log
 MANAGER=$BS/buffer/manager
 PGIDFILE=$BS/pgid.txt
+SETPGID=/$BS/pgid
 #-----------------------------------------------------------
 
 # Prints the help text
@@ -93,7 +94,7 @@ startproc(){
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
         $GRIDREADY $SSHFS $SERVERFL $SERVERLS | $MONITOR L2-client &
         clientpid=$(jobs -lp | tail -n 1)
-        setpgid($clientpid,$clientpid)
+        $SETPGID $clientpid
         clientpgid=$clientpid
       else
         echo Client process was already running.
@@ -104,7 +105,7 @@ startproc(){
       then
         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | $MONITOR L2-convert &
         convertpid=$(jobs -lp | tail -n 1)
-        setpgid($convertpid, $convertpid)
+        $SETPGID $convertpid 
         convertpgid=$convertpid
       else
         echo Convert process was already running.
@@ -115,7 +116,7 @@ startproc(){
       then
         $MANAGER $FILESYSTEM $L1 $DONTDELETE | $MONITOR L1-delete &
         managerpid=$(jobs -lp | tail -n 1)
-        setpgid($managerpid, $managerpid)
+        $SETPGID $managerpid 
         managerpgid=$managerpid
       else
         echo Manager process was already running.
