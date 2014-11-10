@@ -1,353 +1,152 @@
 #!/bin/bash
 
-# This script can operate and monitor the BufferScripts needed
-# to run the L2 trigger.  It keeps track of the PIDs of the various
-# processes.  At start, it also ensures that the necessary files and
-# directory structures are present, and, if not, constructs them.
+# This script can start and stop the three main components of the L2 system:
+# the client, convert, and manager scripts.  It tracks the PGIDs of these
+# processes in the file $PGID.  When starting, it also ensures that the 
+# necessary files and directory structures are present, and, if not, constructs
+# them.
 
 # Organization of locations.  Set directory structure here:
-BUILDER=klabe@cps3.uchicago.edu       # Access to Event Builder
-BS=$HOME/BufferScripts                # Home directory of the Buffer Scripts
-LOGDIR=$BS/log                        # Central location for L2 log files
-FILESYSTEM=/mnt/data                  # Buffer filesystem
-L1=$FILESYSTEM/l1data                 # Directory for raw data
-ZDAB=$BS/zdab                         # Directory for post-L2 zdab files
-MAC=$BS/mac                           # Directory for conversion macros
-GRIDREADY=$FILESYSTEM/l2t             # Output directory for finished products
-RATENV=$HOME/rat_env.sh               # Location of rat_env.sh script
-MONITOR=$HOME/minard/bin/monitor.py   # Location of the monitoring script
-DONTDELETE=$BS/dontdelete             # directory for writing deletion locks
+BS=$HOME/BufferScripts              # Path to the BufferScripts repository
+FILESYSTEM=/mnt/data                # Buffer filesystem
+L1=$FILESYSTEM/l1data               # Directory for raw data
+LOGDIR=$BS/log                      # Central location for L2 log files
+ZDAB=$BS/zdab                       # Directory for post-L2 zdab files
+MAC=$BS/mac                         # Directory for conversion macros
+GRIDREADY=$FILESYSTEM/l2t           # Output directory for finished products
+RATENV=$HOME/rat_env.sh             # Location of rat_env.sh script
+MONITOR=$HOME/minard/bin/monitor.py # Location of the monitoring script
+DONTDELETE=$BS/dontdelete           # directory for writing deletion locks
+SSHFS=/local/eventbuilder           # directory where builder is sshfs mounted
+CHOPPER=~/chopper/stonehenge.sh     # Location of Stonehenge program
+PASSWORDFILE=$HOME/password.txt     # Location of password file
+#----------------------------------------------------------
+# Below this line we specify the relative paths to different components of
+# the L2 system.  This should not need to be edited to reflect local installations.
+SERVERFL=$BS/buffer/served.txt
+SERVERLS=$BS/buffer/ls.txt
+CLIENT=$BS/buffer/client
+CLIENTLOG=$LOGDIR/client.log
+JOBQUEUE=$BS/jobqueue.txt
+CONVERT=$BS/buffer/convert
+CONVERTLOG=$LOGDIR/convert.log
+MANAGER=$BS/buffer/manager
+PGIDFILE=$BS/pgid.txt
+#-----------------------------------------------------------
 
-SSHFS=/local/eventbuilder             # directory where builder is sshfs mounted
-SERVERFL=$BS/buffer/served.txt        # file recording served files 
-SERVERLS=$BS/buffer/ls.txt            # filename for list of available files
-
-CLIENT=$BS/buffer/client              # Location of the client script
-CLIENTLOG=$LOGDIR/client.log          # filename of the client log file
-CHOPPER=~/chopper/stonehenge.sh       # Location of the chopper program
-JOBQUEUE=$BS/jobqueue.txt             # List of subruns to convert
-PASSWORDFILE=$HOME/password.txt       # File holding our password
-
-CONVERT=$BS/buffer/convert            # ZDAB -> Root conversion script
-CONVERTLOG=$LOGDIR/convert.log        # Conversion log
-
-JANITOR=$BS/buffer/janitor            # L1 file manager
-
-# Variables in which to store PIDs of the various monitoring scripts
-clientpid=0
-convertpid=0
-janitorpid=0
-
-# These functions print the menu options
-function printmenu {
-    echo "1) Start"
-    echo "2) Stop"
-    echo "3) Details"
-    echo "4) Status"
-    echo "5) Quit"
-    echo "6) Help"
-}
-function printdetailmenu {
-    echo Start and Stop allow you to control specific scripts.
-    echo Select Cancel to return to main menu.
-    echo "1) Start"
-    echo "2) Stop"
-    echo "3) Cancel"
+# Prints the help text
+printhelp() {
+  echo "This is the L2 Trigger Master Script.\n"
+  echo "It takes the following arguments:\n"
+  echo "-a \t \t Start all scripts\n"
+  echo "-k \t \t Stop all scripts\n"
+  echo "-s [string] \t Start script [string]\n"
+  echo "-z [string] \t Stop script [string]\n"
+  echo "-h \t \t Print this help text\n"
 }
 
-# This function prints lists of running and not-running processes
-function processes {
-    echo Here are the processes running at this time:
-    if [ "$clientpid" -ne 0 ]
+# This function is responsible for parsing the PGID file
+parsepgid(){
+
+}
+
+# This function starts individual scripts
+# If script already running, prints message
+startproc(){
+  case "$1" in
+    "client")
+      ;;
+    "convert")
+      ;;
+    "manager")
+      ;;
+    *)
+      echo "Invalid process name passed\n"
+      echo "Valid options are client, convert, manager\n"
+      exit 1
+      ;;
+  esac
+}
+
+# This function kills individual scripts and their decendents
+# If the script is not running, prints message.
+stopproc(){
+
+}
+
+# This function sets up the L2 scripts to start
+start_all(){
+  parsepgid
+  if [[ "$clientpgid" -eq 0 && "$convertpgid" -eq 0 && "$managerpgid" -eq 0 ]]
+  then
+    echo Preparing file structure...
+    if [ ! -d $LOGDIR ]
     then
-        echo -e "\t client \t $clientpid"
-    else
-        NO+="\tclient\n"
+      mkdir $LOGDIR
     fi
-    if [ "$convertpid" -ne 0 ]
+    if [ ! -d $ZDAB ]
     then
-        echo -e "\t convert \t $convertpid"
-    else
-        NO+="\tconvert\n"
+      mkdir $ZDAB
     fi
-    if [ "$janitorpid" -ne 0 ]
+    if [ ! -d $MAC ]
     then
-        echo -e "\t janitor \t $janitorpid"
-    else
-        NO+="\tjanitor\n"
+      mkdir $MAC
     fi
-    echo Here are the processes not running at this time:
-    echo -e $NO
-    NO=""
+    if [ ! -d $L1 ]
+    then
+      mkdir $L1
+    fi
+    if [ ! -f $JOBQUEUE ]
+    then
+      touch $JOBQUEUE
+    fi
+    if [ ! -d $SSHFS ]
+    then
+      echo SSHFS not mounted.  Please mount before continuing.
+      exit 0
+    fi
+    echo File structure prepared.
+    echo Starting level 2 scripts...
+    startprocess client
+    startprocess convert
+    startprocess manager
+  else
+    echo Some processes were already running.  Please stop all scripts before \
+         using the -a option.  If you do not want to stop running processes, \
+         you can start the processes one at a time using the -s option.
+  fi
 }
 
-# This function will display the current status of each file in the system
-function printstatus {
-    for i in $(find $CLIENTDIR -maxdepth 1 -mindepth 1 -type d)
-    do
-        files1=$(ls $i/zdab | wc -l)
-        files2=$(ls $i/root | wc -l)
-        base=basename $i
-        echo $base:  available chunks: $files1  processed chunks: $files2
-    done
+stop_all(){
+
 }
 
-# These functions allow you to select particular processes for action
-function startselect {
-    echo Select the number of the script you wish to start.
-    echo If you do not wish to start any processes at this time, select cancel \
-          to return to the previous menu.
-    startoptions=("client" "convert" "janitor" "cancel")
-    select opt3 in "${startoptions[@]}"
-        do
-            case $opt3 in
-                "client")
-                    if [ "$clientpid" -eq 0 ]
-                    then
-                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
-                         $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
-                         | $MONITOR L2-client &
-                        clientpid=$(jobs -lp | tail -n 1)
-                    else
-                        echo client already running.  You must stop client \
-                              before starting it again.
-                    fi
-                    ;;
-                "convert")
-                    if [ "$convertpid" -eq 0 ]
-                    then
-                       $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | \
-                       $MONITOR L2-convert &
-                        convertpid=$(jobs -lp | tail -n 1)
-                    else
-                        echo convert already running.  You must stop convert \
-                              before starting it again.
-                    fi
-                    ;;
-                "janitor")
-                    if [ "$janitorpid" -eq 0 ]
-                    then
-                      $JANITOR $FILESYSTEM $L1 $DONTDELETE | $MONITOR \
-                        L1-delete &
-                      convertpid=$(jobs -lp | tail -n 1)
-                    else
-                        echo janitor already running.  You must stop janitor \
-                             before starting it again.
-                    fi
-                    ;;
-                "cancel")
-                    echo Returning to previous menu
-                    printdetailmenu
-                    break
-                    ;;
-                *)
-                    echo Invalid option.  Try again.
-                    ;;
-            esac
-        done
-}
-
-function stopselect {
-    echo Enter the number of the process you wish to stop.
-    echo If you do not wish to stop any process at this time, select "Cancel" \
-          to return to the previous menu.
-    stopoptions=("client" "convert" "janitor" "cancel")
-    select opt4 in "${stopoptions[@]}"
-        do
-            case $opt4 in
-                "client")
-                    if [ "$clientpid" -ne 0 ]
-                    then
-                        kill %?client
-                        clientpid=0
-                    else
-                        echo Client not currently running.  You must start it \
-                              before stopping it.
-                    fi
-                    ;;
-                "convert")
-                    if [ "$convertpid" -ne 0 ]
-                    then
-                        kill %?convert
-                        convertpid=0
-                    else
-                        echo Convert not currently running.  You must start it \
-                              before stopping it.
-                    fi
-                    ;;
-                "janitor")
-                    if [ "$janitorpid" -ne 0 ]
-                    then
-                        kill %?janitor
-                        janitorpid=0
-                    else
-                        echo Janitor not currently running.  You must start it \
-                             before stopping it.
-                    fi
-                    ;;
-                "cancel")
-                    echo Returning to previous menu.
-                    printdetailmenu
-                    break
-                    ;;
-                *)
-                    echo Invalid menu option.  Please try again.
-                    ;;
-            esac
-        done
-}
-
-# This function is the submenu for the details option
-function details {
-    detailoptions=("Start" "Stop" "Cancel")
-    select opt2 in "${detailoptions[@]}"
-        do
-            case $opt2 in
-                "Start")
-                    startselect
-                    ;;
-                "Stop")
-                    stopselect
-                    ;;
-                "Cancel")
-                    echo Returning to main menu
-                    break
-                    ;;
-                *)
-                    echo Invalid selection.  Try again.
-                    ;;
-            esac
-        done
-}
-
-# This function prints the welcome message
-function printwelcome {
-echo "*************************************************************************"
-echo "**       Welcome to the SNO+ Level II Trigger user interface           **"
-echo "**                                                                     **"
-echo "**  BASIC USAGE:                                                       **"
-echo "**      + Select 'Start' to start all scripts                          **"
-echo "**      + Select 'Stop' to kill all scripts                            **"
-echo "**      + Select 'Quit' to exit the program                            **"
-echo "**      + Select 'Help' to print this message                          **"
-echo "**                                                                     **"
-echo "**  EXPERT USAGE:                                                      **"
-echo "**      + Select 'Details' to start or stop specific scripts           **"
-echo "**      + Select 'Status' to see system status and log files           **"
-echo "**                                                                     **"
-echo "*************************************************************************"
-}
-
-#
-# MAIN LOOP BEGINS HERE
-#
-source ~/rat_env.sh
-
-while true
+# MAIN
+while getopts "h?aks:z:" opt
 do
-    printwelcome
-
-    options=("Start" "Stop" "Details" "Status" "Quit" "Help")
-    select opt in "${options[@]}"
-    do
-        case $opt in
-            "Start")
-                    if [[ "$clientpid" -eq 0 && \
-                          "$convertpid" -eq 0 ]];
-                    then
-                        echo Preparing file structure...
-                        if [ ! -d $LOGDIR ]
-                        then
-                            mkdir $LOGDIR
-                        fi
-                        if [ ! -d $ZDAB ]
-                        then
-                            mkdir $ZDAB
-                        fi
-                        if [ ! -d $MAC ]
-                        then
-                            mkdir $MAC
-                        fi
-                        if [ ! -d $L1 ]
-                        then
-                            mkdir $L1
-                        fi
-                        if [ ! -f $JOBQUEUE ]
-                        then
-                            touch $JOBQUEUE
-                        fi
-                        if [ ! -d $SSHFS ]
-                        then
-                        fi
-                        echo File structure prepared.
-                        echo Starting level 2 scripts...
-                        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC \
-                         $PASSWORDFILE $GRIDREADY $SSHFS $SERVERFL $SERVERLS \
-                         | $MONITOR L2-client &
-                        clientpid=$(jobs -lp | tail -n 1)
-                        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | 
-                          $MONITOR L2-convert &
-                        convertpid=$(jobs -lp | tail -n 1)
-                        $JANITOR $FILESYSTEM $L1 $DONTDELETE | $MONITOR \
-                          L1-delete &
-                        janitorpid=$(jobs -lp | tail -n 1)
-                        printmenu
-                    else
-                        echo Some processes were already running.  Please stop \
-                              all scripts before using the Start All option.  \
-                              If you do not want to stop running processes, \
-                              you can start processes one at a time in the \
-                              Details options.
-                    fi
-                ;;
-            "Stop")
-                echo Killing monitoring processes
-                kill -- -$$
-                printmenu
-                ;;
-            "Details")
-                processes
-                echo Select below to start or stop particular processes
-                echo If you wish to return to the main menu, select cancel.
-                details
-                printmenu
-                ;;
-            "Status")
-                stty -echo -icanon time 10 min 0
-                keypress=''
-                while [[ "x$keypress" == "x" ]]
-                do
-                    echo To stop monitoring and return to Main menu, press \
-                          any key at any time.
-                    processes
-                    printstatus
-                    read keypress
-                done
-                stty sane 
-                printmenu
-                ;;
-            "Quit")
-                if [[ "$clientpid" -eq 0 && \
-                      "$convertpid" -eq 0 && \
-                      "$janitorpid" -eq 0 ]];
-                then
-                    echo Goodbye
-                    exit
-                else
-                    echo Some of the scripts are still running.  Please stop \
-                         all processes before exiting the user interface, or \
-                         it will be a pain to recover.
-                fi
-                printmenu
-                ;;
-            "Help")
-                printwelcome
-                printmenu
-                ;;
-            *)
-                echo Invalid option
-                printmenu
-                ;;
-        esac
-    done
+  case "$opt" in
+  h|)
+    printhelp
+    exit 0
+    ;;
+  a)
+    start_all
+    exit 0
+    ;;
+  k)
+    kill_all
+    exit 0
+    ;;
+  s)
+    name=$OPTARG
+    startproc name
+    ;;
+  z)
+    name=$OPTARG
+    stopproc name
+    ;;
+  *)
+    echo "Invalid argument\n"
+    ;;
+   esac
 done
