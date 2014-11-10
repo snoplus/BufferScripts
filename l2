@@ -220,14 +220,13 @@ stop_all(){
   stopprocess client
   stopprocess convert
   stopprocess manager
-  ;;
 }
 
 # MAIN
 while getopts "h?aks:z:" opt
 do
   case "$opt" in
-  h|)
+  h)
     printhelp
     exit 0
     ;;
