@@ -37,13 +37,13 @@ SETPGID=/$BS/pgid
 
 # Prints the help text
 printhelp() {
-  echo "This is the L2 Trigger Master Script.\n"
-  echo "It takes the following arguments:\n"
-  echo "-a \t \t Start all scripts\n"
-  echo "-k \t \t Stop all scripts\n"
-  echo "-s [string] \t Start script [string]\n"
-  echo "-z [string] \t Stop script [string]\n"
-  echo "-h \t \t Print this help text\n"
+  echo -e 'This is the L2 Trigger Master Script.'
+  echo -e 'It takes the following arguments:'
+  echo -e '-a \t \t Start all scripts'
+  echo -e '-k \t \t Stop all scripts'
+  echo -e '-s [string] \t Start script [string]'
+  echo -e '-z [string] \t Stop script [string]'
+  echo -e '-h \t \t Print this help text'
 }
 
 # This function parses the PGID file
@@ -80,12 +80,12 @@ parsepgid(){
 # This function updates the PGID file
 # Should only be called if parsepgid has already been called
 writepgid(){
-  echo "$clientpgid \n $convertpgid \n $managerpgid" > $PGIDFILE 
+  echo -e $clientpgid '\n'$convertpgid '\n'$managerpgid > $PGIDFILE 
 }
 
 # This function starts individual scripts
 # If script already running, prints message
-startproc(){
+startprocess(){
   parsepgid
   case "$1" in
     "client")
@@ -133,7 +133,7 @@ startproc(){
 
 # This function kills individual scripts and their decendents
 # If the script is not running, prints message.
-stopproc(){
+stopprocess(){
   parsepgid
   case "$1" in
   "client")
@@ -223,6 +223,11 @@ stop_all(){
 }
 
 # MAIN
+if [[ $# -eq 0 ]]
+then
+  printhelp
+fi
+
 while getopts "h?aks:z:" opt
 do
   case "$opt" in
@@ -235,16 +240,16 @@ do
     exit 0
     ;;
   k)
-    kill_all
+    stop_all
     exit 0
     ;;
   s)
     name=$OPTARG
-    startproc name
+    startprocess $name
     ;;
   z)
     name=$OPTARG
-    stopproc name
+    stopprocess $name
     ;;
   *)
     echo "Invalid argument\n"
