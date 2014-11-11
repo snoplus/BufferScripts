@@ -123,8 +123,8 @@ startprocess(){
       fi 
       ;;
     *)
-      echo "Invalid process name passed\n"
-      echo "Valid options are client, convert, manager\n"
+      echo -e 'Invalid process name passed\n'
+      echo -e 'Valid options are client, convert, manager\n'
       exit 1
       ;;
   esac
@@ -164,8 +164,8 @@ stopprocess(){
     fi
     ;;
   *)
-    echo Invalid process name passed.
-    echo Valid options are client, convert, and manager.
+    echo -e 'Invalid process name passed.\n'
+    echo -e 'Valid options are client, convert, and manager.\n'
     exit 1
     ;;
   esac
@@ -252,7 +252,7 @@ do
     stopprocess $name
     ;;
   *)
-    echo "Invalid argument\n"
+    echo -e 'Invalid argument\n'
     ;;
   esac
 done
