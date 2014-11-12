@@ -93,7 +93,7 @@ startprocess(){
       if [ $clientpgid -eq 0 ]
       then
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
-        $GRIDREADY $SSHFS $SERVERFL $SERVERLS | $MONITOR L2-client &
+        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST | $MONITOR L2-client &
         clientpid=$(jobs -lp | tail -n 1)
         $SETPGID $clientpid
         clientpgid=$clientpid
