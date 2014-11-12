@@ -6,7 +6,7 @@
 PCADATA=/home/trigger/PCAdata
 CLIENTFILE=/home/trigger/PCAdata/run.txt
 
-while[ true ]
+while true 
 do
 
   if [ ls $PCADATA | wc -l -gt 0 ]
