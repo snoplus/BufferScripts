@@ -57,4 +57,24 @@ do
     mv $RANDFILE $GRIDREADY/L1/$RANDFILE
   fi
 
+# This part monitors the status of each file
+  # Being processed by Stonehenge
+  STONEHENGEFILE=$(ls $L1 | grep *.1)
+  curl --data 
+  # Waiting for (or running in) RAT
+  for i in $(ls $MAC)
+  do
+    if i in $(ls )
+    then
+      curl --data
+    else
+      curl --data
+    fi
+  done
+  # Ready for grid
+  for i in $(ls $GRIDREADY)
+  do
+    curl --data
+  done
+
 done
