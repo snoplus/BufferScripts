@@ -20,6 +20,7 @@ DONTDELETE=$BS/dontdelete           # directory for writing deletion locks
 SSHFS=/local/eventbuilder           # directory where builder is sshfs mounted
 CHOPPER=~/chopper/stonehenge.sh     # Location of Stonehenge program
 PASSWORDFILE=$HOME/password.txt     # Location of password file
+REDISHOST=snotpenn01                # Location of monitoring redis db
 #----------------------------------------------------------
 # Below this line we specify the relative paths to different components of
 # the L2 system.  This should not need to be edited to reflect local installations.
@@ -114,7 +115,7 @@ startprocess(){
     "manager")
       if [ $managerpgid -eq 0 ]
       then
-        $MANAGER $FILESYSTEM $L1 $DONTDELETE | $MONITOR L1-delete &
+        $MANAGER $FILESYSTEM $L1 $DONTDELETE $REDISHOST | $MONITOR L1-delete &
         managerpid=$(jobs -lp | tail -n 1)
         $SETPGID $managerpid 
         managerpgid=$managerpid
