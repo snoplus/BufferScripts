@@ -150,7 +150,8 @@ DONE=0
 exit
 EOF
 
-      echo ~/bufferscripts/buffer/job $MAC $NAME $L1/$BIGFILE $GRIDREADY >> $JOBQUEUE
+      echo ~/bufferscripts/buffer/job $MAC $NAME $L1/$BIGFILE $GRIDREADY \
+             $REDISHOST >> $JOBQUEUE
       echo SUCCESS - Stonehenge done with run $NAME
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
     else

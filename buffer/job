@@ -1,8 +1,17 @@
 #!/bin/bash
 
+REDISHOST=$5
+
+redis-cli -h $REDISHOST l2:rat $(date +%s) $2
+
 if rat $1/$2.mac -l rat.$2.log
 then
   mv SNOP_$2.l2.root $4/SNOP_$2.l2.root
   rm $3
   rm $1/$2.mac
+  redis-cli -h $REDISHOST ZREM l2:rat $2
+  redis-cli -h $REDISHOST ZADD l2:done $(date +%s) $2
+else
+  redis-cli -h $REDISHOST ZREM l2:rat $2
+  redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $2
 fi
