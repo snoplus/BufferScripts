@@ -91,9 +91,9 @@ DONE=0
 # Identify the run type and select the appropriate configuration file
 # Until we write the runtype program, it is commented out
 #//////////////////////////
-    if [ RUN -ne OLDRUN ]
+    if [ $RUN -ne $OLDRUN ]
     then
-      OLDRUN=RUN
+      OLDRUN=$RUN
 #     CONFIGFILE=$(runtype $RUN)
       CONFIGFILE=~/chopper/default.cnfg
     fi 
