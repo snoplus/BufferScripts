@@ -115,7 +115,8 @@ startprocess(){
     "manager")
       if [ $managerpgid -eq 0 ]
       then
-        $MANAGER $FILESYSTEM $L1 $DONTDELETE $REDISHOST | $MONITOR L1-delete &
+        $MANAGER $FILESYSTEM $L1 $DONTDELETE $REDISHOST $MAC | \
+         $MONITOR L1-delete &
         managerpid=$(jobs -lp | tail -n 1)
         $SETPGID $managerpid 
         managerpgid=$managerpid

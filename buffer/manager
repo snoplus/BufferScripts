@@ -8,6 +8,7 @@ L1=$2
 DONTDELETE=$3
 GRIDREADY=$4
 REDISHOST=$5
+MAC=$6
 
 OLDDATE=$(date --utc +%e)
 FIRST=1
