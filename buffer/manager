@@ -59,24 +59,4 @@ do
     mv $RANDFILE $GRIDREADY/L1/$RANDFILE
   fi
 
-# This part monitors the status of each file
-  # Being processed by Stonehenge
-  STONEHENGEFILE=$(ls $L1 | grep *.1)
-  redis-cli -h $REDISHOST ZADD l2:process $time $STONEHENGEFILE 
-  # Waiting for (or running in) RAT
-  for i in $(ls $MAC)
-  do
-    if i in $(ls )
-    then
-      redis-cli -h $REDISHOST ZADD l2:rat $time i
-    else
-      redis-cli -h $REDISHOST ZADD 'l2:wait' $time i
-    fi
-  done
-  # Ready for grid
-  for i in $(ls $GRIDREADY)
-  do
-    redis-cli -h $REDISHOST ZADD 'l2:done' $time i
-  done
-
 done

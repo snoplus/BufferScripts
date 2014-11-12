@@ -101,6 +101,7 @@ DONE=0
     tail -f -c +1 $FILE | tee -a $L1/$TEMPBIGFILE \
                         | chopper &
     PID=$( jobs -lp | tail -n 1)
+    redis-cli -h $REDISHOST ZADD l2:process $(date +%s) $BIGFILE
     while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ]
     do
       sleep 1
@@ -151,7 +152,10 @@ EOF
 
       echo ~/bufferscripts/buffer/job $MAC $NAME $L1/$BIGFILE $GRIDREADY >> $JOBQUEUE
       echo SUCCESS - Stonehenge done with run $NAME
+      redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
     else
       echo ERROR - Stonehenge could not process run $NAME
+      redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
+      redis-cli -h $REDISHOST ZADD l2:fail $BIGFILE
     fi
 done
