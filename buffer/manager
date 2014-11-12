@@ -60,21 +60,21 @@ do
 # This part monitors the status of each file
   # Being processed by Stonehenge
   STONEHENGEFILE=$(ls $L1 | grep *.1)
-  curl --data 
+  redis-cli -h $REDISHOST ZADD l2:process $time $STONEHENGEFILE 
   # Waiting for (or running in) RAT
   for i in $(ls $MAC)
   do
     if i in $(ls )
     then
-      curl --data
+      redis-cli -h $REDISHOST ZADD l2:rat $time i
     else
-      curl --data
+      redis-cli -h $REDISHOST ZADD 'l2:wait' $time i
     fi
   done
   # Ready for grid
   for i in $(ls $GRIDREADY)
   do
-    curl --data
+    redis-cli -h $REDISHOST ZADD 'l2:done' $time i
   done
 
 done
