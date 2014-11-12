@@ -90,7 +90,7 @@ startprocess(){
   parsepgid
   case "$1" in
     "client")
-      if [ $clientpgid -eq 0 ]
+      if [ "$clientpgid" -eq 0 ]
       then
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
         $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST | $MONITOR L2-client &
@@ -102,7 +102,7 @@ startprocess(){
       fi
       ;;
     "convert")
-      if [ $convertpgid -eq 0 ]
+      if [ "$convertpgid" -eq 0 ]
       then
         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | $MONITOR L2-convert &
         convertpid=$(jobs -lp | tail -n 1)
@@ -113,7 +113,7 @@ startprocess(){
       fi
       ;;
     "manager")
-      if [ $managerpgid -eq 0 ]
+      if [ "$managerpgid" -eq 0 ]
       then
         $MANAGER $FILESYSTEM $L1 $DONTDELETE $REDISHOST $MAC | \
          $MONITOR L1-delete &
