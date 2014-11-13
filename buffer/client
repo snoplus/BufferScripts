@@ -25,7 +25,6 @@ DATA=$8
 FL=$9
 LS=${10}
 REDISHOST=${11}
-SETPGID=${12}
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
@@ -51,7 +50,6 @@ fi
 
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
-$SETPGID $$
 TRIES=0
 OLDRUN=0
 while true

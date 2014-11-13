@@ -7,11 +7,8 @@ JOBQUEUE=$1
 LOG=$2
 MAC=$3
 RATENV=$4
-SETPGID=$5
 
 source $RATENV
-
-$SETPGID $$
 
 # If we are starting up, refresh the jobqueue
 rm $JOBQUEUE

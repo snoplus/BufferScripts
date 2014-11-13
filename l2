@@ -6,6 +6,10 @@
 # necessary files and directory structures are present, and, if not, constructs
 # them.
 
+# Do not delete this weird line
+# It sets the option which assigns new pgid's to backgrounded pipelines
+set -m
+
 # Organization of locations.  Set directory structure here:
 BS=$HOME/BufferScripts              # Path to the BufferScripts repository
 FILESYSTEM=/mnt/data                # Buffer filesystem
@@ -33,7 +37,6 @@ CONVERT=$BS/buffer/convert
 CONVERTLOG=$LOGDIR/convert.log
 MANAGER=$BS/buffer/manager
 PGIDFILE=$BS/pgid.txt
-SETPGID=/$BS/pgid
 #-----------------------------------------------------------
 
 # Prints the help text
@@ -93,7 +96,7 @@ startprocess(){
       if [ "$clientpgid" -eq 0 ]
       then
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
-        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $SETPGID \
+        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST \
          | $MONITOR L2-client &
         clientpgid=$(jobs -lp | tail -n 1)
       else
@@ -103,7 +106,7 @@ startprocess(){
     "convert")
       if [ "$convertpgid" -eq 0 ]
       then
-        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV $PGID \
+        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV \
          | $MONITOR L2-convert &
         convertpgid=$(jobs -lp | tail -n 1)
       else
@@ -113,7 +116,7 @@ startprocess(){
     "manager")
       if [ "$managerpgid" -eq 0 ]
       then
-        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC $PGID | \
+        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC | \
          $MONITOR L1-delete &
         managerpgid=$(jobs -lp | tail -n 1)
       else
