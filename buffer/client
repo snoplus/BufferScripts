@@ -155,7 +155,7 @@ EOF
              $REDISHOST >> $JOBQUEUE
       echo SUCCESS - Stonehenge done with run $NAME
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
-      redis-cli -h $REDISHOST ZADD 'l2:wait' $BIGFILE
+      redis-cli -h $REDISHOST ZADD l2:wait $BIGFILE
     else
       echo ERROR - Stonehenge could not process run $NAME
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
