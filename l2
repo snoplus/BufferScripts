@@ -106,7 +106,7 @@ startprocess(){
     "convert")
       if [ "$convertpgid" -eq 0 ]
       then
-        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV \
+        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV $REDISHOST \
          | $MONITOR L2-convert &
         convertpgid=$(jobs -lp | tail -n 1)
       else

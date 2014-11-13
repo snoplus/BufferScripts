@@ -7,6 +7,7 @@ JOBQUEUE=$1
 LOG=$2
 MAC=$3
 RATENV=$4
+REDISHOST=$5
 
 source $RATENV
 
@@ -18,7 +19,7 @@ do
   SUBRUN=$( echo $i | awk 'BEGIN {FS="_"}{print $2}' | 
             awk 'BEGIN {FS="."}{print $1}' )
   NAME=$RUN"_"$SUBRUN".zdab"
-  echo ~/bufferscripts/buffer/job $MAC $RUN_$SUBRUN $NAME >> $JOBQUEUE
+  echo ~/bufferscripts/buffer/job $MAC $RUN_$SUBRUN $NAME $REDISHOST >> $JOBQUEUE
 done
 
 # Check if there is anything to do
