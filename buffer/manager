@@ -8,7 +8,9 @@ L1=$2
 DONTDELETE=$3
 GRIDREADY=$4
 MAC=$5
+SETPGID=$6
 
+$SETPGID $$
 OLDDATE=$(date --utc +%e)
 FIRST=1
 while true

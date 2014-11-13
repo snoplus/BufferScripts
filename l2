@@ -93,10 +93,9 @@ startprocess(){
       if [ "$clientpgid" -eq 0 ]
       then
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
-        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST | $MONITOR L2-client &
-        clientpid=$(jobs -lp | tail -n 1)
-        $SETPGID $clientpid
-        clientpgid=$clientpid
+        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $SETPGID \
+         | $MONITOR L2-client &
+        clientpgid=$(jobs -lp | tail -n 1)
       else
         echo Client process was already running.
       fi
@@ -104,10 +103,9 @@ startprocess(){
     "convert")
       if [ "$convertpgid" -eq 0 ]
       then
-        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV | $MONITOR L2-convert &
-        convertpid=$(jobs -lp | tail -n 1)
-        $SETPGID $convertpid 
-        convertpgid=$convertpid
+        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV $PGID \
+         | $MONITOR L2-convert &
+        convertpgid=$(jobs -lp | tail -n 1)
       else
         echo Convert process was already running.
       fi
@@ -115,11 +113,9 @@ startprocess(){
     "manager")
       if [ "$managerpgid" -eq 0 ]
       then
-        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC | \
+        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC $PGID | \
          $MONITOR L1-delete &
-        managerpid=$(jobs -lp | tail -n 1)
-        $SETPGID $managerpid 
-        managerpgid=$managerpid
+        managerpgid=$(jobs -lp | tail -n 1)
       else
         echo Manager process was already running.
       fi 
