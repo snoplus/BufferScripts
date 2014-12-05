@@ -30,14 +30,14 @@ REDISHOST=${11}
 # signals to the server
 chopper()
 {
-$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c $CONFIGFILE >> $LOG
+$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c $CONFIGFILE -s $TRIES >> $LOG
 if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
   touch $SERVERDIR/filereceived 
 else
   echo WARNING - Stonehenge exited on file $FILE. 
-  if [ $TRIES -lt 3 ]
+  if [ $TRIES -lt 2 ]
   then
     echo INFO - Trying to read file $FILE again. 
     touch $SERVERDIR/filetryagain
