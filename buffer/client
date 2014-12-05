@@ -48,6 +48,27 @@ else
 fi
 }
 
+# This function updates the text files holding the lists of files available 
+# on the builder, and the list of files we have already processed.
+updatefilelists()
+{
+# Get the list of files needing processing
+ls $DATA/*.zdab > temp.txt
+sort temp.txt > $LS
+rm temp.txt
+
+# If there is no $FL file, assume we want to start from present
+if [ ! -f $FL ]
+then
+  cp $LS $FL
+fi
+
+# Drop files from $FL no longer in $LS
+comm -12 $LS $FL > temp.txt
+sort temp.txt > $FL
+rm temp.txt
+}
+
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 TRIES=0
@@ -57,14 +78,9 @@ do
 DONE=0
 # First get appropriate file
 #////////////////////////////
-# Get list of files needing serving
-    ls -tr $DATA/*.zdab > $LS
+updatefilelists
 
-# If there is no $FL file, assume we want to start from present
-    if [ ! -f $FL ]
-    then
-      ls -tr $DATA/*.zdab > $FL
-    fi
+# Find next file to process
     COUNT=0
     while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
     do
@@ -74,9 +90,9 @@ DONE=0
       then
         echo INFO - Waiting for data
       fi
-      ls -tr $DATA/*.zdab > $LS
+      updatefilelists
     done
-    FILE=$(comm -23 $LS $FL | head -n 1)
+    FILE=$(ls -lt $(comm -23 $LS $FL) | head -n 1)
 
 # Prepare to process file
 #//////////////////////////
