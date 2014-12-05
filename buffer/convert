@@ -18,8 +18,8 @@ do
   RUN=$( echo $i | awk 'BEGIN {FS="_"}{print $1}' )
   SUBRUN=$( echo $i | awk 'BEGIN {FS="_"}{print $2}' | 
             awk 'BEGIN {FS="."}{print $1}' )
-  NAME=$RUN"_"$SUBRUN".zdab"
-  echo ~/bufferscripts/buffer/job $MAC $RUN_$SUBRUN $NAME $REDISHOST >> $JOBQUEUE
+  NAME=$RUN"_"$SUBRUN
+  echo ~/BufferScripts/buffer/job $MAC $NAME.mac /mnt/data/l1data/SNOP_$NAME.zdab $REDISHOST >> $JOBQUEUE
 done
 
 # Check if there is anything to do

@@ -74,6 +74,7 @@ DONE=0
       then
         echo INFO - Waiting for data
       fi
+      ls -tr $DATA/*.zdab > $LS
     done
     FILE=$(comm -23 $LS $FL | head -n 1)
 
@@ -82,7 +83,8 @@ DONE=0
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
     echo $RUN > $PCAFILE
-    SUBRUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
+    SUBRUN2=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
+    SUBRUN=$( echo $SUBRUN2 | awk 'BEGIN {FS="."}{print $1}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
     TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
