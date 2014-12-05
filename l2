@@ -96,7 +96,7 @@ startprocess(){
       if [ "$clientpgid" -eq 0 ]
       then
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
-        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST \
+        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $ZDAB \
          | $MONITOR L2-client &
         clientpgid=$(jobs -lp | tail -n 1)
       else
@@ -107,7 +107,7 @@ startprocess(){
       if [ "$convertpgid" -eq 0 ]
       then
         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV $REDISHOST \
-         | $MONITOR L2-convert &
+         $ZDAB | $MONITOR L2-convert &
         convertpgid=$(jobs -lp | tail -n 1)
       else
         echo Convert process was already running.

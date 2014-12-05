@@ -25,12 +25,13 @@ DATA=$8
 FL=$9
 LS=${10}
 REDISHOST=${11}
+ZDAB=${12}
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
 chopper()
 {
-$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c $CONFIGFILE -s $TRIES >> $LOG
+$CHOPPER -i /dev/stdin -o $ZDAB"/"$NAME -r $PASSWORD -c $CONFIGFILE -s $TRIES >> $LOG
 if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
@@ -164,7 +165,7 @@ updatefilelists
 /rat/proclast outroot
 /rat/procset file "$NAME.l2.root"
 
-/rat/inzdab/read $NAME.zdab
+/rat/inzdab/read $ZDAB/$NAME.zdab
 
 exit
 EOF
