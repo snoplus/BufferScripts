@@ -11,7 +11,7 @@
 set -m
 
 # Organization of locations.  Set directory structure here:
-BS=$HOME/BufferScripts              # Path to the BufferScripts repository
+BS=$HOME/bufferscripts              # Path to the BufferScripts repository
 FILESYSTEM=/mnt/data                # Buffer filesystem
 L1=$FILESYSTEM/l1data               # Directory for raw data
 LOGDIR=$BS/log                      # Central location for L2 log files
@@ -32,7 +32,7 @@ SERVERFL=$BS/buffer/served.txt
 SERVERLS=$BS/buffer/ls.txt
 CLIENT=$BS/buffer/client
 CLIENTLOG=$LOGDIR/client.log
-JOBQUEUE=$BS/jobqueue.txt
+JOBQUEUE=$BS/buffer/jobs
 CONVERT=$BS/buffer/convert
 CONVERTLOG=$LOGDIR/convert.log
 MANAGER=$BS/buffer/manager
@@ -96,9 +96,9 @@ startprocess(){
       if [ "$clientpgid" -eq 0 ]
       then
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
-        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $ZDAB \
-         | $MONITOR L2-client &
+        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $ZDAB &
         clientpgid=$(jobs -lp | tail -n 1)
+        disown %1
       else
         echo Client process was already running.
       fi
@@ -195,9 +195,9 @@ start_all(){
     then
       mkdir $L1
     fi
-    if [ ! -f $JOBQUEUE ]
+    if [ ! -d $JOBQUEUE ]
     then
-      touch $JOBQUEUE
+      mkdir $JOBQUEUE
     fi
     if [ ! -d $SSHFS ]
     then

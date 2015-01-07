@@ -11,23 +11,53 @@ REDISHOST=$5
 
 source $RATENV
 
+# Set here the maximum number of concurrent conversion jobs to run
+MAXJOBS=4
+
+# This function checks on the conversion jobs that are supposed to be running
+# and updates the job count variable appropriately.
+checkjobs()
+{
+
+}
+
 # If we are starting up, refresh the jobqueue
-rm $JOBQUEUE
+# Also, check the jobs list - presumably this will return zero, but
+# in the event of some kind of crash, this may actually be nonzero so
+# we may as well get it right.
+JOBS=0
 for i in $(ls $MAC)
 do
   RUN=$( echo $i | awk 'BEGIN {FS="_"}{print $1}' )
   SUBRUN=$( echo $i | awk 'BEGIN {FS="_"}{print $2}' | 
             awk 'BEGIN {FS="."}{print $1}' )
   NAME=$RUN"_"$SUBRUN
-  echo ~/BufferScripts/buffer/job $MAC $NAME.mac /mnt/data/l1data/SNOP_$NAME.zdab $REDISHOST >> $JOBQUEUE
+  if [ ! -f $JOBQUEUE/NAME ]
+  then
+    echo ~/BufferScripts/buffer/job $MAC $NAME.mac /mnt/data/l1data/SNOP_$NAME.zdab $REDISHOST >> $JOBQUEUE/NAME
+  fi
 done
+checkjobs
 
-# Check if there is anything to do
-while [ "$(cat $JOBQUEUE | wc -l)" -eq 0 ]
+while true
 do
-  echo INFO - No files to process, waiting
-  sleep 10
-done
+# Check if there is anything to do
+  while [ "$(ls $JOBQUEUE | wc -l)" -eq 0 ]
+  do
+    echo INFO - No files to process, waiting
+    sleep 10
+  done
 
-# Run the jobs
-tail -f -c +1 $JOBQUEUE | parallel -j4 --retries 4 --joblog $LOG
+# Check if there is space to run a new job
+  while [ $JOBS -eq $MAXJOBS ]
+  do
+    sleep 10
+    checkjobs
+  done
+
+# If there is, start a new job
+  FILE=$(ls -lt $JOBQUEUE | head -n 1)
+  $(cat $FILE)
+  pgid=$(jobs -lp | tail -n 1)
+  let $JOBS++
+done

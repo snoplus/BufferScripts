@@ -170,8 +170,9 @@ updatefilelists
 exit
 EOF
 
+      JOBFILE=$JOBQUEUE/$NAME
       echo ~/bufferscripts/buffer/job $MAC $NAME $L1/$BIGFILE $GRIDREADY \
-             $REDISHOST >> $JOBQUEUE
+             $REDISHOST >> $JOBFILE
       echo SUCCESS - Stonehenge done with run $NAME
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
       redis-cli -h $REDISHOST ZADD l2:wait $(date +%s) $BIGFILE
