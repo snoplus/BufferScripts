@@ -8,6 +8,7 @@ LOG=$2
 MAC=$3
 RATENV=$4
 REDISHOST=$5
+RUNNING=~/bufferscripts/buffer/runningjobs
 
 source $RATENV
 
@@ -18,7 +19,17 @@ MAXJOBS=4
 # and updates the job count variable appropriately.
 checkjobs()
 {
-
+if [ "$(ls $RUNNING | wc -l)" -eq 0 ]
+then
+  JOBS=0
+else
+  for i in $(ls $RUNNING)
+  if [ "$(ps -p $i | wc -l)" -eq 1 ]
+  then
+    let $JOBS--
+    rm $i
+  fi
+fi
 }
 
 # If we are starting up, refresh the jobqueue
@@ -60,4 +71,5 @@ do
   $(cat $FILE)
   pgid=$(jobs -lp | tail -n 1)
   let $JOBS++
+  mv $FILE $RUNNING/$pgid
 done
