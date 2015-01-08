@@ -11,7 +11,7 @@
 set -m
 
 # Organization of locations.  Set directory structure here:
-BS=$HOME/bufferscripts              # Path to the BufferScripts repository
+BS=$HOME/BufferScripts              # Path to the BufferScripts repository
 FILESYSTEM=/mnt/data                # Buffer filesystem
 L1=$FILESYSTEM/l1data               # Directory for raw data
 LOGDIR=$BS/log                      # Central location for L2 log files
