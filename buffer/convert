@@ -24,11 +24,14 @@ then
   JOBS=0
 else
   for i in $(ls $RUNNING)
-  if [ "$(ps -p $i | wc -l)" -eq 1 ]
-  then
-    let $JOBS--
-    rm $i
-  fi
+  do
+    RUNNAME=$( cat $i | awk '{print $3}' ) 
+    if [ "$(ps -p $i | grep $RUNNAME | wc -l)" -eq 0 ]
+    then
+      let $JOBS--
+      rm $i
+    fi
+  done
 fi
 }
 
@@ -39,8 +42,8 @@ fi
 JOBS=0
 for i in $(ls $MAC)
 do
-  RUN=$( echo $i | awk 'BEGIN {FS="_"}{print $1}' )
-  SUBRUN=$( echo $i | awk 'BEGIN {FS="_"}{print $2}' | 
+  RUN=$( cat $i | awk 'BEGIN {FS="_"}{print $1}' )
+  SUBRUN=$( cat $i | awk 'BEGIN {FS="_"}{print $2}' | 
             awk 'BEGIN {FS="."}{print $1}' )
   NAME=$RUN"_"$SUBRUN
   if [ ! -f $JOBQUEUE/NAME ]
