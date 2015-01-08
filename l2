@@ -96,9 +96,9 @@ startprocess(){
       if [ "$clientpgid" -eq 0 ]
       then
         $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
-        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $ZDAB &
+        $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $ZDAB \
+         | $MONITOR L2-client &
         clientpgid=$(jobs -lp | tail -n 1)
-        disown %1
       else
         echo Client process was already running.
       fi
