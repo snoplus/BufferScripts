@@ -12,19 +12,18 @@ set -m
 
 # Organization of locations.  Set directory structure here:
 BS=$HOME/BufferScripts              # Path to the BufferScripts repository
-FILESYSTEM=/mnt/data                # Buffer filesystem
+FILESYSTEM=/raid/data               # Buffer filesystem
 L1=$FILESYSTEM/l1data               # Directory for raw data
 LOGDIR=$BS/log                      # Central location for L2 log files
 ZDAB=$BS/zdab                       # Directory for post-L2 zdab files
 MAC=$BS/mac                         # Directory for conversion macros
 GRIDREADY=$FILESYSTEM/l2t           # Output directory for finished products
 RATENV=$HOME/rat_env.sh             # Location of rat_env.sh script
-MONITOR=$BS/monitor.py              # Location of the monitoring script
 DONTDELETE=$BS/dontdelete           # directory for writing deletion locks
 SSHFS=$HOME/builderdata             # directory where builder is sshfs mounted
-CHOPPER=$HOME/chopper/stonehenge.sh # Location of Stonehenge program
+CHOPPER=$HOME/stonehenge/stonehenge.sh # Location of Stonehenge program
 PASSWORDFILE=$HOME/password.txt     # Location of password file
-REDISHOST=snotpenn01.sp.snolab.ca   # Location of monitoring redis db
+REDISHOST=192.168.80.128            # Location of monitoring redis db
 #----------------------------------------------------------
 # Below this line we specify the relative paths to different components of
 # the L2 system.  This should not need to be edited to reflect local installations.
@@ -37,6 +36,7 @@ CONVERT=$BS/buffer/convert
 CONVERTLOG=$LOGDIR/convert.log
 MANAGER=$BS/buffer/manager
 PGIDFILE=$BS/pgid.txt
+MONITOR=$BS/monitor.py
 #-----------------------------------------------------------
 
 # Prints the help text
