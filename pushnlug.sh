@@ -117,4 +117,7 @@ do
     FILE=$(ls -lt $(comm -23 $LSzdab $FLzdab) | head -n 1)
     scp $FILE $NLUG:$zdabdest/$FILE
   fi
+  # Don't sleep for too long to reduce latency in getting burst
+  # files to nlug
+  sleep 1
 done
