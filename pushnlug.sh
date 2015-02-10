@@ -6,8 +6,8 @@
 
 # Specifying where things are located--------------
 ## directories holding the data to ship
-PCAdir=/raid/data/PCA
-ECAdir=/raid/data/ECA
+PCAdir=/home/trigger/PCA
+ECAdir=/home/trigger/ECA
 burstdir=/raid/data/burst
 zdabdir=/raid/data/l1
 ## filelist files
@@ -19,6 +19,12 @@ FLpca=/home/trigger/BufferScripts/flpca.txt
 FLeca=/home/trigger/BufferScripts/fleca.txt
 FLburst=/home/trigger/BufferScripts/flburst.txt
 FLzdab=/home/trigger/BufferScripts/flzdab.txt
+## nlug stuff
+NLUG=192.168.80.138
+PCAdest=/raid/data/pca
+ECAdest=/raid/data/eca
+zdabdest=/raid/data/zdab
+burstdest=/raid/data/burst
 #--------------------------------------------------
 
 # This function updates the text files holding the lists of files
@@ -87,24 +93,28 @@ do
   if [ $(comm -23 $LSpca $FLpca | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSpca $FLpca) | head -n 1)
-    scp 
+    scp $FILE $NLUG:$PCAdest/$FILE 
+    # This is only a link so we can rm it once it is copied
+    rm $FILE
   fi
   # ECA
   if [ $(comm -23 $LSeca $FLeca | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSeca $FLeca) | head -n 1)
-    scp
+    scp $FILE $NLUG:$ECAdest/$FILE
+    # This is only a link so we can rm it once it is copied
+    rm $FILE
   fi
   # bursts
   if [ $(comm -23 $Lsburst $FLburst | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSburst $FLburst) | head -n 1)
-    scp
+    scp $FILE $NLUG:$burstdest/$FILE
   fi
   # zdab
   if [ $(comm -23 $LSzdab $FLzdab | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSzdab $FLzdab) | head -n 1)
-    scp
+    scp $FILE $NLUG:$zdabdest/$FILE
   fi
 done
