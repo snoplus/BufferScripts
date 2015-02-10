@@ -13,11 +13,11 @@ set -m
 # Organization of locations.  Set directory structure here:
 BS=$HOME/BufferScripts              # Path to the BufferScripts repository
 FILESYSTEM=/raid/data               # Buffer filesystem
-L1=$FILESYSTEM/l1data               # Directory for raw data
+L1=$FILESYSTEM/l1                   # Directory for raw data
 LOGDIR=$BS/log                      # Central location for L2 log files
 ZDAB=$BS/zdab                       # Directory for post-L2 zdab files
 MAC=$BS/mac                         # Directory for conversion macros
-GRIDREADY=$FILESYSTEM/l2t           # Output directory for finished products
+GRIDREADY=$FILESYSTEM/l2            # Output directory for finished products
 RATENV=$HOME/rat_env.sh             # Location of rat_env.sh script
 DONTDELETE=$BS/dontdelete           # directory for writing deletion locks
 SSHFS=$HOME/builderdata             # directory where builder is sshfs mounted
