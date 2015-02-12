@@ -8,7 +8,7 @@ LOG=$2
 MAC=$3
 RATENV=$4
 REDISHOST=$5
-RUNNING=~/bufferscripts/buffer/runningjobs
+RUNNING=~/BufferScripts/buffer/runningjobs
 
 source $RATENV
 
