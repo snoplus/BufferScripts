@@ -199,6 +199,11 @@ start_all(){
     then
       mkdir $JOBQUEUE
     fi
+    if [ ! -d $DONTDELETE ]
+    then
+      echo No DONTDELETE folder!  Aborting!
+      exit 0
+    fi
     if [ ! -d $SSHFS ]
     then
       echo SSHFS not mounted.  Please mount before continuing.
