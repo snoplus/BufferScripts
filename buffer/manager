@@ -15,7 +15,7 @@ while true
 do
 
 # This part checks whether we need to delete files
-  PERCENTFULL=$( df | grep $FILESYSTEM | awk '{print $4}' | sed 's/%//' )
+  PERCENTFULL=$( df | grep /dev/sdb1 | awk '{print $4}' | sed 's/%//' )
   if [ $PERCENTFULL -lt 90 ]
   then
     echo INFO - Buffer $PERCENTFULL% full
