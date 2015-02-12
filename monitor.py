@@ -153,7 +153,7 @@ if __name__ == '__main__':
         host = 'localhost:50000'
         auth = None
     else:
-        host = 'cp4.uchicago.edu:50000'
+        host = '192.168.80.128'
         auth = None
 
     
