@@ -11,14 +11,14 @@ ECAdir=/home/trigger/ECAdata
 burstdir=/raid/data/burst
 zdabdir=/raid/data/l1
 ## filelist files
-LSpca=/home/trigger/BufferScripts/lspca.txt
-LSeca=/home/trigger/BufferScripts/lseca.txt
-LSburst=/home/trigger/BufferScripts/lsburst.txt
-LSzdab=/home/trigger/BufferScripts/lszdab.txt
-FLpca=/home/trigger/BufferScripts/flpca.txt
-FLeca=/home/trigger/BufferScripts/fleca.txt
-FLburst=/home/trigger/BufferScripts/flburst.txt
-FLzdab=/home/trigger/BufferScripts/flzdab.txt
+LSpca=/home/trigger/BufferScripts/nlug/lspca.txt
+LSeca=/home/trigger/BufferScripts/nlug/lseca.txt
+LSburst=/home/trigger/BufferScripts/nlug/lsburst.txt
+LSzdab=/home/trigger/BufferScripts/nlug/lszdab.txt
+FLpca=/home/trigger/BufferScripts/nlug/flpca.txt
+FLeca=/home/trigger/BufferScripts/nlug/fleca.txt
+FLburst=/home/trigger/BufferScripts/nlug/flburst.txt
+FLzdab=/home/trigger/BufferScripts/nlug/flzdab.txt
 ## nlug stuff
 NLUG=192.168.80.138
 PCAdest=/raid/data/pca
