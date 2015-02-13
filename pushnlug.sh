@@ -6,8 +6,8 @@
 
 # Specifying where things are located--------------
 ## directories holding the data to ship
-PCAdir=/home/trigger/PCA
-ECAdir=/home/trigger/ECA
+PCAdir=/home/trigger/PCAdata
+ECAdir=/home/trigger/ECAdata
 burstdir=/raid/data/burst
 zdabdir=/raid/data/l1
 ## filelist files
