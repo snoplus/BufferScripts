@@ -106,7 +106,7 @@ do
     rm $FILE
   fi
   # bursts
-  if [ $(comm -23 $Lsburst $FLburst | wc -l) -gt 0 ]
+  if [ $(comm -23 $LSburst $FLburst | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSburst $FLburst) | head -n 1)
     scp $FILE $NLUG:$burstdest/$FILE
