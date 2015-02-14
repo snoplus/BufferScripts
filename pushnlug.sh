@@ -33,19 +33,19 @@ burstdest=/raid/data/burst
 updatefilelists(){
 # Get the list of files available to ship
 ## PCA
-ls $PCAdir/*.zdab > temp.txt
+ls $PCAdir | grep .zdab > temp.txt
 sort temp.txt > $LSpca
 rm temp.txt
 ## ECA
-ls $ECAdir/*.zdab > temp.txt
+ls $ECAdir | grep .zdab > temp.txt
 sort temp.txt > $LSeca
 rm temp.txt
 ## Bursts
-ls $burstdir/*.zdab > temp.txt
+ls $burstdir | grep .zdab > temp.txt
 sort temp.txt > $LSburst
 rm temp.txt
 ## zdabs
-ls $zdabdir/*.zdab > temp.txt
+ls $zdabdir | grep .zdab > temp.txt
 sort temp.txt > $LSzdab
 rm temp.txt
 
