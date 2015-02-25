@@ -93,7 +93,7 @@ updatefilelists
       fi
       updatefilelists
     done
-    FILE=$(ls -lt $(comm -23 $LS $FL) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LS $FL) | head -n 1)
 
 # Prepare to process file
 #//////////////////////////
