@@ -54,7 +54,7 @@ fi
 updatefilelists()
 {
 # Get the list of files needing processing
-ls $DATA/*.zdab > temp.txt
+ls $DATA | grep .zdab > temp.txt
 sort temp.txt > $LS
 rm temp.txt
 
@@ -114,7 +114,7 @@ updatefilelists
     then
       OLDRUN=$RUN
 #     CONFIGFILE=$(runtype $RUN)
-      CONFIGFILE=~/chopper/default.cnfg
+      CONFIGFILE=~/stonehenge/default.cnfg
     fi 
     
 # Receive file - try three times, report errors

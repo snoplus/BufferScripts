@@ -33,21 +33,21 @@ burstdest=/raid/data/burst
 updatefilelists(){
 # Get the list of files available to ship
 ## PCA
-ls $PCAdir | grep .zdab > temp.txt
-sort temp.txt > $LSpca
-rm temp.txt
+ls $PCAdir | grep .zdab > nlugtemp.txt
+sort nlugtemp.txt > $LSpca
+rm nlugtemp.txt
 ## ECA
-ls $ECAdir | grep .zdab > temp.txt
-sort temp.txt > $LSeca
-rm temp.txt
+ls $ECAdir | grep .zdab > nlugtemp.txt
+sort nlugtemp.txt > $LSeca
+rm nlugtemp.txt
 ## Bursts
-ls $burstdir | grep .zdab > temp.txt
-sort temp.txt > $LSburst
-rm temp.txt
+ls $burstdir | grep .zdab > nlugtemp.txt
+sort nlugtemp.txt > $LSburst
+rm nlugtemp.txt
 ## zdabs
-ls $zdabdir | grep .zdab > temp.txt
-sort temp.txt > $LSzdab
-rm temp.txt
+ls $zdabdir | grep .zdab > nlugtemp.txt
+sort nlugtemp.txt > $LSzdab
+rm nlugtemp.txt
 
 # If there is no $FL file, assume we want to ship everything available
 if [ ! -f $FLpca ]
@@ -68,21 +68,21 @@ then
 fi
 
 # Drop files from $FL no longer in $LS
-comm -12 $LSpca $FLpca > temp.txt
-sort temp.txt > $FLpca
-rm temp.txt
+comm -12 $LSpca $FLpca > nlugtemp.txt
+sort nlugtemp.txt > $FLpca
+rm nlugtemp.txt
 
-comm -12 $LSeca $FLeca > temp.txt
-sort temp.txt > $FLeca
-rm temp.txt
+comm -12 $LSeca $FLeca > nlugtemp.txt
+sort nlugtemp.txt > $FLeca
+rm nlugtemp.txt
 
-comm -12 $LSburst $FLburst > temp.txt
-sort temp.txt > $FLburst
-rm temp.txt
+comm -12 $LSburst $FLburst > nlugtemp.txt
+sort nlugtemp.txt > $FLburst
+rm nlugtemp.txt
 
-comm -12 $LSzdab $FLzdab > temp.txt
-sort temp.txt > $FLzdab
-rm temp.txt
+comm -12 $LSzdab $FLzdab > nlugtemp.txt
+sort nlugtemp.txt > $FLzdab
+rm nlugtemp.txt
 }
 
 # MAIN
@@ -106,7 +106,7 @@ do
     rm $FILE
   fi
   # bursts
-  if [ $(comm -23 $Lsburst $FLburst | wc -l) -gt 0 ]
+  if [ $(comm -23 $LSburst $FLburst | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSburst $FLburst) | head -n 1)
     scp $FILE $NLUG:$burstdest/$FILE
