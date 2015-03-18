@@ -1,0 +1,10 @@
+[Unit]
+Description=Level 2 Trigger System
+After=
+
+[Service]
+Type=simple
+ExecStart=/home/trigger/BufferScripts/l2 -a
+
+[Install]
+WantedBy=multi-user.target
