@@ -102,7 +102,7 @@ updatefilelists
     echo $RUN > $PCAFILE
     SUBRUN2=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $SUBRUN2 | awk 'BEGIN {FS="."}{print $1}' )
-    BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
+    BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $4}' )
     TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
     PASSWORD=$(cat $PASSWORDFILE)
