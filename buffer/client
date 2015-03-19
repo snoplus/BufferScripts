@@ -54,7 +54,7 @@ fi
 updatefilelists()
 {
 # Get the list of files needing processing
-ls $DATA/*.zdab > temp.txt
+ls $DATA/SNOP*.zdab > temp.txt
 sort temp.txt > $LS
 rm temp.txt
 
