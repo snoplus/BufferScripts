@@ -31,7 +31,7 @@ ZDAB=${12}
 # signals to the server
 chopper()
 {
-$CHOPPER -i /dev/stdin -o $ZDAB/$NAME -r $PASSWORD -c $CONFIGFILE -s $TRIES >> $LOG
+$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c $CONFIGFILE -s $TRIES >> $LOG
 if [ $? -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
