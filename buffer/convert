@@ -73,6 +73,6 @@ do
   FILE=$(ls -t $JOBQUEUE | head -n 1)
   $(cat $FILE)
   pgid=$(jobs -lp | tail -n 1)
-  let $JOBS++
+  let "JOBS++"
   mv $FILE $RUNNING/$pgid
 done
