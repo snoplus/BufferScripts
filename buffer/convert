@@ -40,18 +40,21 @@ fi
 # in the event of some kind of crash, this may actually be nonzero so
 # we may as well get it right.
 JOBS=0
-for i in $(ls $MAC)
-do
-  RUN=$( cat $i | awk 'BEGIN {FS="_"}{print $1}' )
-  SUBRUN=$( cat $i | awk 'BEGIN {FS="_"}{print $2}' | 
-            awk 'BEGIN {FS="."}{print $1}' )
-  NAME=$RUN"_"$SUBRUN
-  if [ ! -f $JOBQUEUE/NAME ]
-  then
-    echo ~/BufferScripts/buffer/job $MAC $NAME.mac /mnt/data/l1data/SNOP_$NAME.zdab $REDISHOST >> $JOBQUEUE/NAME
-  fi
-done
 checkjobs
+if [ $(ls $MAC | wc -l) -gt 0 ]
+then
+  for i in $(ls $MAC)
+  do
+    RUN=$( cat $i | awk 'BEGIN {FS="_"}{print $1}' )
+    SUBRUN=$( cat $i | awk 'BEGIN {FS="_"}{print $2}' | 
+              awk 'BEGIN {FS="."}{print $1}' )
+    NAME=$RUN"_"$SUBRUN
+    if [ ! -f $JOBQUEUE/NAME ]
+    then
+      echo ~/BufferScripts/buffer/job $MAC $NAME.mac /mnt/data/l1data/SNOP_$NAME.zdab $REDISHOST >> $JOBQUEUE/NAME
+    fi
+  done
+fi
 
 while true
 do
