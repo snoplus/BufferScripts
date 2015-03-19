@@ -71,7 +71,7 @@ do
 
 # If there is, start a new job
   FILE=$(ls -t $JOBQUEUE | head -n 1)
-  $(cat $FILE)
+  $(cat $JOBQUEUE/$FILE)
   pgid=$(jobs -lp | tail -n 1)
   let "JOBS++"
   mv $FILE $RUNNING/$pgid
