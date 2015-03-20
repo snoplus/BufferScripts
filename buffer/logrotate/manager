@@ -1,0 +1,7 @@
+/home/trigger/BufferScripts/log/manager.log {
+    rotate 7
+    daily
+    copytruncate
+    notifempty
+    compress
+}
