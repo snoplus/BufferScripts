@@ -99,7 +99,7 @@ startprocess(){
       then
         $CLIENT $L1 $STONELOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
         $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $ZDAB \
-        2> $CLIENTLOG | python $MONITOR L2-client &> $CLIENTLOG &
+        2>> $CLIENTLOG | python $MONITOR L2-client >> $CLIENTLOG 2>&1 &
         clientpgid=$(jobs -lp | tail -n 1)
       else
         echo Client process was already running.
@@ -109,7 +109,8 @@ startprocess(){
       if [ "$convertpgid" -eq 0 ]
       then
         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV $REDISHOST \
-         $ZDAB 2> $CONVERTLOG | python $MONITOR L2-convert &> $CONVERTLOG &
+         $ZDAB 2>> $CONVERTLOG | \
+         python $MONITOR L2-convert >> $CONVERTLOG 2>&1 &
         convertpgid=$(jobs -lp | tail -n 1)
       else
         echo Convert process was already running.
@@ -118,8 +119,8 @@ startprocess(){
     "manager")
       if [ "$managerpgid" -eq 0 ]
       then
-        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC 2> $MANAGERLOG | \
-         python $MONITOR L1-delete &> $MANAGERLOG &
+        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC 2>> $MANAGERLOG | \
+         python $MONITOR L1-delete >> $MANAGERLOG 2>&1 &
         managerpgid=$(jobs -lp | tail -n 1)
       else
         echo Manager process was already running.
