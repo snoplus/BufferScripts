@@ -30,11 +30,13 @@ REDISHOST=192.168.80.128            # Location of monitoring redis db
 SERVERFL=$BS/buffer/served.txt
 SERVERLS=$BS/buffer/ls.txt
 CLIENT=$BS/buffer/client
+STONELOG=$LOGDIR/stone.log
 CLIENTLOG=$LOGDIR/client.log
 JOBQUEUE=$BS/buffer/jobs
 CONVERT=$BS/buffer/convert
 CONVERTLOG=$LOGDIR/convert.log
 MANAGER=$BS/buffer/manager
+MANAGERLOG=$LOGDIR/manager.log
 PGIDFILE=$BS/pgid.txt
 MONITOR=$BS/monitor.py
 #-----------------------------------------------------------
@@ -95,9 +97,9 @@ startprocess(){
     "client")
       if [ "$clientpgid" -eq 0 ]
       then
-        $CLIENT $L1 $CLIENTLOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
+        $CLIENT $L1 $STONELOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
         $GRIDREADY $SSHFS $SERVERFL $SERVERLS $REDISHOST $ZDAB \
-         | python $MONITOR L2-client &
+        2>> $CLIENTLOG | python $MONITOR L2-client >> $CLIENTLOG 2>&1 &
         clientpgid=$(jobs -lp | tail -n 1)
       else
         echo Client process was already running.
@@ -107,7 +109,8 @@ startprocess(){
       if [ "$convertpgid" -eq 0 ]
       then
         $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV $REDISHOST \
-         $ZDAB | python $MONITOR L2-convert &
+         $ZDAB 2>> $CONVERTLOG | \
+         python $MONITOR L2-convert >> $CONVERTLOG 2>&1 &
         convertpgid=$(jobs -lp | tail -n 1)
       else
         echo Convert process was already running.
@@ -116,8 +119,8 @@ startprocess(){
     "manager")
       if [ "$managerpgid" -eq 0 ]
       then
-        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC | \
-         python $MONITOR L1-delete &
+        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC 2>> $MANAGERLOG | \
+         python $MONITOR L1-delete >> $MANAGERLOG 2>&1 &
         managerpgid=$(jobs -lp | tail -n 1)
       else
         echo Manager process was already running.
