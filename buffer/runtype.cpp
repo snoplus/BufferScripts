@@ -3,6 +3,7 @@
 // This program reads from the Couch database to determine the run type
 // of a given run.
 // See http://stackoverflow.com/questions/2329571/c-libcurl-get-output-into-a-string
+// for some discussion of the curl reply handling used here
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -55,7 +56,6 @@ int main(int argc, char* argv[]){
     printf("You must specify exactly one run number as an argument\n");
     exit(1);
   } 
-  int run = atoi(argv[1]);
 
   // The default runtype is zero
   int runtype = 0;
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
     init_string(&s);
     curl_easy_setopt(couchcurl, CURLOPT_HTTPGET, 1L);
     char getrequest[1024];
-    sprintf(getrequest, "snotpenn01:5984/orcadb?reduce=false&key=%s", run);
+    sprintf(getrequest, "snotpenn01:5984/orcadb?reduce=false&key=%s", argv[1]);
     curl_easy_setopt(couchcurl, CURLOPT_WRITEFUNCTION, writefunc);
     curl_easy_setopt(couchcurl, CURLOPT_WRITEDATA, &s);
     CURLcode res = curl_easy_perform(couchcurl);
