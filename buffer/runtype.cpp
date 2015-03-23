@@ -4,11 +4,10 @@
 // of a given run.
 // See http://stackoverflow.com/questions/2329571/c-libcurl-get-output-into-a-string
 
-#include "curl.h"
-
-int parserundoc(){
-  return 0;
-}
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <curl/curl.h>
 
 // This is useful for bookkeeping when dynamically allocating space in ptr
 struct string{
@@ -19,10 +18,10 @@ struct string{
 // This initializes our string to be empty
 void init_string(struct string *s){
   s->len = 0;
-  s->ptr = malloc(s->len+1);
-  if(s->ptr == NULL ){
+  s->ptr = (char*) malloc(s->len+1);
+  if( s->ptr == NULL ){
     fprintf(stderr, "malloc() failed\n");
-    exit 1;
+    exit(1);
   }
   s->ptr[0] = '\0';
 }
@@ -31,10 +30,10 @@ void init_string(struct string *s){
 // It dynamically extends the length of the string as new data arrives.
 size_t writefunc(void* ptr, size_t size, size_t nmemb, struct string* s){
   size_t new_len = s->len + size*nmemb;
-  s->ptr = realloc(s->ptr, new_len+1);
+  s->ptr = (char*) realloc(s->ptr, new_len+1);
   if(s->ptr == NULL){
     fprintf(stderr, "realloc() failed\n");
-    exit 1;
+    exit(1);
   }
   memcpy(s->ptr+s->len, ptr, size*nmemb);
   s->ptr[new_len] = '\0';
@@ -42,7 +41,22 @@ size_t writefunc(void* ptr, size_t size, size_t nmemb, struct string* s){
   return size*nmemb;
 }
 
-int main(int run){
+// This function actually parses the run documents
+int parserundoc(struct string s){
+  printf("%s\n", s.ptr);
+  return 0;
+}
+
+// This program should be called with an integer argument (the run number).
+// It will return the runtype for that run.
+int main(int argc, char* argv[]){
+  // Read out the argument
+  if(argc != 2){
+    printf("You must specify exactly one run number as an argument\n");
+    exit(1);
+  } 
+  int run = atoi(argv[1]);
+
   // The default runtype is zero
   int runtype = 0;
 
@@ -61,7 +75,7 @@ int main(int run){
     curl_easy_setopt(couchcurl, CURLOPT_WRITEFUNCTION, writefunc);
     curl_easy_setopt(couchcurl, CURLOPT_WRITEDATA, &s);
     CURLcode res = curl_easy_perform(couchcurl);
-    int runtype = parserundoc(s.ptr);
+    int runtype = parserundoc(s);
   }
 
   // Clean up and return answer
