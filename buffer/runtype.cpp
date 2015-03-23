@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
     init_string(&s);
     curl_easy_setopt(couchcurl, CURLOPT_HTTPGET, 1L);
     char getrequest[1024];
-    sprintf(getrequest, "snotpenn01:5984/orcadb?reduce=false&key=%s", argv[1]);
+    sprintf(getrequest, "snotpenn01.sp.snolab.ca:5984/orcadb?reduce=false&key=%s", argv[1]);
     curl_easy_setopt(couchcurl, CURLOPT_WRITEFUNCTION, writefunc);
     curl_easy_setopt(couchcurl, CURLOPT_WRITEDATA, &s);
     CURLcode res = curl_easy_perform(couchcurl);
