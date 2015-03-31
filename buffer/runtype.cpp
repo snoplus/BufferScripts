@@ -43,13 +43,24 @@ size_t writefunc(void* ptr, size_t size, size_t nmemb, struct string* s){
 }
 
 // This function actually parses the run documents
+// It accepts the string where we have stored the couch response and the
+// variable holding the commandline argument for the run number, which it 
+// uses to confirm that the correct run has been returned from the database.
 int parserundoc(struct string s, char* run){
+  // These bools tell us whether the couch response can be parsed as expected.
   bool foundrun = false;
   bool foundtype = false;
+  // This will hold the result
   int runtype;
+  
+  // We parse the couch result by alternately looking ahead to the next colon
+  // and the next comma.  Colon delimit labels from values, while commas delimit
+  // between key-value pairs.  In this way, we read along, holding successive
+  // keys in the key variable and successive values in the valu variable.
   char* key = strtok(s.ptr, ":");
   while(key){
     char* valu = strtok(NULL, ",");
+    // Have we reached the key named "key"?
     if(!strcmp(key, "\"key\"")){
       if(!strcmp(valu, run)){
         printf("Correct run number retrieved!\n");
@@ -60,6 +71,7 @@ int parserundoc(struct string s, char* run){
         exit(1);
       }
     }
+    // Have we reached the key named "value"?
     if(!strcmp(key, "\"value\"")){
       foundtype = true;
       printf("Identified run type!\n");
@@ -68,6 +80,8 @@ int parserundoc(struct string s, char* run){
     }
     key = strtok(NULL, ":");
   }
+  // End of the parsing loop.  Now check that the couch reply was parsed 
+  // correctly and if so, report the run type.
   if(!foundrun){
     printf("Could not find run %s!\n", run);
     exit(1);
