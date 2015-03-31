@@ -43,9 +43,41 @@ size_t writefunc(void* ptr, size_t size, size_t nmemb, struct string* s){
 }
 
 // This function actually parses the run documents
-int parserundoc(struct string s){
-  printf("%s\n", s.ptr);
-  return 0;
+int parserundoc(struct string s, char* run){
+  bool foundrun = false;
+  bool foundtype = false;
+  int runtype;
+  char* key = strtok(s.ptr, ":");
+  while(key){
+    char* valu = strtok(NULL, ",");
+    if(!strcmp(key, "\"key\"")){
+      if(!strcmp(valu, run)){
+        printf("Correct run number retrieved!\n");
+        foundrun = true;
+      }
+      else{
+        printf("Incorrect run number retrieved!\n");
+        exit(1);
+      }
+    }
+    if(!strcmp(key, "\"value\"")){
+      foundtype = true;
+      printf("Identified run type!\n");
+      runtype = atoi(valu);
+      break;
+    }
+    key = strtok(NULL, ":");
+  }
+  if(!foundrun){
+    printf("Could not find run %s!\n", run);
+    exit(1);
+  }
+  if(!foundtype){
+    printf("Run type not recorded in run document!\n");
+    exit(1);
+  }
+  printf("Runtype: %d\n", runtype);
+  return runtype;
 }
 
 // This program should be called with an integer argument (the run number).
@@ -76,7 +108,7 @@ int main(int argc, char* argv[]){
     curl_easy_setopt(couchcurl, CURLOPT_WRITEFUNCTION, writefunc);
     curl_easy_setopt(couchcurl, CURLOPT_WRITEDATA, &s);
     CURLcode res = curl_easy_perform(couchcurl);
-    int runtype = parserundoc(s);
+    int runtype = parserundoc(s, argv[1]);
   }
 
   // Clean up and return answer
