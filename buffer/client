@@ -68,6 +68,18 @@ fi
 comm -12 $LS $FL > temp.txt
 sort temp.txt > $FL
 rm temp.txt
+
+# Repeat for test files
+ls $testDATA/SNOP*.zdab > temp.txt
+sort temp.txt > $testLS
+rm temp.txt
+if [ ! -f $testFL ]
+then
+  cp $testLS $testFL
+fi
+comm -12 $testLS $testFL > temp.txt
+sort temp.txt > $testFL
+rm temp.txt
 }
 
 # This function performs basically the same function as "updatefilelists",
