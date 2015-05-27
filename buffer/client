@@ -26,6 +26,9 @@ FL=$9
 LS=${10}
 REDISHOST=${11}
 ZDAB=${12}
+testDATA=$DATA/test
+testFL=~/BufferScripts/buffer/testfl.txt
+testLS=~/BufferScripts/buffer/testls.txt
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
@@ -127,7 +130,7 @@ do
 
 # Prepare to process file
 # TODO - Check different cases for parsing filename:
-#        SNOP, default, test
+#        SNOP, default
 #//////////////////////////
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
