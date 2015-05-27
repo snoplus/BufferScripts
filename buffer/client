@@ -76,10 +76,10 @@ TRIES=0
 OLDRUN=0
 while true
 do
-DONE=0
+    DONE=0
 # First get appropriate file
 #////////////////////////////
-updatefilelists
+    updatefilelists
 
 # Find next file to process
     COUNT=0
@@ -93,9 +93,11 @@ updatefilelists
       fi
       updatefilelists
     done
-    FILE=$(ls -t $(comm -23 $LS $FL) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
 
 # Prepare to process file
+# TODO - Check different cases for parsing filename:
+#        SNOP, default, test
 #//////////////////////////
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
@@ -147,7 +149,6 @@ updatefilelists
       kill $PID
       echo INFO - Server will not try to read file $FILE again.
       echo $FILE >> $FL
-      TRIES=0
     else
       echo DEBUG - Message file disappeared
     fi
@@ -177,8 +178,12 @@ EOF
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
       redis-cli -h $REDISHOST ZADD l2:wait $(date +%s) $BIGFILE
     else
-      echo ERROR - Stonehenge could not process run $NAME
-      redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
-      redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $BIGFILE
+      if [ ! $TRIES -lt 2 ]
+      then
+        echo ERROR - Stonehenge could not process run $NAME
+        redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
+        redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $BIGFILE
+        TRIES=0
+      fi
     fi
 done
