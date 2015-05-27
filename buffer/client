@@ -70,6 +70,13 @@ sort temp.txt > $FL
 rm temp.txt
 }
 
+# This function performs basically the same function as "updatefilelists",
+# but it performs the checks on the testdata folder
+checkfortestdata()
+{
+
+}
+
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 TRIES=0
@@ -83,8 +90,8 @@ do
 
 # Find next file to process
     COUNT=0
-    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
-    do
+    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ] && [ ! checkfortestdata ]
+    do 
       sleep 1
       let COUNT++
       if [ $(( COUNT % 60 )) -eq 0 ]
@@ -93,7 +100,18 @@ do
       fi
       updatefilelists
     done
-    FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
+    # Prefer to process real data, if it is available
+    # but accept test data if we are otherwise just waiting
+    if [ ! $(comm -23 $LS $FL | wc -l) -lt 1 ]
+    then
+      FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
+      TEST=false
+    elif [ checkfortestdata ]
+      FILE=
+      TEST=true
+    else
+      echo DEBUG - File went missing!
+    fi
 
 # Prepare to process file
 # TODO - Check different cases for parsing filename:
