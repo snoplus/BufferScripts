@@ -34,7 +34,7 @@ testLS=~/BufferScripts/buffer/testls.txt
 # signals to the server
 chopper()
 {
-if [ $TEST = false ]
+if [ $TEST -eq 0 ]
 then
   $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES >> $LOG
   STONEHENGERETURN=$?
@@ -127,10 +127,10 @@ do
     if [ $(comm -23 $LS $FL | wc -l) -gt 0 ]
     then
       FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
-      TEST=false
+      TEST=0
     elif [ $(comm -23 $testLS $testFL | wc -l) -gt 0 ]
       FILE=$(ls -t $(comm -23 $testLS $testFL) | tail -n 1)
-      TEST=true
+      TEST=1
     else
       echo DEBUG - File went missing!
     fi
