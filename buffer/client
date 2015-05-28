@@ -34,8 +34,15 @@ testLS=~/BufferScripts/buffer/testls.txt
 # signals to the server
 chopper()
 {
-$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c $CONFIGFILE -s $TRIES >> $LOG
-if [ $? -eq 0 ]
+if [ $TEST = false ]
+then
+  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES >> $LOG
+  STONEHENGERETURN=$?
+else
+  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES >> $LOG
+  STONEHENGERETURN=$?
+fi
+if [ $STONEHENGERETURN -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
   touch $SERVERDIR/filereceived 
@@ -120,10 +127,10 @@ do
     if [ $(comm -23 $LS $FL | wc -l) -gt 0 ]
     then
       FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
-      TEST=0
+      TEST=false
     elif [ $(comm -23 $testLS $testFL | wc -l) -gt 0 ]
       FILE=$(ls -t $(comm -23 $testLS $testFL) | tail -n 1)
-      TEST=1
+      TEST=true
     else
       echo DEBUG - File went missing!
     fi
@@ -140,7 +147,7 @@ do
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
     TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
-    PASSWORD=$(cat $PASSWORDFILE)
+#    PASSWORD=$(cat $PASSWORDFILE)
 
 # Identify the run type and select the appropriate configuration file
 # Until we write the runtype program, it is commented out
