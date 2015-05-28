@@ -76,12 +76,12 @@ TRIES=0
 OLDRUN=0
 while true
 do
-DONE=0
-# First get appropriate file
-#////////////////////////////
-updatefilelists
+    DONE=0
+    # First get appropriate file
+    #////////////////////////////
+    updatefilelists
 
-# Find next file to process
+    # Find next file to process
     COUNT=0
     while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
     do
@@ -93,7 +93,7 @@ updatefilelists
       fi
       updatefilelists
     done
-    FILE=$(ls -t $(comm -23 $LS $FL) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
 
 # Prepare to process file
 #//////////////////////////
