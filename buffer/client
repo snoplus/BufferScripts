@@ -26,13 +26,23 @@ FL=$9
 LS=${10}
 REDISHOST=${11}
 ZDAB=${12}
+testDATA=$DATA/test
+testFL=~/BufferScripts/buffer/testfl.txt
+testLS=~/BufferScripts/buffer/testls.txt
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
 chopper()
 {
-$CHOPPER -i /dev/stdin -o $NAME -r $PASSWORD -c $CONFIGFILE -s $TRIES >> $LOG
-if [ $? -eq 0 ]
+if [ $TEST -eq 0 ]
+then
+  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES >> $LOG
+  STONEHENGERETURN=$?
+else
+  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES >> $LOG
+  STONEHENGERETURN=$?
+fi
+if [ $STONEHENGERETURN -eq 0 ]
 then
   echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
   touch $SERVERDIR/filereceived 
@@ -68,6 +78,25 @@ fi
 comm -12 $LS $FL > temp.txt
 sort temp.txt > $FL
 rm temp.txt
+
+# Repeat for test files
+ls $testDATA/SNOP*.zdab > temp.txt
+sort temp.txt > $testLS
+rm temp.txt
+if [ ! -f $testFL ]
+then
+  cp $testLS $testFL
+fi
+comm -12 $testLS $testFL > temp.txt
+sort temp.txt > $testFL
+rm temp.txt
+}
+
+# This function performs basically the same function as "updatefilelists",
+# but it performs the checks on the testdata folder
+checkfortestdata()
+{
+
 }
 
 # MAIN - Control flow begins here
@@ -83,8 +112,8 @@ do
 
     # Find next file to process
     COUNT=0
-    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
-    do
+    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ] && [ $(comm -23 $testLS $testFL | wc -l) -lt 1 ]
+    do 
       sleep 1
       let COUNT++
       if [ $(( COUNT % 60 )) -eq 0 ]
@@ -93,9 +122,23 @@ do
       fi
       updatefilelists
     done
-    FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
+
+    # Prefer to process real data, if it is available
+    # but accept test data if we are otherwise just waiting
+    if [ $(comm -23 $LS $FL | wc -l) -gt 0 ]
+    then
+      FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
+      TEST=0
+    elif [ $(comm -23 $testLS $testFL | wc -l) -gt 0 ]
+      FILE=$(ls -t $(comm -23 $testLS $testFL) | tail -n 1)
+      TEST=1
+    else
+      echo DEBUG - File went missing!
+    fi
 
 # Prepare to process file
+# TODO - Check different cases for parsing filename:
+#        SNOP, default
 #//////////////////////////
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
@@ -105,7 +148,7 @@ do
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
     TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
-    PASSWORD=$(cat $PASSWORDFILE)
+#    PASSWORD=$(cat $PASSWORDFILE)
 
 # Identify the run type and select the appropriate configuration file
 # Until we write the runtype program, it is commented out
@@ -147,7 +190,6 @@ do
       kill $PID
       echo INFO - Server will not try to read file $FILE again.
       echo $FILE >> $FL
-      TRIES=0
     else
       echo DEBUG - Message file disappeared
     fi
@@ -177,8 +219,12 @@ EOF
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
       redis-cli -h $REDISHOST ZADD l2:wait $(date +%s) $BIGFILE
     else
-      echo ERROR - Stonehenge could not process run $NAME
-      redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
-      redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $BIGFILE
+      if [ ! $TRIES -lt 2 ]
+      then
+        echo ERROR - Stonehenge could not process run $NAME
+        redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
+        redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $BIGFILE
+        TRIES=0
+      fi
     fi
 done
