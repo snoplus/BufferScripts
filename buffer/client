@@ -152,6 +152,10 @@ do
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
     TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
+    if [ $TEST -eq 1 ]
+    then
+      NAME=test/$NAME
+    fi
 #    PASSWORD=$(cat $PASSWORDFILE)
 
 # Identify the run type and select the appropriate configuration file
