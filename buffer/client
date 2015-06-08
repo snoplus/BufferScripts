@@ -17,15 +17,14 @@ LOG=$2
 CHOPPER=$3
 JOBQUEUE=$4
 MAC=$5
-PASSWORDFILE=$6
-GRIDREADY=$7
+GRIDREADY=$6
 SERVERDIR=~/BufferScripts/buffer
-DATA=$8
-TESTDATA=$9
-FL=${10}
-LS=${11}
-REDISHOST=${12}
-ZDAB=${13}
+DATA=$7
+TESTDATA=$8
+FL=$9
+LS=${10}
+REDISHOST=${11}
+ZDAB=${12}
 testFL=~/BufferScripts/buffer/testfl.txt
 testLS=~/BufferScripts/buffer/testls.txt
 
@@ -154,7 +153,6 @@ do
     then
       NAME=test/$NAME
     fi
-#    PASSWORD=$(cat $PASSWORDFILE)
 
 # Identify the run type and select the appropriate configuration file
 # Until we write the runtype program, it is commented out

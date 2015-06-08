@@ -24,7 +24,6 @@ SSHFS=$HOME/builder                 # directory where builder is sshfs mounted
 DATA=$SSHFS/data                    # normal data directory
 TESTDATA=$SSHFS/testdata            # test data directory
 CHOPPER=$HOME/stonehenge/stonehenge.sh # Location of Stonehenge program
-PASSWORDFILE=$HOME/password.txt     # Location of password file
 REDISHOST=192.168.80.128            # Location of monitoring redis db
 #----------------------------------------------------------
 # Below this line we specify the relative paths to different components of
@@ -99,7 +98,7 @@ startprocess(){
     "client")
       if [ "$clientpgid" -eq 0 ]
       then
-        $CLIENT $L1 $STONELOG $CHOPPER $JOBQUEUE $MAC $PASSWORDFILE \
+        $CLIENT $L1 $STONELOG $CHOPPER $JOBQUEUE $MAC \
         $GRIDREADY $DATA $TESTDATA $SERVERFL $SERVERLS $REDISHOST $ZDAB \
         2>> $CLIENTLOG | python $MONITOR L2-client >> $CLIENTLOG 2>&1 &
         clientpgid=$(jobs -lp | tail -n 1)
