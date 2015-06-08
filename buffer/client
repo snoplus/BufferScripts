@@ -19,7 +19,6 @@ JOBQUEUE=$4
 MAC=$5
 PASSWORDFILE=$6
 GRIDREADY=$7
-PCAFILE=~/run.txt
 SERVERDIR=~/BufferScripts/buffer
 DATA=$8
 TESTDATA=$9
@@ -146,7 +145,6 @@ do
 #//////////////////////////
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
-    echo $RUN > $PCAFILE
     SUBRUN2=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $SUBRUN2 | awk 'BEGIN {FS="."}{print $1}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
