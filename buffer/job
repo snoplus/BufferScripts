@@ -8,8 +8,8 @@ redis-cli -h $REDISHOST ZADD l2:rat $(date +%s) $2
 if rat $1/$2.mac -l rat.$2.log
 then
   mv /home/trigger/BufferScripts/$2.l2.root $4/SNOP_$2.l2.root
-  rm $3
   rm $1/$2.mac
+  mv $3 /raid/data/$3
   redis-cli -h $REDISHOST ZREM l2:rat $2
   redis-cli -h $REDISHOST ZADD l2:done $(date +%s) $2
 else

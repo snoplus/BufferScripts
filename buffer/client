@@ -22,11 +22,11 @@ GRIDREADY=$7
 PCAFILE=~/run.txt
 SERVERDIR=~/BufferScripts/buffer
 DATA=$8
-FL=$9
-LS=${10}
-REDISHOST=${11}
-ZDAB=${12}
-testDATA=$DATA/test
+TESTDATA=$9
+FL=${10}
+LS=${11}
+REDISHOST=${12}
+ZDAB=${13}
 testFL=~/BufferScripts/buffer/testfl.txt
 testLS=~/BufferScripts/buffer/testls.txt
 
