@@ -49,9 +49,9 @@ then
     SUBRUN=$( cat $i | awk 'BEGIN {FS="_"}{print $2}' | 
               awk 'BEGIN {FS="."}{print $1}' )
     NAME=$RUN"_"$SUBRUN
-    if [ ! -f $JOBQUEUE/NAME ]
+    if [ ! -f $JOBQUEUE/$NAME ]
     then
-      echo ~/BufferScripts/buffer/job $MAC $NAME.mac /mnt/data/l1data/SNOP_$NAME.zdab $REDISHOST >> $JOBQUEUE/NAME
+      echo ~/BufferScripts/buffer/job $MAC $NAME.mac /mnt/data/l1data/SNOP_$NAME.zdab $REDISHOST >> $JOBQUEUE/$NAME
     fi
   done
 fi
