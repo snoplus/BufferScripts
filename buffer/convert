@@ -19,14 +19,14 @@ MAXJOBS=4
 # and updates the job count variable appropriately.
 checkjobs()
 {
-if [ "$(ls $RUNNING | wc -l)" -eq 0 ]
+if [ $(ls $RUNNING | wc -l)-eq 0 ]
 then
   JOBS=0
 else
   for i in $(ls $RUNNING)
   do
     RUNNAME=$( cat $i | awk '{print $3}' ) 
-    if [ "$(ps -p $i | grep $RUNNAME | wc -l)" -eq 0 ]
+    if [ $(ps -p $i | grep $RUNNAME | wc -l) -eq 0 ]
     then
       let $JOBS--
       rm $i
@@ -59,7 +59,7 @@ fi
 while true
 do
 # Check if there is anything to do
-  while [ "$(ls $JOBQUEUE | wc -l)" -eq 0 ]
+  while [ $(ls $JOBQUEUE | wc -l) -eq 0 ]
   do
     echo INFO - No files to process, waiting
     sleep 10

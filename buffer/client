@@ -17,15 +17,16 @@ LOG=$2
 CHOPPER=$3
 JOBQUEUE=$4
 MAC=$5
-PASSWORDFILE=$6
-GRIDREADY=$7
-PCAFILE=~/run.txt
+GRIDREADY=$6
 SERVERDIR=~/BufferScripts/buffer
-DATA=$8
+DATA=$7
+TESTDATA=$8
 FL=$9
 LS=${10}
 REDISHOST=${11}
 ZDAB=${12}
+testFL=~/BufferScripts/buffer/testfl.txt
+testLS=~/BufferScripts/buffer/testls.txt
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
@@ -77,6 +78,30 @@ sort temp.txt > $FL
 rm temp.txt
 }
 
+# This function checks for new testdata, if available, it echos 1,
+# otherwise, it echos 0.
+checkfortestdata()
+{
+# First update testfile lists as in updatefilelists
+ls $TESTDATA/SNOP*.zdab > temp.txt
+sort temp.txt > $testLS
+rm temp.txt
+if [ ! -f $testFL ]
+then
+  cp $testLS $testFL
+fi
+comm -12 $testLS $testFL > temp.txt
+sort temp.txt
+rm temp.txt
+
+# Then check for new data
+if [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
+  echo 0
+else
+  echo 1
+
+}
+
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 TRIES=0
@@ -88,10 +113,18 @@ do
     #////////////////////////////
     updatefilelists
 
-    # Find next file to process
+# Find next file to process
+# Check for test data only if there is no real data available
     COUNT=0
+    TEST=0
     while [ $(comm -23 $LS $FL | wc -l) -lt 1 ] 
     do 
+      if [ $(checkfortestdata) -eq 1 ]
+      then
+        TEST=1
+        FILE=$(ls -t $(comm -23 $testLS $testFL) | tail -n 1)
+        break
+      fi
       sleep 1
       let COUNT++
       if [ $(( COUNT % 60 )) -eq 0 ]
@@ -100,8 +133,10 @@ do
       fi
       updatefilelists
     done
-
-    FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
+    if [ $TEST -eq 0 ]
+    then
+      FILE=$(ls -t $(comm -23 $LS $FL) | tail -n 1)
+    fi
 
 # Prepare to process file
 # TODO - Check different cases for parsing filename:
@@ -109,13 +144,15 @@ do
 #//////////////////////////
     echo INFO - Receiving file $FILE 
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
-    echo $RUN > $PCAFILE
     SUBRUN2=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $SUBRUN2 | awk 'BEGIN {FS="."}{print $1}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
     TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
-#    PASSWORD=$(cat $PASSWORDFILE)
+    if [ $TEST -eq 1 ]
+    then
+      NAME=test/$NAME
+    fi
 
 # Identify the run type and select the appropriate configuration file
 # Until we write the runtype program, it is commented out
