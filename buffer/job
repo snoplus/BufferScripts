@@ -6,17 +6,19 @@ L1=$3
 GRIDREADY=$4
 REDISHOST=$5
 
-redis-cli -h $REDISHOST ZREM l2:wait $NAME
-redis-cli -h $REDISHOST ZADD l2:rat $(date +%s) $NAME
+REDISNAME=SNOP_$NAME.zdab
+
+redis-cli -h $REDISHOST ZREM l2:wait $REDISNAME
+redis-cli -h $REDISHOST ZADD l2:rat $(date +%s) $REDISNAME
 
 if rat $MAC/$NAME.mac -l rat.$NAME.log
 then
   mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADY/SNOP_$NAME.l2.root
   rm $MAC/$NAME.mac
   mv $L1 /raid/data/$L1
-  redis-cli -h $REDISHOST ZREM l2:rat $NAME
-  redis-cli -h $REDISHOST ZADD l2:done $(date +%s) $NAME
+  redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
+  redis-cli -h $REDISHOST ZADD l2:done $(date +%s) $REDISNAME
 else
-  redis-cli -h $REDISHOST ZREM l2:rat $NAME
-  redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $NAME
+  redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
+  redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $REDISNAME
 fi
