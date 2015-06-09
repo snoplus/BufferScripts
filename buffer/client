@@ -83,7 +83,7 @@ rm temp.txt
 checkfortestdata()
 {
 # First update testfile lists as in updatefilelists
-ls $testDATA/SNOP*.zdab > temp.txt
+ls $TESTDATA/SNOP*.zdab > temp.txt
 sort temp.txt > $testLS
 rm temp.txt
 if [ ! -f $testFL ]
