@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# This client script receives newly-built files from the server script
-# and (1) writes them out to the Buffer and (2) feeds them to the chopper.
-# When the chopper has run to completion, it touches the file filereceived
-# on the Buffer to advance the server.  There is a client log that records
-# the output of the Chopper as well as statements when files are complete.
-# The client also writes a joblog file for each builder file at
-# $RUN.chopper.log to record the job numbers associated to that file.
+# This client script identifies the next builder file to process and
+# (1) writes it out to the Buffer and (2) feeds it to Stonehenge.
+# When Stonehenge runs to completion, it touches the the file filereceived,
+# filetryagain, or filefailed, depending on how it has exited.  This triggers
+# this script to move on to the next file (or try again as appropriate).
+# If Stonehenge completed successfully, the script prepares a macro for its
+# further processing, and creates a file in the job queue.
 
 # This script is designed for use with the L2 Master Script.  It can be run
 # independently by giving it the arguments listed below:
@@ -96,6 +96,7 @@ rm temp.txt
 
 # Then check for new data
 if [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
+then
   echo 0
 else
   echo 1
