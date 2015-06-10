@@ -96,6 +96,7 @@ rm temp.txt
 
 # Then check for new data
 if [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
+then
   echo 0
 else
   echo 1
