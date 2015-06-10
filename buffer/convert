@@ -68,6 +68,7 @@ do
 # Check if there is space to run a new job
   while [ $JOBS -eq $MAXJOBS ]
   do
+    echo INFO - $JOBS jobs running.
     sleep 10
     checkjobs
   done
