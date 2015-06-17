@@ -195,6 +195,7 @@ do
       kill $PID
       echo INFO - Server will not try to read file $FILE again.
       echo $FILE >> $FL
+      let TRIES++
     else
       echo DEBUG - Message file disappeared
     fi
@@ -223,7 +224,7 @@ EOF
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
       redis-cli -h $REDISHOST ZADD l2:wait $(date +%s) $BIGFILE
     else
-      if [ ! $TRIES -lt 2 ]
+      if [ ! $TRIES -lt 3 ]
       then
         echo ERROR - Stonehenge could not process run $NAME
         redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
