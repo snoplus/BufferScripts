@@ -68,6 +68,7 @@ do
 # Check if there is space to run a new job
   while [ $JOBS -eq $MAXJOBS ]
   do
+    echo INFO - $JOBS jobs running.
     sleep 10
     echo INFO - $JOBS jobs running.
     checkjobs
@@ -75,7 +76,7 @@ do
 
 # If there is, start a new job
   FILE=$(ls -t $JOBQUEUE | head -n 1)
-  $(cat $JOBQUEUE/$FILE)
+  $(cat $JOBQUEUE/$FILE) &
   pgid=$(jobs -lp | tail -n 1)
   let "JOBS++"
   mv $JOBQUEUE/$FILE $RUNNING/$pgid

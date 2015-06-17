@@ -6,24 +6,20 @@
 
 # Specifying where things are located--------------
 ## directories holding the data to ship
-PCAdir=/home/trigger/PCAdata
-ECAdir=/home/trigger/ECAdata
 burstdir=/raid/data/burst
-zdabdir=/raid/data/l1
+l1dir=/raid/data/l1
+l2dir=/raid/data/l2
 ## filelist files
-LSpca=/home/trigger/BufferScripts/nlug/lspca.txt
-LSeca=/home/trigger/BufferScripts/nlug/lseca.txt
+LSl1=/home/trigger/BufferScripts/nlug/lsl1.txt
+LSl2=/home/trigger/BufferScripts/nlug/lsl2.txt
 LSburst=/home/trigger/BufferScripts/nlug/lsburst.txt
-LSzdab=/home/trigger/BufferScripts/nlug/lszdab.txt
-FLpca=/home/trigger/BufferScripts/nlug/flpca.txt
-FLeca=/home/trigger/BufferScripts/nlug/fleca.txt
+FLl1=/home/trigger/BufferScripts/nlug/fll1.txt
+FLl2=/home/trigger/BufferScripts/nlug/fll2.txt
 FLburst=/home/trigger/BufferScripts/nlug/flburst.txt
-FLzdab=/home/trigger/BufferScripts/nlug/flzdab.txt
 ## nlug stuff
 NLUG=192.168.80.138
-PCAdest=/raid/data/pca
-ECAdest=/raid/data/eca
-zdabdest=/raid/data/zdab
+l2dest=/raid/data/l2
+l1dest=/raid/data/zdab
 burstdest=/raid/data/burst
 #--------------------------------------------------
 
@@ -32,76 +28,63 @@ burstdest=/raid/data/burst
 # shipped to nlug.
 updatefilelists(){
 # Get the list of files available to ship
-## PCA
-ls $PCAdir | grep .zdab > nlugtemp.txt
-sort nlugtemp.txt > $LSpca
+## L1
+ls $l1dir | grep .zdab > nlugtemp.txt
+sort nlugtemp.txt > $LSl1
 rm nlugtemp.txt
-## ECA
-ls $ECAdir | grep .zdab > nlugtemp.txt
-sort nlugtemp.txt > $LSeca
+## L2
+ls $l2dir | grep .zdab > nlugtemp.txt
+sort nlugtemp.txt > $LSl2
 rm nlugtemp.txt
 ## Bursts
 ls $burstdir | grep .zdab > nlugtemp.txt
 sort nlugtemp.txt > $LSburst
 rm nlugtemp.txt
-## zdabs
-ls $zdabdir | grep .zdab > nlugtemp.txt
-sort nlugtemp.txt > $LSzdab
-rm nlugtemp.txt
 
 # If there is no $FL file, assume we want to ship everything available
-if [ ! -f $FLpca ]
+if [ ! -f $FLl1 ]
 then
-  cp $LSpca $FLpca
+  cp $LSl1 $FLl1
 fi
-if [ ! -f $FLeca ]
+if [ ! -f $FLl2 ]
 then
-  cp $LSeca $FLeca
+  cp $LSl2 $FLl2
 fi
 if [ ! -f $FLburst ]
 then
   cp $LSburst $FLburst
 fi
-if [ ! -f $FLzdab ]
-then
-  cp $LSzdab $FLzdab
-fi
 
 # Drop files from $FL no longer in $LS
-comm -12 $LSpca $FLpca > nlugtemp.txt
-sort nlugtemp.txt > $FLpca
+comm -12 $LSl1 $FLl1 > nlugtemp.txt
+sort nlugtemp.txt > $FLl1
 rm nlugtemp.txt
 
-comm -12 $LSeca $FLeca > nlugtemp.txt
-sort nlugtemp.txt > $FLeca
+comm -12 $LSl2 $FLl2 > nlugtemp.txt
+sort nlugtemp.txt > $FLl2
 rm nlugtemp.txt
 
 comm -12 $LSburst $FLburst > nlugtemp.txt
 sort nlugtemp.txt > $FLburst
 rm nlugtemp.txt
 
-comm -12 $LSzdab $FLzdab > nlugtemp.txt
-sort nlugtemp.txt > $FLzdab
-rm nlugtemp.txt
-}
-
 # MAIN
 while true
 do
   updatefilelists
-  # PCA
-  if [ $(comm -23 $LSpca $FLpca | wc -l) -gt 0 ]
+  # L1
+  if [ $(comm -23 $LSl1 $FLl1 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -lt $(comm -23 $LSpca $FLpca) | head -n 1)
-    scp $FILE $NLUG:$PCAdest/$FILE 
+    FILE=$(ls -lt $(comm -23 $LSl1 $FLl1) | head -n 1)
+    scp $FILE $NLUG:$l1dest/$FILE 
     # This is only a link so we can rm it once it is copied
     rm $FILE
   fi
-  # ECA
-  if [ $(comm -23 $LSeca $FLeca | wc -l) -gt 0 ]
+  # L2
+  if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -lt $(comm -23 $LSeca $FLeca) | head -n 1)
-    scp $FILE $NLUG:$ECAdest/$FILE
+    FILE=$(ls -lt $(comm -23 $LSl2 $FLl2) | head -n 1)
+    scp $FILE $NLUG:$l2dest/$FILE
     # This is only a link so we can rm it once it is copied
     rm $FILE
   fi
@@ -110,12 +93,6 @@ do
   then
     FILE=$(ls -lt $(comm -23 $LSburst $FLburst) | head -n 1)
     scp $FILE $NLUG:$burstdest/$FILE
-  fi
-  # zdab
-  if [ $(comm -23 $LSzdab $FLzdab | wc -l) -gt 0 ]
-  then
-    FILE=$(ls -lt $(comm -23 $LSzdab $FLzdab) | head -n 1)
-    scp $FILE $NLUG:$zdabdest/$FILE
   fi
   # Don't sleep for too long to reduce latency in getting burst
   # files to nlug
