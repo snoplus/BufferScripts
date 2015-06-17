@@ -69,6 +69,7 @@ do
   while [ $JOBS -eq $MAXJOBS ]
   do
     sleep 10
+    echo INFO - $JOBS jobs running.
     checkjobs
   done
 
