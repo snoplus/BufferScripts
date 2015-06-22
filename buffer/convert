@@ -19,13 +19,15 @@ MAXJOBS=4
 # and updates the job count variable appropriately.
 checkjobs()
 {
-if [ $(ls $RUNNING | wc -l)-eq 0 ]
+if [ $(ls $RUNNING | wc -l) -eq 0 ]
 then
   JOBS=0
 else
   for i in $(ls $RUNNING)
   do
+    echo $i
     RUNNAME=$( cat $i | awk '{print $3}' ) 
+    echo $RUNNAME
     if [ $(ps -p $i | grep $RUNNAME | wc -l) -eq 0 ]
     then
       let $JOBS--
@@ -70,7 +72,6 @@ do
   do
     echo INFO - $JOBS jobs running.
     sleep 10
-    echo INFO - $JOBS jobs running.
     checkjobs
   done
 
