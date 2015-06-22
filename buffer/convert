@@ -25,13 +25,11 @@ then
 else
   for i in $(ls $RUNNING)
   do
-    echo $i
-    RUNNAME=$( cat $i | awk '{print $3}' ) 
-    echo $RUNNAME
+    RUNNAME=$( cat $RUNNING/$i | awk '{print $3}' ) 
     if [ $(ps -p $i | grep $RUNNAME | wc -l) -eq 0 ]
     then
       let $JOBS--
-      rm $i
+      rm $RUNNING/$i
     fi
   done
 fi
