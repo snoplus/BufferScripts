@@ -19,7 +19,7 @@ MAXJOBS=4
 # and updates the job count variable appropriately.
 checkjobs()
 {
-if [ $(ls $RUNNING | wc -l)-eq 0 ]
+if [ $(ls $RUNNING | wc -l) -eq 0 ]
 then
   JOBS=0
 else
@@ -29,7 +29,7 @@ else
     if [ $(ps -p $i | grep $RUNNAME | wc -l) -eq 0 ]
     then
       let $JOBS--
-      rm $i
+      rm $RUNNING/$i
     fi
   done
 fi
