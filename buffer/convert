@@ -25,7 +25,7 @@ then
 else
   for i in $(ls $RUNNING)
   do
-    RUNNAME=$( cat $i | awk '{print $3}' ) 
+    RUNNAME=$( cat $RUNNING/$i | awk '{print $3}' ) 
     if [ $(ps -p $i | grep $RUNNAME | wc -l) -eq 0 ]
     then
       let $JOBS--
