@@ -34,10 +34,10 @@ chopper()
 {
 if [ $TEST -eq 0 ]
 then
-  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES >> $LOG
+  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES -b burst >> $LOG
   STONEHENGERETURN=$?
 else
-  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES >> $LOG
+  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES -b burst >> $LOG
   STONEHENGERETURN=$?
 fi
 if [ $STONEHENGERETURN -eq 0 ]
