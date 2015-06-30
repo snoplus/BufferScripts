@@ -112,6 +112,7 @@ do
     FILE=$(ls -t $(comm -23 $LSburst $FLburst) | tail -n 1)
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLtest
+  fi
   # Don't sleep for too long to reduce latency in getting burst
   # files to nlug
   sleep 1

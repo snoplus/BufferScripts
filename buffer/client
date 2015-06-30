@@ -122,6 +122,7 @@ do
     do 
       if [ $(checkfortestdata) -eq 1 ]
       then
+        echo DEBUG - TESTDATA
         TEST=1
         FILE=$(ls -t $(comm -23 $testLS $testFL) | tail -n 1)
         break
