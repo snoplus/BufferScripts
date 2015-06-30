@@ -14,8 +14,13 @@ redis-cli -h $REDISHOST ZADD l2:rat $(date +%s) $REDISNAME
 if rat $MAC/$NAME.mac -l rat.$NAME.log
 then
   mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADY/SNOP_$NAME.l2.root
+<<<<<<< HEAD
   mv /home/trigger/zdab/$NAME.zdab $GRIDREADY/SNOP_$NAME.zdab
   mv /home/trigger/BufferScripts/$NAME.lock $GRIDREADY/SNOP_$NAME.lock
+=======
+  mv /home/trigger/zdab/$NAME.zdab $GRIDREADY/SNOP_$NAME.l2.zdab
+  mv /home/trigger/zdab/$NAME.lock $GRIDREADY/SNOP_$NAME.lock
+>>>>>>> 1b5aca623973b1031ab8e9cb48a93153502bf034
   rm $MAC/$NAME.mac
   mv $L1 /raid/data/$L1
   redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
