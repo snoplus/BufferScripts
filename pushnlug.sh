@@ -76,19 +76,19 @@ do
   # L1
   if [ $(comm -23 $LSl1 $FLl1 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -lt $(comm -23 $LSl1 $FLl1) | head -n 1)
+    FILE=$(ls -lt $l1dir/$(comm -23 $LSl1 $FLl1) | head -n 1)
     scp $l1dir/$FILE $NLUG:$l1dest/$FILE 
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -lt $(comm -23 $LSl2 $FLl2) | head -n 1)
+    FILE=$(ls -lt $l2dir/$(comm -23 $LSl2 $FLl2) | head -n 1)
     scp $l2dir/$FILE $NLUG:$l2dest/$FILE
   fi
   # bursts
   if [ $(comm -23 $LSburst $FLburst | wc -l) -gt 0 ]
   then
-    FILE=$(ls -lt $(comm -23 $LSburst $FLburst) | head -n 1)
+    FILE=$(ls -lt $burstdir/$(comm -23 $LSburst $FLburst) | head -n 1)
     scp $burstdir/$FILE $NLUG:$burstdest/$FILE
   fi
   # Don't sleep for too long to reduce latency in getting burst
