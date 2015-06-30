@@ -152,7 +152,7 @@ do
     NAME=$RUN"_"$SUBRUN 
     if [ $TEST -eq 1 ]
     then
-      NAME=test/$NAME
+      NAME=test$NAME
     fi
 
 # Identify the run type and select the appropriate configuration file
