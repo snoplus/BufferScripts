@@ -199,7 +199,7 @@ do
       rm $SERVERDIR/filefailed
       kill $PID
       echo INFO - Server will not try to read file $FILE again.
-      if [ $TEST -eq 0]
+      if [ $TEST -eq 0 ]
       then
         echo $FILE >> $FL
       else
