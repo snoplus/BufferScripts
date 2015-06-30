@@ -41,3 +41,4 @@ else
   redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
   redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $REDISNAME
 fi
+
