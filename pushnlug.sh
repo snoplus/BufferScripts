@@ -29,15 +29,15 @@ burstdest=/raid/data/burst
 updatefilelists(){
 # Get the list of files available to ship
 ## L1
-ls $l1dir | grep .zdab > nlugtemp.txt
+find $l1dir | grep .zdab > nlugtemp.txt
 sort nlugtemp.txt > $LSl1
 rm nlugtemp.txt
 ## L2
-ls $l2dir | grep .zdab > nlugtemp.txt
+find $l2dir | grep .zdab > nlugtemp.txt
 sort nlugtemp.txt > $LSl2
 rm nlugtemp.txt
 ## Bursts
-ls $burstdir | grep .zdab > nlugtemp.txt
+find $burstdir | grep .zdab > nlugtemp.txt
 sort nlugtemp.txt > $LSburst
 rm nlugtemp.txt
 
@@ -76,19 +76,19 @@ do
   # L1
   if [ $(comm -23 $LSl1 $FLl1 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -t $l1dir/$(comm -23 $LSl1 $FLl1) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LSl1 $FLl1) | head -n 1)
     scp $FILE $NLUG:$l1dest/$FILE 
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -t $l2dir/$(comm -23 $LSl2 $FLl2) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LSl2 $FLl2) | head -n 1)
     scp $FILE $NLUG:$l2dest/$FILE
   fi
   # bursts
   if [ $(comm -23 $LSburst $FLburst | wc -l) -gt 0 ]
   then
-    FILE=$(ls -t $burstdir/$(comm -23 $LSburst $FLburst) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LSburst $FLburst) | head -n 1)
     scp $FILE $NLUG:$burstdest/$FILE
   fi
   # Don't sleep for too long to reduce latency in getting burst
