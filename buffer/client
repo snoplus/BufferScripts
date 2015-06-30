@@ -91,7 +91,7 @@ then
   cp $testLS $testFL
 fi
 comm -12 $testLS $testFL > temp.txt
-sort temp.txt
+sort temp.txt > $testFL
 rm temp.txt
 
 # Then check for new data
