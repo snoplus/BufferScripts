@@ -29,7 +29,7 @@ NLUG=192.168.80.138
 updatefilelists(){
 # Get the list of files available to ship
 ## L1
-find $l1dir | grep .zdab > nlugtemp.txt
+find $l1dir -name *.zdab > nlugtemp.txt
 sort nlugtemp.txt > $LSl1
 rm nlugtemp.txt
 ## L2
@@ -109,7 +109,7 @@ do
   # test
   if [ $(comm -23 $LStest $FLtest | wc -l) -gt 0 ]
   then
-    FILE=$(ls -t $(comm -23 $LSburst $FLburst) | tail -n 1)
+    FILE=$(ls -t $(comm -23 $LStest $FLtest) | tail -n 1)
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLtest
   fi
