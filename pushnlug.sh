@@ -77,23 +77,19 @@ do
   if [ $(comm -23 $LSl1 $FLl1 | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSl1 $FLl1) | head -n 1)
-    scp $FILE $NLUG:$l1dest/$FILE 
-    # This is only a link so we can rm it once it is copied
-    rm $FILE
+    scp $l1dir/$FILE $NLUG:$l1dest/$FILE 
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSl2 $FLl2) | head -n 1)
-    scp $FILE $NLUG:$l2dest/$FILE
-    # This is only a link so we can rm it once it is copied
-    rm $FILE
+    scp $l2dir/$FILE $NLUG:$l2dest/$FILE
   fi
   # bursts
   if [ $(comm -23 $LSburst $FLburst | wc -l) -gt 0 ]
   then
     FILE=$(ls -lt $(comm -23 $LSburst $FLburst) | head -n 1)
-    scp $FILE $NLUG:$burstdest/$FILE
+    scp $burstdir/$FILE $NLUG:$burstdest/$FILE
   fi
   # Don't sleep for too long to reduce latency in getting burst
   # files to nlug
