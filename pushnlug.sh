@@ -18,9 +18,6 @@ FLl2=/home/trigger/BufferScripts/nlug/fll2.txt
 FLburst=/home/trigger/BufferScripts/nlug/flburst.txt
 ## nlug stuff
 NLUG=192.168.80.138
-l2dest=/raid/data/l2
-l1dest=/raid/data/zdab
-burstdest=/raid/data/burst
 #--------------------------------------------------
 
 # This function updates the text files holding the lists of files
@@ -77,19 +74,19 @@ do
   if [ $(comm -23 $LSl1 $FLl1 | wc -l) -gt 0 ]
   then
     FILE=$(ls -t $(comm -23 $LSl1 $FLl1) | head -n 1)
-    scp $FILE $NLUG:$l1dest/$FILE 
+    scp $FILE $NLUG:$FILE 
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
   then
     FILE=$(ls -t $(comm -23 $LSl2 $FLl2) | head -n 1)
-    scp $FILE $NLUG:$l2dest/$FILE
+    scp $FILE $NLUG:$FILE
   fi
   # bursts
   if [ $(comm -23 $LSburst $FLburst | wc -l) -gt 0 ]
   then
     FILE=$(ls -t $(comm -23 $LSburst $FLburst) | head -n 1)
-    scp $FILE $NLUG:$burstdest/$FILE
+    scp $FILE $NLUG:$FILE
   fi
   # Don't sleep for too long to reduce latency in getting burst
   # files to nlug
