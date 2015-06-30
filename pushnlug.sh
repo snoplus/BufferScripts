@@ -18,9 +18,6 @@ FLl2=/home/trigger/BufferScripts/nlug/fll2.txt
 FLburst=/home/trigger/BufferScripts/nlug/flburst.txt
 ## nlug stuff
 NLUG=192.168.80.138
-l2dest=/raid/data/l2
-l1dest=/raid/data/l1
-burstdest=/raid/data/burst
 #--------------------------------------------------
 
 # This function updates the text files holding the lists of files
