@@ -9,13 +9,16 @@
 burstdir=/raid/data/burst
 l1dir=/raid/data/l1
 l2dir=/raid/data/l2
+testdir=/raid/data/test
 ## filelist files
 LSl1=/home/trigger/BufferScripts/nlug/lsl1.txt
 LSl2=/home/trigger/BufferScripts/nlug/lsl2.txt
 LSburst=/home/trigger/BufferScripts/nlug/lsburst.txt
+LStest=/home/trigger/BufferScripts/nlug/lstest.txt
 FLl1=/home/trigger/BufferScripts/nlug/fll1.txt
 FLl2=/home/trigger/BufferScripts/nlug/fll2.txt
 FLburst=/home/trigger/BufferScripts/nlug/flburst.txt
+FLtest=/home/trigger/BufferScripts/nlug/fltest.txt
 ## nlug stuff
 NLUG=192.168.80.138
 #--------------------------------------------------
@@ -37,6 +40,10 @@ rm nlugtemp.txt
 find $burstdir | grep .zdab > nlugtemp.txt
 sort nlugtemp.txt > $LSburst
 rm nlugtemp.txt
+## Test
+find $testdir | grep .zdab > nlugtemp.txt
+sort nlugtemp.txt > $LStest
+rm nlugtemp.txt
 
 # If there is no $FL file, assume we want to ship everything available
 if [ ! -f $FLl1 ]
@@ -51,6 +58,10 @@ if [ ! -f $FLburst ]
 then
   cp $LSburst $FLburst
 fi
+if [ ! -f $FLtest ]
+then
+  cp $LStest $FLtest
+fi
 
 # Drop files from $FL no longer in $LS
 comm -12 $LSl1 $FLl1 > nlugtemp.txt
@@ -63,6 +74,10 @@ rm nlugtemp.txt
 
 comm -12 $LSburst $FLburst > nlugtemp.txt
 sort nlugtemp.txt > $FLburst
+rm nlugtemp.txt
+
+comm -12 $LStest $FLtest > nlugtemp.txt
+sort nlugtemp.txt > $FLtest
 rm nlugtemp.txt
 }
 
@@ -91,6 +106,12 @@ do
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLburst
   fi
+  # test
+  if [ $(comm -23 $LStest $FLtest | wc -l) -gt 0 ]
+  then
+    FILE=$(ls -t $(comm -23 $LSburst $FLburst) | tail -n 1)
+    scp $FILE $NLUG:$FILE
+    echo $FILE >> $FLtest
   # Don't sleep for too long to reduce latency in getting burst
   # files to nlug
   sleep 1
