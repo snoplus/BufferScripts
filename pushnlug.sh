@@ -73,21 +73,21 @@ do
   # L1
   if [ $(comm -23 $LSl1 $FLl1 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -t $(comm -23 $LSl1 $FLl1) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LSl1 $FLl1) | tail -n 1)
     scp $FILE $NLUG:$FILE 
     echo $FILE >> $FLl1
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
   then
-    FILE=$(ls -t $(comm -23 $LSl2 $FLl2) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LSl2 $FLl2) | tail -n 1)
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLl2
   fi
   # bursts
   if [ $(comm -23 $LSburst $FLburst | wc -l) -gt 0 ]
   then
-    FILE=$(ls -t $(comm -23 $LSburst $FLburst) | head -n 1)
+    FILE=$(ls -t $(comm -23 $LSburst $FLburst) | tail -n 1)
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLburst
   fi
