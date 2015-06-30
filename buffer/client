@@ -180,7 +180,12 @@ do
       rm $SERVERDIR/filereceived
       kill $PID
       echo INFO - Reached end of $FILE
-      echo $FILE >> $FL
+      if [ $TEST -eq 0 ]
+      then
+        echo $FILE >> $FL
+      else
+        echo $FILE >> $testFL
+      fi
       TRIES=0
       DONE=1
     elif [ -f $SERVERDIR/filetryagain ]
@@ -194,7 +199,12 @@ do
       rm $SERVERDIR/filefailed
       kill $PID
       echo INFO - Server will not try to read file $FILE again.
-      echo $FILE >> $FL
+      if [ $TEST -eq 0 ]
+      then
+        echo $FILE >> $FL
+      else
+        echo $FILE >> $testFL
+      fi
       let TRIES++
     else
       echo DEBUG - Message file disappeared
