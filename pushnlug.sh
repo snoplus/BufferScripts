@@ -67,6 +67,7 @@ rm nlugtemp.txt
 comm -12 $LSburst $FLburst > nlugtemp.txt
 sort nlugtemp.txt > $FLburst
 rm nlugtemp.txt
+}
 
 # MAIN
 while true
