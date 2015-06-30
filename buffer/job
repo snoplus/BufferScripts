@@ -5,19 +5,36 @@ NAME=$2
 L1=$3
 GRIDREADY=$4
 REDISHOST=$5
+GRIDREADYTEST=/raid/data/test
 
 REDISNAME=SNOP_$NAME.zdab
+
+# Check if it is a test
+if [[ $NAME == test* ]]
+then
+  TEST=1
+  FINALNAME=$(echo $NAME | cut -c 5-)
+else
+  TEST=0
+fi
 
 redis-cli -h $REDISHOST ZREM l2:wait $REDISNAME
 redis-cli -h $REDISHOST ZADD l2:rat $(date +%s) $REDISNAME
 
 if rat $MAC/$NAME.mac -l rat.$NAME.log
 then
-  mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADY/SNOP_$NAME.l2.root
-  mv /home/trigger/zdab/$NAME.zdab $GRIDREADY/SNOP_$NAME.l2.zdab
-  mv /home/trigger/BufferScripts/$NAME.lock $GRIDREADY/SNOP_$NAME.lock
-  rm $MAC/$NAME.mac
-  mv $L1 /raid/data/$L1
+  if [ $TEST -eq 0 ]
+  then
+    mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADY/SNOP_$NAME.l2.root
+    mv /home/trigger/zdab/$NAME.zdab $GRIDREADY/SNOP_$NAME.l2.zdab
+    mv /home/trigger/zdab/$NAME.lock $GRIDREADY/SNOP_$NAME.lock
+    rm $MAC/$NAME.mac
+    mv $L1 /raid/data/$L1
+  else
+    mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADYTEST/SNOP_$FINALNAME.l2.root
+    mv /home/trigger/zdab/$NAME.zdab $GRIDREADYTEST/SNOP_$FINALNAME.l2.zdab
+    mv /home/trigger/zdab/$NAME.lock $GRIDREADYTEST/SNOP_$FINALNAME.lock
+  fi
   redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
   redis-cli -h $REDISHOST ZADD l2:done $(date +%s) $REDISNAME
 else
