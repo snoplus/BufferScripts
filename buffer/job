@@ -28,13 +28,13 @@ then
     mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADY/SNOP_$NAME.l2.root
     mv /home/trigger/zdab/$NAME.zdab $GRIDREADY/SNOP_$NAME.l2.zdab
     mv /home/trigger/zdab/$NAME.lock $GRIDREADY/SNOP_$NAME.lock
-    rm $MAC/$NAME.mac
-    mv $L1 /raid/data/$L1
   else
     mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADYTEST/SNOP_$FINALNAME.l2.root
     mv /home/trigger/zdab/$NAME.zdab $GRIDREADYTEST/SNOP_$FINALNAME.l2.zdab
     mv /home/trigger/zdab/$NAME.lock $GRIDREADYTEST/SNOP_$FINALNAME.lock
   fi
+  rm $MAC/$NAME.mac
+  mv $L1 /raid/data/$L1
   redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
   redis-cli -h $REDISHOST ZADD l2:done $(date +%s) $REDISNAME
 else

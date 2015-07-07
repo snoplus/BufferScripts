@@ -9,3 +9,9 @@ runtype: runtype.o
 
 runtype.o: runtype.cpp
 	g++ -c runtype.cpp $(CFLAGS)
+
+dqxx: dqxx.o
+	g++ -o dqxx dqxx.o $(LINKFLAGS)
+
+dqxx.o: dqxx.cpp
+	g++ -c dqxx.cpp $(CFLAGS)
