@@ -107,7 +107,7 @@ fullrun(){
       echo $LASTSUBRUN > $l2donedir/$LASTRUN
     fi
   else
-    # Not last file, check whether this completes any other runs
+    # Not last file, check whether this completes a finished run anyway
     if [ -f $l2donedir/$LASTRUN ]
     then
       SUBFILES=$(echo $l2donedir/$LASTRUN)
