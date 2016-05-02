@@ -18,7 +18,12 @@ else
   TEST=0
 fi
 
-redis-cli -h $REDISHOST ZREM l2:wait $REDISNAME
+if [ $TEST -eq 0 ]
+then
+  redis-cli -h $REDISHOST ZREM l2:wait $REDISNAME
+else
+  redis-cli -h $REDISHOST ZREM l2:wait SNOP_$FINALNAME.zdab
+fi
 redis-cli -h $REDISHOST ZADD l2:rat $(date +%s) $REDISNAME
 
 if rat $MAC/$NAME.mac -l rat.$NAME.log
@@ -27,11 +32,11 @@ then
   then
     mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADY/SNOP_$NAME.l2.root
     mv /home/trigger/zdab/$NAME.zdab $GRIDREADY/SNOP_$NAME.l2.zdab
-    mv /home/trigger/zdab/$NAME.lock $GRIDREADY/SNOP_$NAME.lock
+    mv /home/trigger/BufferScripts/$NAME.lock $GRIDREADY/SNOP_$NAME.lock
   else
     mv /home/trigger/BufferScripts/$NAME.l2.root $GRIDREADYTEST/SNOP_$FINALNAME.l2.root
     mv /home/trigger/zdab/$NAME.zdab $GRIDREADYTEST/SNOP_$FINALNAME.l2.zdab
-    mv /home/trigger/zdab/$NAME.lock $GRIDREADYTEST/SNOP_$FINALNAME.lock
+    mv /home/trigger/BufferScripts/$NAME.lock $GRIDREADYTEST/SNOP_$FINALNAME.lock
   fi
   rm $MAC/$NAME.mac
   mv $L1 /raid/data/$L1
