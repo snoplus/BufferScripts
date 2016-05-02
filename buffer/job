@@ -42,6 +42,7 @@ then
   mv $L1 /raid/data/$L1
   redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
   redis-cli -h $REDISHOST ZADD l2:done $(date +%s) $REDISNAME
+  redis-cli -h $REDISHOST ZREMRANGEBYRANK l2:done -12 -11
 else
   redis-cli -h $REDISHOST ZREM l2:rat $REDISNAME
   redis-cli -h $REDISHOST ZADD l2:fail $(date +%s) $REDISNAME

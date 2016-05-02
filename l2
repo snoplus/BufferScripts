@@ -22,8 +22,7 @@ RATENV=/opt/env/latest.sh           # Location of rat_env.sh script
 DONTDELETE=$BS/dontdelete           # directory for writing deletion locks
 SSHFS=$HOME/builderdata             # directory where builder is sshfs mounted
 DATA=$SSHFS                         # normal data directory
-TESTDATA=$HOME/testbuilderdata
-#TESTDATA=$HOME/testbuilderdata      # test data directory
+TESTDATA=$HOME/testbuilderdata      # test data directory
 CHOPPER=$HOME/stonehenge/stonehenge.sh # Location of Stonehenge program
 REDISHOST=192.168.80.128            # Location of monitoring redis db
 #----------------------------------------------------------
