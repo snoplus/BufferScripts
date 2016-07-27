@@ -129,6 +129,8 @@ do
     FILE=$(ls -t $(comm -23 $LSl1 $FLl1) | tail -n 1)
     scp $FILE $NLUG:$FILE 
     echo $FILE >> $FLl1
+    sort $FLl1 > nlugtemp.txt
+    mv nlugtemp.txt > $FLl1
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
@@ -136,6 +138,8 @@ do
     FILE=$(ls -t $(comm -23 $LSl2 $FLl2) | tail -n 1)
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLl2
+    sort $FLl2 > nlugtemp.txt
+    mv nlugtemp.txt > $FLl2
     fullrun
   fi
   # bursts
@@ -144,6 +148,8 @@ do
     FILE=$(ls -t $(comm -23 $LSburst $FLburst) | tail -n 1)
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLburst
+    sort $FLburst > nlugtemp.txt
+    mv nlugtemp.txt > $FLburst
   fi
   # test
   if [ $(comm -23 $LStest $FLtest | wc -l) -gt 0 ]
@@ -151,6 +157,8 @@ do
     FILE=$(ls -t $(comm -23 $LStest $FLtest) | tail -n 1)
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLtest
+    sort $FLtest > nlugtemp.txt
+    mv nlugtemp.txt > $FLtest
   fi
   # Don't sleep for too long to reduce latency in getting burst
   # files to nlug
