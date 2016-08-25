@@ -148,7 +148,6 @@ do
     SUBRUN2=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $SUBRUN2 | awk 'BEGIN {FS="."}{print $1}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $6}' )
-    TEMPBIGFILE=$( echo $BIGFILE"."$TRIES)
     NAME=$RUN"_"$SUBRUN 
     if [ $TEST -eq 1 ]
     then
@@ -166,8 +165,7 @@ do
     fi 
     
 # Receive file - try three times, report errors
-    tail -f -c +1 $FILE | tee -a $L1/$TEMPBIGFILE \
-                        | chopper &
+    tail -f -c +1 $FILE | chopper &
     PID=$( jobs -lp | tail -n 1)
     redis-cli -h $REDISHOST ZADD l2:process $(date +%s) $BIGFILE
     while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ]
@@ -213,7 +211,6 @@ do
 # If file successfully received, prepare for conversion
     if [ $DONE -eq 1 ]
     then
-      mv $L1/$TEMPBIGFILE $L1/$BIGFILE
       cat > $MAC/$NAME.mac << EOF
 
 /rat/physics_list/OmitAll true
@@ -229,7 +226,7 @@ exit
 EOF
 
       JOBFILE=$JOBQUEUE/$NAME
-      echo $SERVERDIR/job $MAC $NAME $L1/$BIGFILE $GRIDREADY $REDISHOST >> $JOBFILE
+      echo $SERVERDIR/job $MAC $NAME $DATA/$BIGFILE $GRIDREADY $REDISHOST >> $JOBFILE
       echo SUCCESS - Stonehenge done with run $NAME
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
       redis-cli -h $REDISHOST ZADD l2:wait $(date +%s) $BIGFILE
