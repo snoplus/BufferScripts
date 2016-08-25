@@ -23,7 +23,7 @@ FLtest=/home/trigger/BufferScripts/nlug/fltest.txt
 ## nlug stuff
 NLUG=192.168.80.138
 ## builder directory
-BUILDER=/home/trigger/builderdata
+BUILDERDATA=/home/trigger/builderdata
 #--------------------------------------------------
 
 # This function updates the text files holding the lists of files
@@ -92,13 +92,16 @@ fullrun(){
   LASTFILE=$(cat $FLl2 | tail -n 1)
   LASTRUN=$( echo $LASTFILE | awk 'BEGIN {FS="_"}{print $2}' )
   LASTSUBRUN=$( echo $LASTFILE | awk 'BEGIN {FS="_"}{print $3}' )
+  LASTSUBRUN=$( echo $LASTSUBRUN | cut -d '.' -f1)
+  GLASTSUBRUN=\'$LASTSUBRUN\.\'
   # Next, check whether builder is done
-  BUILDERFILE=$(ls $BUILDERDATA | grep done | grep $LASTRUN | grep $LASTSUBRUN)
-  if[ $(cat $BUILDERFILE | grep END_RUN | wc -l) ]
+  BUILDERFILE=$(ls $BUILDERDATA | grep closed | grep $LASTRUN | grep $GLASTSUBRUN)
+  if [ $(cat $BUILDERDATA/'SNOP_'$LASTRUN'_'$LASTSUBRUN'.zdab_closed' | grep END_RUN | wc -l) -ne 0 ]
   then
     # Builder is done 
     # Check whether other subfiles have been shipped
-    if [ $(cat FLl2 | grep $LASTRUN | wc -l) -eq $LASTSUBFILE - 1 ]
+    let "LASTSUBRUN +=1"
+    if [ $(cat $FLl2 | grep $LASTRUN | wc -l) -eq $LASTSUBRUN ]
     then
       # All files shipped - tell nlug
       ssh $NLUG touch $l2donedir/$LASTRUN
