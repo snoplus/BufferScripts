@@ -10,6 +10,7 @@ burstdir=/raid/data/burst
 l1dir=/raid/data/l1
 l2dir=/raid/data/l2
 testdir=/raid/data/test
+zdabdir=/raid/data/zdab
 l2donedir=/home/trigger/l2done
 ## filelist files
 LSl1=/home/trigger/BufferScripts/nlug/lsl1.txt
@@ -32,7 +33,13 @@ BUILDERDATA=/raid/data/l1
 updatefilelists(){
 # Get the list of files available to ship
 ## L1
-find $l1dir -name *.zdab > nlugtemp.txt
+for i in $(find /raid/data/l1 -name *.zdab)
+do
+  if [ -f $i'_closed' ]
+  then
+    echo $i >> nlugtemp.txt
+  fi
+done
 sort nlugtemp.txt > $LSl1
 rm nlugtemp.txt
 ## L2
@@ -134,6 +141,14 @@ do
     echo $FILE >> $FLl1
     sort $FLl1 > nlugtemp.txt
     mv nlugtemp.txt $FLl1
+    ZCOUNT=$(ssh nlug "ls /raid/data/zdab" | wc -l)
+    if [ $ZCOUNT -eq 10 ]
+    then
+      ZFILE=$(ssh nlug "ls -tr /raid/data/zdab" | tail -n 1)
+      ssh nlug "rm /raid/data/zdab/$ZFILE"
+    fi
+    ZFILE=$(ssh nlug 'ls -tr /raid/data/l1' | tail -n 1)
+    ssh nlug "cp /raid/data/l1/$ZFILE /raid/data/zdab/$ZFILE"
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
