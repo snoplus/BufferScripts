@@ -23,7 +23,7 @@ FLtest=/home/trigger/BufferScripts/nlug/fltest.txt
 ## nlug stuff
 NLUG=192.168.80.138
 ## builder directory
-BUILDERDATA=/home/trigger/builderdata
+BUILDERDATA=/raid/data/l1
 #--------------------------------------------------
 
 # This function updates the text files holding the lists of files
@@ -133,7 +133,7 @@ do
     scp $FILE $NLUG:$FILE 
     echo $FILE >> $FLl1
     sort $FLl1 > nlugtemp.txt
-    mv nlugtemp.txt > $FLl1
+    mv nlugtemp.txt $FLl1
   fi
   # L2
   if [ $(comm -23 $LSl2 $FLl2 | wc -l) -gt 0 ]
@@ -142,7 +142,7 @@ do
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLl2
     sort $FLl2 > nlugtemp.txt
-    mv nlugtemp.txt > $FLl2
+    mv nlugtemp.txt $FLl2
     fullrun
   fi
   # bursts
@@ -152,7 +152,7 @@ do
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLburst
     sort $FLburst > nlugtemp.txt
-    mv nlugtemp.txt > $FLburst
+    mv nlugtemp.txt $FLburst
   fi
   # test
   if [ $(comm -23 $LStest $FLtest | wc -l) -gt 0 ]
@@ -161,7 +161,7 @@ do
     scp $FILE $NLUG:$FILE
     echo $FILE >> $FLtest
     sort $FLtest > nlugtemp.txt
-    mv nlugtemp.txt > $FLtest
+    mv nlugtemp.txt $FLtest
   fi
   # Don't sleep for too long to reduce latency in getting burst
   # files to nlug
