@@ -163,13 +163,29 @@ do
 #     CONFIGFILE=$(runtype $RUN)
       CONFIGFILE=~/chopper/default.cnfg
     fi 
-    
+
 # Receive file - try three times, report errors
-    tail -f -c +1 $FILE | chopper &
+    FILESTOPROCESS=$(comm -23 $LS $FL)
+    if [ $FILESTOPROCESS -gt 1 ]
+    then
+      tail -c +1 $FILE | chopper &
+    else
+      tail -f -c +1 $FILE | chopper &
+    fi
     PID=$( jobs -lp | tail -n 1)
     redis-cli -h $REDISHOST ZADD l2:process $(date +%s) $BIGFILE
-    while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ]
+    while [ ! -f $SERVERDIR/filereceived ] && [ ! -f $SERVERDIR/filetryagain ] && [ ! -f $SERVERDIR/filefailed ] && [ ! -f $SERVERDIR/fileended ]
     do
+# Check whether we need to move on
+      FILESTOPROCESS=$(comm -23 $LS $FL)
+      if [ $FILESTOPROCESS -gt 1 ]
+      then
+        WAITTIME=$($(date +%s) - $(date +%s -r /raid/data/l2/SNOP_$NAME.l2.zdab))
+        if [ $WAITTIME -gt 60 ]
+        then
+          touch $SERVERDIR/fileended
+        fi
+      fi 
       sleep 1
     done
     if [ -f $SERVERDIR/filereceived ]
@@ -204,6 +220,11 @@ do
         echo $FILE >> $testFL
       fi
       let TRIES++
+    elif [ -f $SERVERDIR/fileended ]
+    then
+      rm $SERVERDIR/fileended
+      kill $PID
+      echo INFO - File ended unexpectedly
     else
       echo DEBUG - Message file disappeared
     fi
