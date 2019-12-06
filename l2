@@ -2,28 +2,25 @@
 
 # This script can start and stop the three main components of the L2 system:
 # the client, convert, and manager scripts.  It tracks the PGIDs of these
-# processes in the file $PGID.  When starting, it also ensures that the 
+# processes in the file $PGID.  When starting, it also ensures that the
 # necessary files and directory structures are present, and, if not, constructs
 # them.
 
 # Do not delete this weird line
 # It sets the option which assigns new pgid's to backgrounded pipelines
+
+# 2019 update to remove L2 output and disentangle from pushnlug
+
 set -m
 
 # Organization of locations.  Set directory structure here:
-BS=$HOME/BufferScripts              # Path to the BufferScripts repository
-FILESYSTEM=/raid                    # Buffer filesystem
-L1=$FILESYSTEM/data/l1              # Directory for raw data
-LOGDIR=$BS/log                      # Central location for L2 log files
-ZDAB=$HOME/zdab                     # Directory for post-L2 zdab files
-MAC=$BS/mac                         # Directory for conversion macros
-GRIDREADY=$FILESYSTEM/data/l2       # Output directory for finished products
-RATENV=/opt/env/latest.sh           # Location of rat_env.sh script
-DONTDELETE=$BS/dontdelete           # directory for writing deletion locks
-DATA=$FILESYSTEM/data/l1            # normal data directory
-TESTDATA=$HOME/testbuilderdata      # test data directory
-CHOPPER=$HOME/stonehenge/stonehenge.sh # Location of Stonehenge program
-REDISHOST=192.168.80.128            # Location of monitoring redis db
+BS=$HOME/BufferScripts                  # Path to the BufferScripts repository
+FILESYSTEM=/raid                        # Buffer filesystem
+L1=$FILESYSTEM/data/l1                  # Directory for raw data
+LOGDIR=$BS/log                          # Central location for L2 log files
+DATA=$FILESYSTEM/data/l1                # normal data directory
+CHOPPER=$HOME/stonehenge/stonehenge.sh  # Location of Stonehenge program
+REDISHOST=192.168.80.128                # Location of monitoring redis db
 #----------------------------------------------------------
 # Below this line we specify the relative paths to different components of
 # the L2 system.  This should not need to be edited to reflect local installations.
@@ -32,11 +29,6 @@ SERVERLS=$BS/buffer/ls.txt
 CLIENT=$BS/buffer/client
 STONELOG=$LOGDIR/stone.log
 CLIENTLOG=$LOGDIR/client.log
-JOBQUEUE=$BS/buffer/jobs
-CONVERT=$BS/buffer/convert
-CONVERTLOG=$LOGDIR/convert.log
-MANAGER=$BS/buffer/manager
-MANAGERLOG=$LOGDIR/manager.log
 PGIDFILE=$BS/pgid.txt
 MONITOR=$BS/monitor.py
 #-----------------------------------------------------------
@@ -79,14 +71,14 @@ parsepgid(){
           exit 1
           ;;
        esac
-    done < $PGIDFILE 
+    done < $PGIDFILE
   fi
 }
 
 # This function updates the PGID file
 # Should only be called if parsepgid has already been called
 writepgid(){
-  echo -e $clientpgid '\n'$convertpgid '\n'$managerpgid > $PGIDFILE 
+  echo -e $clientpgid '\n'$convertpgid '\n'$managerpgid > $PGIDFILE
 }
 
 # This function starts individual scripts
@@ -97,34 +89,13 @@ startprocess(){
     "client")
       if [ "$clientpgid" -eq 0 ]
       then
-        $CLIENT $L1 $STONELOG $CHOPPER $JOBQUEUE $MAC \
-        $GRIDREADY $DATA $TESTDATA $SERVERFL $SERVERLS $REDISHOST $ZDAB \
+        $CLIENT $L1 $STONELOG $CHOPPER \
+        $DATA $SERVERFL $SERVERLS $REDISHOST \
         2>> $CLIENTLOG | python $MONITOR L2-client >> $CLIENTLOG 2>&1 &
         clientpgid=$(jobs -lp | tail -n 1)
       else
         echo Client process was already running.
       fi
-      ;;
-    "convert")
-      if [ "$convertpgid" -eq 0 ]
-      then
-        $CONVERT $JOBQUEUE $CONVERTLOG $MAC $RATENV $REDISHOST \
-         $ZDAB 2>> $CONVERTLOG | \
-         python $MONITOR L2-convert >> $CONVERTLOG 2>&1 &
-        convertpgid=$(jobs -lp | tail -n 1)
-      else
-        echo Convert process was already running.
-      fi
-      ;;
-    "manager")
-      if [ "$managerpgid" -eq 0 ]
-      then
-        $MANAGER $FILESYSTEM $L1 $DONTDELETE $MAC 2>> $MANAGERLOG | \
-         python $MONITOR L1-delete >> $MANAGERLOG 2>&1 &
-        managerpgid=$(jobs -lp | tail -n 1)
-      else
-        echo Manager process was already running.
-      fi 
       ;;
     *)
       echo -e 'Invalid process name passed\n'
@@ -149,24 +120,6 @@ stopprocess(){
       echo Client process was not running.
     fi
     ;;
-  "convert")
-    if [ $convertpgid -ne 0 ]
-    then
-      kill -- -$convertpgid
-      convertpgid=0
-    else
-      echo Convert process was not running.
-    fi
-    ;;
-  "manager")
-    if [ $managerpgid -ne 0 ]
-    then
-      kill -- -$managerpgid
-      managerpgid=0
-    else
-      echo Manager process was not running.
-    fi
-    ;;
   *)
     echo -e 'Invalid process name passed.\n'
     echo -e 'Valid options are client, convert, and manager.\n'
@@ -174,56 +127,6 @@ stopprocess(){
     ;;
   esac
   writepgid
-}
-
-# This function sets up the L2 scripts to start
-start_all(){
-  parsepgid
-  if [[ "$clientpgid" -eq 0 && "$convertpgid" -eq 0 && "$managerpgid" -eq 0 ]]
-  then
-    echo Preparing file structure...
-    if [ ! -d $LOGDIR ]
-    then
-      mkdir $LOGDIR
-    fi
-    if [ ! -d $ZDAB ]
-    then
-      mkdir $ZDAB
-    fi
-    if [ ! -d $MAC ]
-    then
-      mkdir $MAC
-    fi
-    if [ ! -d $L1 ]
-    then
-      mkdir $L1
-    fi
-    if [ ! -d $JOBQUEUE ]
-    then
-      mkdir $JOBQUEUE
-    fi
-    if [ ! -d $DONTDELETE ]
-    then
-      echo No DONTDELETE folder!  Aborting!
-      exit 0
-    fi
-    echo File structure prepared.
-    echo Starting level 2 scripts...
-    startprocess client
-    startprocess convert
-    startprocess manager
-  else
-    echo Some processes were already running.  Please stop all scripts before \
-         using the -a option.  If you do not want to stop running processes, \
-         you can start the processes one at a time using the -s option.
-  fi
-}
-
-stop_all(){
-  echo Killing L2 processes
-  stopprocess client
-  stopprocess convert
-  stopprocess manager
 }
 
 # MAIN
