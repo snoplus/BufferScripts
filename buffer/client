@@ -5,59 +5,46 @@
 # When Stonehenge runs to completion, it touches the the file filereceived,
 # filetryagain, or filefailed, depending on how it has exited.  This triggers
 # this script to move on to the next file (or try again as appropriate).
-# If Stonehenge completed successfully, the script prepares a macro for its
-# further processing, and creates a file in the job queue.
 
 # This script is designed for use with the L2 Master Script.  It can be run
 # independently by giving it the arguments listed below:
+
+# 2019 update to remove L2 and disentangle from pushnlug
 
 # Specifying where things are located
 L1=$1
 LOG=$2
 CHOPPER=$3
-JOBQUEUE=$4
-MAC=$5
-GRIDREADY=$6
 SERVERDIR=~/BufferScripts/buffer
-DATA=$7
-TESTDATA=$8
-FL=$9
-LS=${10}
-REDISHOST=${11}
-ZDAB=${12}
-testFL=~/BufferScripts/buffer/testfl.txt
-testLS=~/BufferScripts/buffer/testls.txt
+DATA=$4
+FL=$5
+LS=$6
+REDISHOST=$7
 
 # This function is a wrapper for Stonehenge, which will send the appropriate
 # signals to the server
 chopper()
 {
-if [ $TEST -eq 0 ]
-then
-  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES -b burst >> $LOG
-  STONEHENGERETURN=$?
-else
-  $CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES -b burst >> $LOG
-  STONEHENGERETURN=$?
-fi
+$CHOPPER -i /dev/stdin -o $NAME -r -c $CONFIGFILE -s $TRIES -b burst >> $LOG
+STONEHENGERETURN=$?
 if [ $STONEHENGERETURN -eq 0 ]
 then
-  echo SUCCESS - Stonehenge finished processing file $FILE successfully. 
-  touch $SERVERDIR/filereceived 
+  echo SUCCESS - Stonehenge finished processing file $FILE successfully.
+  touch $SERVERDIR/filereceived
 else
-  echo WARNING - Stonehenge exited on file $FILE. 
+  echo WARNING - Stonehenge exited on file $FILE.
   if [ $TRIES -lt 2 ]
   then
-    echo INFO - Trying to read file $FILE again. 
+    echo INFO - Trying to read file $FILE again.
     touch $SERVERDIR/filetryagain
   else
-    echo ERROR - Three failured trying to process file $FILE.  Moving on. 
+    echo ERROR - Three failured trying to process file $FILE.  Moving on.
     touch $SERVERDIR/filefailed
   fi
 fi
 }
 
-# This function updates the text files holding the lists of files available 
+# This function updates the text files holding the lists of files available
 # on the builder, and the list of files we have already processed.
 updatefilelists()
 {
@@ -78,31 +65,6 @@ sort temp.txt > $FL
 rm temp.txt
 }
 
-# This function checks for new testdata, if available, it echos 1,
-# otherwise, it echos 0.
-checkfortestdata()
-{
-# First update testfile lists as in updatefilelists
-ls $TESTDATA/SNOP*.zdab > temp.txt
-sort temp.txt > $testLS
-rm temp.txt
-if [ ! -f $testFL ]
-then
-  cp $testLS $testFL
-fi
-comm -12 $testLS $testFL > temp.txt
-sort temp.txt > $testFL
-rm temp.txt
-
-# Then check for new data
-if [ $(comm -23 $testLS $testFL | wc -l) -lt 1 ]
-then
-  echo 0
-else
-  echo 1
-fi
-}
-
 # MAIN - Control flow begins here
 echo SUCCESS - L2 Client starting
 TRIES=0
@@ -118,14 +80,8 @@ do
 # Check for test data only if there is no real data available
     COUNT=0
     TEST=0
-    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ] 
-    do 
-      if [ $(checkfortestdata) -eq 1 ]
-      then
-        TEST=1
-        FILE=$(ls -t $(comm -23 $testLS $testFL) | tail -n 1)
-        break
-      fi
+    while [ $(comm -23 $LS $FL | wc -l) -lt 1 ]
+    do
       sleep 1
       let COUNT++
       if [ $(( COUNT % 60 )) -eq 0 ]
@@ -143,12 +99,12 @@ do
 # TODO - Check different cases for parsing filename:
 #        SNOP, default
 #//////////////////////////
-    echo INFO - Receiving file $FILE 
+    echo INFO - Receiving file $FILE
     RUN=$( echo $FILE | awk 'BEGIN {FS="_"}{print $2}' )
     SUBRUN2=$( echo $FILE | awk 'BEGIN {FS="_"}{print $3}' )
     SUBRUN=$( echo $SUBRUN2 | awk 'BEGIN {FS="."}{print $1}' )
     BIGFILE=$( echo $FILE | awk 'BEGIN {FS="/"}{print $5}' )
-    NAME=$RUN"_"$SUBRUN 
+    NAME=$RUN"_"$SUBRUN
     if [ $TEST -eq 1 ]
     then
       NAME=test$NAME
@@ -162,7 +118,7 @@ do
       OLDRUN=$RUN
 #     CONFIGFILE=$(runtype $RUN)
       CONFIGFILE=~/stonehenge/default.cnfg
-    fi 
+    fi
 
 # Receive file - try three times, report errors
     FILESTOPROCESS=$(comm -23 $LS $FL)
@@ -180,12 +136,12 @@ do
       FILESTOPROCESS=$(comm -23 $LS $FL)
       if [ $FILESTOPROCESS -gt 1 ]
       then
-        WAITTIME=$($(date +%s) - $(date +%s -r /raid/data/l2/SNOP_$NAME.l2.zdab))
+        WAITTIME=$($(date +%s) - $(date +%s -r /raid/data/l1/SNOP_$NAME.zdab))
         if [ $WAITTIME -gt 60 ]
         then
           touch $SERVERDIR/fileended
         fi
-      fi 
+#      fi
       sleep 1
     done
     if [ -f $SERVERDIR/filereceived ]
@@ -194,12 +150,7 @@ do
       rm $SERVERDIR/filereceived
       kill $PID
       echo INFO - Reached end of $FILE
-      if [ $TEST -eq 0 ]
-      then
-        echo $FILE >> $FL
-      else
-        echo $FILE >> $testFL
-      fi
+      echo $FILE >> $FL
       TRIES=0
       DONE=1
     elif [ -f $SERVERDIR/filetryagain ]
@@ -213,12 +164,7 @@ do
       rm $SERVERDIR/filefailed
       kill $PID
       echo INFO - Server will not try to read file $FILE again.
-      if [ $TEST -eq 0 ]
-      then
-        echo $FILE >> $FL
-      else
-        echo $FILE >> $testFL
-      fi
+      echo $FILE >> $FL
       let TRIES++
     elif [ -f $SERVERDIR/fileended ]
     then
@@ -229,26 +175,9 @@ do
       echo DEBUG - Message file disappeared
     fi
 
-# If file successfully received, prepare for conversion
+# If file successfully received, end
     if [ $DONE -eq 1 ]
     then
-      cat > $MAC/$NAME.mac << EOF
-
-/rat/physics_list/OmitAll true
-/rat/inzdab/load $ZDAB/$NAME.zdab
-
-/run/initialize
-
-/rat/proclast outroot
-/rat/procset file "$NAME.l2.root"
-
-/rat/inzdab/read
-
-exit
-EOF
-
-      JOBFILE=$JOBQUEUE/$NAME
-      echo $SERVERDIR/job $MAC $NAME $DATA/$BIGFILE $GRIDREADY $REDISHOST >> $JOBFILE
       echo SUCCESS - Stonehenge done with run $NAME
       redis-cli -h $REDISHOST ZREM l2:process $BIGFILE
       redis-cli -h $REDISHOST ZADD l2:wait $(date +%s) $BIGFILE
